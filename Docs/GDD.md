@@ -176,31 +176,128 @@ Mining Drone → Hauler → Refinery → Hauler → Ship Cargo → Auto-sell at 
 
 ## Ships & Fleet
 
+### Hull System
+
+Ships are defined by their **hull**, which determines size, capacity, and equipment tier limit.
+
+#### Hull Sizes
+
+| Size | Cargo Capacity | Equipment Slots | Base Speed | Example |
+|------|----------------|-----------------|------------|---------|
+| **XS (Extra Small)** | 50 units | 4 | Very Fast | Shuttle, Probe |
+| **S (Small)** | 200 units | 6 | Fast | Scout, Interceptor |
+| **M (Medium)** | 1,000 units | 8 | Medium | Freighter, Miner |
+| **L (Large)** | 5,000 units | 10 | Slow | Heavy Freighter, Cruiser |
+| **XL (Extra Large)** | 25,000 units | 12 | Very Slow | Capital, Carrier |
+
+#### Hull Tiers (1-8)
+
+Every hull has a tier that determines what equipment it can use.
+
+| Tier | Quality | Equipment Limit | Availability |
+|------|---------|-----------------|--------------|
+| **T1** | Scrap | T1 only | Tutorial, starter |
+| **T2** | Basic | T1-T2 | Common craft |
+| **T3** | Standard | T1-T3 | Intermediate |
+| **T4** | Quality | T1-T4 | Advanced craft |
+| **T5** | Superior | T1-T5 | Rare materials |
+| **T6** | Elite | T1-T6 | Full PvP zones |
+| **T7** | Prototype | T1-T7 | Hardcore zones |
+| **T8** | Legendary | T1-T8 | Endgame, faction rewards |
+
+**Tier Rules:**
+- A T5 hull can equip any equipment T1-T5
+- A T3 hull CANNOT equip T4+ equipment
+- Higher tier = better base stats + higher equipment ceiling
+- Same size hull at higher tier is strictly better
+
 ### Ship Classes
 
-| Class | Role | Cargo | Speed | Combat |
-|-------|------|-------|-------|--------|
-| **Scout** | Exploration | Tiny | Fast | None |
-| **Freighter** | Hauling | Large | Slow | Light |
-| **Miner** | Extraction | Medium | Slow | None |
-| **Gunship** | Combat/Escort | Small | Medium | Heavy |
-| **Capital** | Command/Base | Massive | Very Slow | Medium |
+| Class | Size | Role | Specialty |
+|-------|------|------|-----------|
+| **Shuttle** | XS | Transport | Fast travel, no combat |
+| **Scout** | S | Exploration | Speed, sensors, stealth |
+| **Interceptor** | S | Combat | Fast attack, light weapons |
+| **Freighter** | M | Hauling | Max cargo for size |
+| **Miner** | M | Extraction | Built-in mining bonuses |
+| **Gunship** | M | Combat | Balanced offense/defense |
+| **Heavy Freighter** | L | Hauling | Massive cargo capacity |
+| **Cruiser** | L | Combat | Heavy weapons, tough |
+| **Capital** | XL | Command | Fleet bonuses, drone control |
+| **Carrier** | XL | Support | Launches fighter drones |
 
-### Ship Components (All Player-Crafted)
-- **Hull** - Durability, cargo space
-- **Engine** - Speed, fuel efficiency
-- **Power Core** - Energy for systems
-- **Cargo Hold** - Storage capacity
-- **Weapons** - Defense capability
-- **Shields** - Damage absorption
-- **Scanner** - Detection range
-- **Command Module** - Drone control capacity
+### Equipment System
+
+All equipment is player-crafted and has tiers (T1-T8).
+
+#### Equipment Categories
+
+| Category | Function | Slot Type |
+|----------|----------|-----------|
+| **Weapons** | Damage dealing | Weapon slot |
+| **Shields** | Damage absorption | Defense slot |
+| **Armor** | Hull reinforcement | Defense slot |
+| **Thrusters** | Speed, maneuverability | Engine slot |
+| **Power Core** | Energy capacity | Core slot |
+| **Sensors** | Detection, scanning | Utility slot |
+| **Cargo Modules** | Extra storage | Utility slot |
+| **Command Array** | Drone control | Utility slot |
+
+#### Equipment Slots by Hull Size
+
+| Hull Size | Weapon | Defense | Engine | Core | Utility |
+|-----------|--------|---------|--------|------|---------|
+| **XS** | 1 | 1 | 1 | 1 | 0 |
+| **S** | 2 | 1 | 1 | 1 | 1 |
+| **M** | 2 | 2 | 1 | 1 | 2 |
+| **L** | 3 | 3 | 2 | 1 | 1 |
+| **XL** | 4 | 4 | 2 | 2 | 2 |
+
+#### Weapon Types
+
+| Type | Range | Damage | Notes |
+|------|-------|--------|-------|
+| **Laser** | Medium | Energy | Consistent, drains shields |
+| **Cannon** | Short | Kinetic | High burst, slow fire |
+| **Missile** | Long | Explosive | Tracking, ammo-based |
+| **Railgun** | Very Long | Kinetic | Sniper, charge time |
+| **Mining Laser** | Short | Special | Resource extraction only |
+
+#### Shield Types
+
+| Type | Strength | Recharge | Notes |
+|------|----------|----------|-------|
+| **Standard** | Medium | Medium | Balanced |
+| **Reinforced** | High | Slow | Tank builds |
+| **Rapid** | Low | Fast | Hit and run |
+| **Reflective** | Medium | Medium | Energy resist |
+| **Ablative** | Medium | Medium | Kinetic resist |
+
+#### Thruster Types
+
+| Type | Speed | Agility | Fuel Use |
+|------|-------|---------|----------|
+| **Economy** | Slow | Low | Very Low |
+| **Standard** | Medium | Medium | Medium |
+| **Performance** | Fast | High | High |
+| **Afterburner** | Boost | Low | Very High |
+
+#### Sensor Types
+
+| Type | Range | Function |
+|------|-------|----------|
+| **Basic Scanner** | Short | Nearby objects |
+| **Deep Scanner** | Long | Distant detection |
+| **Resource Scanner** | Medium | Mineral deposits |
+| **Combat Scanner** | Medium | Enemy loadouts |
+| **Stealth Detector** | Medium | Reveal cloaked ships |
 
 ### Fleet Management
 - Own multiple ships
-- Assign ships to routes (automated trade)
-- Hire NPC crew or use alone
-- Fleet size limited by player progression
+- Switch active ship at stations
+- Assign ships to fleet (follow you)
+- Fleet size limited by Command skill
+- Ships in fleet consume fuel when traveling
 
 ---
 
