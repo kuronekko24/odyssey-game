@@ -51,6 +51,8 @@ Explore Planet → Extract Resources → Refine & Craft → Sell/Trade → Upgra
 
 ### Major Cities (Trade Hubs)
 
+All major cities are **Friendly Zones** - no PvP allowed within city limits.
+
 | City | System | Specialty | Market Focus |
 |------|--------|-----------|--------------|
 | **Nova Prime** | Sol Proxima | Capital, balanced | General goods, high volume |
@@ -58,6 +60,17 @@ Explore Planet → Extract Resources → Refine & Craft → Sell/Trade → Upgra
 | **Cryo Haven** | Glacius | Research | Tech components, rare elements |
 | **Dust Port** | Aridian Reach | Frontier | Mining equipment, survival gear |
 | **Nexus Gate** | Outer Ring | Crossroads | Luxury goods, exotic materials |
+
+### System Zones
+
+| System | Inner Zone | Outer Zone | Deep Space |
+|--------|------------|------------|------------|
+| **Sol Proxima** | Friendly | Mild | Mild |
+| **Vulcan Belt** | Friendly | Mild | Full |
+| **Glacius** | Friendly | Full | Full |
+| **Aridian Reach** | Mild | Full | Hardcore |
+| **Outer Ring** | Mild | Full | Hardcore |
+| **Uncharted Space** | - | Hardcore | Hardcore |
 
 ### Planet Types
 
@@ -263,10 +276,34 @@ Mining Drone → Hauler → Refinery → Hauler → Ship Cargo → Auto-sell at 
 - Ship-to-ship: Tactical, positioning-based
 - On-foot: Survival-focused, avoid or defend
 
-### PvP Zones
-- Designated high-risk, high-reward areas
-- Cargo can be looted
-- Safe zones in cities and claimed territories
+### Zone System
+
+| Zone | PvP | On Death | Resources | Typical Locations |
+|------|-----|----------|-----------|-------------------|
+| **Friendly** | None | No loss | Common | Major cities, starting areas, trade routes |
+| **Mild** | Optional | Lose cargo | Uncommon | Outer system planets, minor routes |
+| **Full** | Enabled | Lose cargo + equipment | Rare | Frontier systems, contested territories |
+| **Hardcore** | Enabled | Lose entire fleet | Exotic | Deep space, uncharted regions, endgame zones |
+
+**Zone Rules:**
+- **Friendly Zones** - Complete safety, no player attacks possible. Lower resource yields. All 5 major cities are Friendly.
+- **Mild Zones** - PvP requires both parties to be flagged (duel/war). Destroyed ships drop cargo but hull and equipment are saved.
+- **Full Zones** - Open PvP. Ships drop cargo AND equipped modules. Hull survives but stripped. Insurance can recover base hull.
+- **Hardcore Zones** - Open PvP. Total loss on destruction. Ships, cargo, equipment, drones - all gone. Highest tier resources only found here.
+
+**Risk vs Reward:**
+```
+Friendly:  ★☆☆☆☆ Risk  |  ★☆☆☆☆ Reward
+Mild:      ★★☆☆☆ Risk  |  ★★☆☆☆ Reward
+Full:      ★★★★☆ Risk  |  ★★★★☆ Reward
+Hardcore:  ★★★★★ Risk  |  ★★★★★ Reward
+```
+
+**Insurance System:**
+- Available in Friendly and Mild zones only
+- Covers base hull value (not equipment/cargo)
+- Premium based on ship class and zone
+- Cooldown period between claims
 
 ---
 
@@ -369,8 +406,7 @@ Mining Drone → Hauler → Refinery → Hauler → Ship Cargo → Auto-sell at 
 
 1. **Offline progression** - How much can happen while player is away?
 2. **Planet instances** - Shared world or instanced per player?
-3. **Ship destruction** - Lose ship or just cargo on death?
-4. **Starting experience** - Tutorial mission or freeform?
+3. **Starting experience** - Tutorial mission or freeform?
 
 ---
 
