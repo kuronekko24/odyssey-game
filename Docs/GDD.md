@@ -450,20 +450,181 @@ All equipment is player-crafted and has tiers (T1-T8).
 
 ## Economy & Markets
 
+### Economic Philosophy
+
+Odyssey runs a **closed-loop player-driven economy**:
+- The game **ONLY generates raw resources** (minerals spawn in the world)
+- **ALL equipment, items, ships are player-crafted** - no NPC vendors sell gear
+- PvP deaths create **item sinks** - goods leave the economy
+- Lost items are **recycled** back via NPC loot drops and quest rewards
+- OMEN currency has multiple **sinks** to prevent inflation
+
+```
+[World] → Raw Resources → [Players] → Crafted Goods → [Market] → [Players]
+                                            ↓
+                                      [PvP Deaths]
+                                            ↓
+                                    [Game Inventory]
+                                            ↓
+                              [NPC Drops / Quest Chests]
+                                            ↓
+                                      [Players]
+```
+
+---
+
+### Resource Extraction
+
+All crafting begins with raw material extraction from planets.
+
+#### Raw Material Categories
+
+| Category | Examples | Found On | Uses |
+|----------|----------|----------|------|
+| **Stone** | Granite,Ite,Ite, Sandite | All planets | Basic construction, filler |
+| **Common Ore** | Iron, Copper, Aluminum | Terrestrial, Barren | T1-T3 metals, components |
+| **Industrial Ore** | Titanium, Tungsten, Cobalt | Volcanic, Asteroid | T4-T5 alloys, armor |
+| **Rare Ore** | Platinum, Iridium, Osmium | Deep deposits, Moons | T6-T7 components |
+| **Exotic Ore** | Neutronium, Darkmatter Residue | Hardcore zones only | T8 legendary gear |
+| **Crystals** | Quartz, Ruby, Sapphire | Caves, volcanic vents | Energy systems, optics |
+| **Mystical Gems** | Voidstone, Ethercrystal, Soulite | Ancient ruins, anomalies | T7-T8 special equipment |
+| **Gases** | Hydrogen, Helium-3, Xenon | Gas giants, ice worlds | Fuel, coolants |
+| **Organics** | Biomass, Polymers, Compounds | Terrestrial, forests | Consumables, plastics |
+
+#### Resource Rarity by Zone
+
+| Zone | Resource Tiers Available |
+|------|--------------------------|
+| Friendly | Common, some Industrial |
+| Mild | Common, Industrial, some Rare |
+| Full | Industrial, Rare, some Exotic |
+| Hardcore | Rare, Exotic, Mystical Gems |
+
+---
+
+### Crafting Pipeline
+
+Every resource has a purpose in the production chain.
+
+```
+Raw Ore → [Refine] → Ingots/Materials → [Craft] → Components → [Assemble] → Final Product
+```
+
+#### Production Stages
+
+| Stage | Input | Output | Station |
+|-------|-------|--------|---------|
+| **Extraction** | Planet deposits | Raw ore, gems, gases | Mining equipment |
+| **Refining** | Raw ore | Ingots, pure materials | Refinery |
+| **Processing** | Gases, organics | Fuel, compounds | Processor |
+| **Crafting** | Materials | Components, parts | Fabricator |
+| **Assembly** | Components | Equipment, modules | Assembly Bay |
+| **Construction** | Modules, hulls | Ships, structures | Shipyard |
+
+#### Crafted Item Categories
+
+| Category | Examples | Tradeable |
+|----------|----------|-----------|
+| **Consumables** | Fuel cells, repair kits, ammo | Yes |
+| **Tools** | Mining drills, scanners | Yes |
+| **Equipment** | Weapons, shields, thrusters | Yes |
+| **Components** | Circuit boards, power cores | Yes |
+| **Ship Modules** | Cargo holds, engines | Yes |
+| **Ship Hulls** | Scout hull, freighter hull | Yes |
+| **Complete Ships** | Assembled vessels | Yes |
+| **Drones** | Mining, hauler, combat drones | Yes |
+
+---
+
 ### OMEN Currency
-- Universal currency across all systems
-- Earned through selling goods
-- Spent on: blueprints, station services, repairs, NPC services
+
+#### Sources (How OMEN Enters Economy)
+- **Selling goods** to other players (primary)
+- **NPC contracts** - missions pay OMEN rewards
+- **Bounties** - killing wanted players
+- **Quest rewards** - story/side missions
+- **Salvage** - selling NPC wreckage
+
+#### Sinks (How OMEN Leaves Economy)
+
+| Sink | Cost Range | Notes |
+|------|------------|-------|
+| **Repair Costs** | 1-10% of ship value | Based on damage taken |
+| **Towing Costs** | 5-20% of ship value | Emergency rescue service |
+| **Marketplace Fees** | 1-5% | Varies by city |
+| **Blueprint Research** | 1K - 1M OMEN | Learning new recipes |
+| **Station Services** | Variable | Refining, crafting station use |
+| **Storage Upgrades** | 5K - 2M OMEN | Per city |
+| **License Fees** | 10K - 500K OMEN | Trading, piloting certifications |
+| **Insurance Premiums** | 1-5% of ship value | Per coverage period |
+| **Faction Taxes** | 1-10% of earnings | If in a faction |
+| **Warp Gate Tolls** | 100 - 10K OMEN | Fast travel between systems |
+
+---
+
+### Item Sinks (PvP Death Economy)
+
+When a player dies in PvP, items are lost based on zone:
+
+| Zone | Cargo Lost | Equipment Lost | Hull Lost |
+|------|------------|----------------|-----------|
+| Friendly | 0% | 0% | 0% |
+| Mild | 100% | 0% | 0% |
+| Full | 100% | 100% | 0% |
+| Hardcore | 100% | 100% | 100% |
+
+#### What Happens to Lost Items
+
+```
+Player Death → Items Dropped
+                    ↓
+         ┌─────────┴─────────┐
+         ↓                   ↓
+    70% to Killer      30% to Game
+    (Lootable)         (Destroyed/Recycled)
+```
+
+**The 30% Game Take:**
+- Items are removed from player economy
+- Added to **Game Inventory** pool
+- Redistributed as loot from:
+  - NPC enemy drops
+  - Boss defeat rewards
+  - Quest completion chests
+  - Exploration discoveries
+
+**Why This Matters:**
+- Prevents infinite item accumulation
+- Creates demand for crafters (gear gets destroyed)
+- Rewards PvE players with recycled gear
+- Keeps economy balanced
+
+#### Item Recycling Rates
+
+| Source | Loot Quality |
+|--------|--------------|
+| Common NPCs | T1-T3 items, basic materials |
+| Elite NPCs | T3-T5 items, components |
+| Bosses | T5-T7 items, rare drops |
+| World Bosses | T6-T8 items, unique cosmetics |
+| Quest Chests | Scaled to quest difficulty |
+
+---
 
 ### Market Mechanics
 
-**Supply & Demand**
+#### OMEN Currency Flow
+- Universal currency across all systems
+- Earned through selling goods
+- Spent on: services, fees, sinks listed above
+
+#### Supply & Demand
 - Prices fluctuate based on player activity
 - Each city has different demands
 - Rare goods command premiums
 - Oversupply crashes prices
 
-**Market Types**
+#### Market Types
 | Type | Description |
 |------|-------------|
 | **Buy Orders** | Players request items at set price |
@@ -471,13 +632,13 @@ All equipment is player-crafted and has tiers (T1-T8).
 | **Instant Buy** | Buy at lowest sell price |
 | **Instant Sell** | Sell at highest buy price |
 
-**Trade Routes**
+#### Trade Routes
 - Buy low in one system, sell high in another
 - Distance affects profit potential
 - Danger increases with value
 
 ### What CAN Be Traded
-- Raw resources (only non-crafted items)
+- Raw resources
 - Refined materials
 - Components
 - Equipment and tools
@@ -489,6 +650,7 @@ All equipment is player-crafted and has tiers (T1-T8).
 - Blueprints (must be found/earned)
 - Player progression/skills
 - Reputation
+- OMEN (no direct player-to-player transfer, market only)
 
 ---
 
