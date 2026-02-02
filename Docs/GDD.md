@@ -1257,6 +1257,283 @@ Factions maintain standing military forces for territory defense.
 
 ---
 
+## Travel & Navigation
+
+### Galaxy Structure
+
+```
+                        ┌─────────────────┐
+                        │  UNCHARTED      │
+                        │    SPACE        │
+                        └────────┬────────┘
+                                 │
+          ┌──────────────────────┼──────────────────────┐
+          │                      │                      │
+    ┌─────┴─────┐          ┌─────┴─────┐          ┌─────┴─────┐
+    │  OUTER    │          │  ARIDIAN  │          │  GLACIUS  │
+    │   RING    │          │   REACH   │          │           │
+    │(Nexus Gate)          │(Dust Port)│          │(Cryo Haven)
+    └─────┬─────┘          └─────┬─────┘          └─────┬─────┘
+          │                      │                      │
+          └──────────────────────┼──────────────────────┘
+                                 │
+                        ┌────────┴────────┐
+                        │  CENTRAL NEXUS  │
+                        │     (Banx)      │
+                        └────────┬────────┘
+                                 │
+                  ┌──────────────┼──────────────┐
+                  │                             │
+            ┌─────┴─────┐                 ┌─────┴─────┐
+            │  VULCAN   │                 │    SOL    │
+            │   BELT    │                 │  PROXIMA  │
+            │  (Spira)  │                 │  (Uurf)   │
+            └───────────┘                 └───────────┘
+```
+
+---
+
+### Travel Methods
+
+#### 1. Local Travel (Within System)
+
+Movement within a single star system.
+
+| Method | Speed | Fuel Cost | Use Case |
+|--------|-------|-----------|----------|
+| **Sub-light** | Slow | None | Short distances, combat |
+| **In-system Warp** | Fast | Low | Planet to planet |
+| **Autopilot** | Medium | Low | AFK travel, safe zones |
+
+**In-system Warp:**
+- Point-to-point instant travel
+- Requires warp drive charge (5-30 seconds based on distance)
+- Can be disrupted by Warp Scramblers
+- Leaves warp signature (trackable briefly)
+
+#### 2. Inter-system Travel (Between Systems)
+
+Travel between star systems via Jump Gates or Jump Drives.
+
+| Method | Speed | Cost | Requirements |
+|--------|-------|------|--------------|
+| **Jump Gate** | Instant | Toll (OMEN) | Gate access |
+| **Jump Drive** | Instant | Fuel (high) | Ship module |
+| **Wormhole** | Instant | Free | Find entrance |
+
+---
+
+### Jump Gates
+
+Fixed structures connecting major systems. Primary method of inter-system travel.
+
+#### Gate Network
+
+| Route | Toll Cost | Zone at Gate |
+|-------|-----------|--------------|
+| Uurf ↔ Banx | 500 OMEN | Friendly |
+| Uurf ↔ Spira | 500 OMEN | Friendly |
+| Banx ↔ Spira | 500 OMEN | Friendly |
+| Banx ↔ Cryo Haven | 1,000 OMEN | Friendly |
+| Banx ↔ Dust Port | 1,000 OMEN | Mild |
+| Banx ↔ Nexus Gate | 1,500 OMEN | Mild |
+| Dust Port ↔ Nexus Gate | 2,000 OMEN | Full |
+| Nexus Gate ↔ Uncharted | 5,000 OMEN | Hardcore |
+
+#### Gate Mechanics
+
+| Feature | Details |
+|---------|---------|
+| **Activation** | Approach gate, pay toll, instant jump |
+| **Cooldown** | 60 seconds before next gate use |
+| **Cargo Scan** | Gates scan cargo (can't smuggle through) |
+| **Gate Camps** | PvP common at gates in dangerous zones |
+| **Gate Guns** | Friendly zone gates have defense turrets |
+
+#### Gate Camp Dangers
+
+Gates in Mild/Full/Hardcore zones are prime ganking locations:
+- Gankers wait on exit side
+- No gate guns to protect you
+- Must fight or escape immediately
+- Scout before jumping recommended
+
+---
+
+### Jump Drives
+
+Ship-mounted module for direct system-to-system travel without gates.
+
+#### Jump Drive Tiers
+
+| Tier | Range | Fuel Cost | Charge Time | Ship Size |
+|------|-------|-----------|-------------|-----------|
+| T3 | Adjacent systems | 500 fuel | 60s | M+ |
+| T5 | 2 systems | 1,000 fuel | 45s | M+ |
+| T7 | 3 systems | 2,000 fuel | 30s | L+ |
+| T8 | Any system | 5,000 fuel | 15s | L+ |
+
+**Jump Drive Advantages:**
+- Bypass gate camps
+- No toll fees
+- Choose entry point (not fixed gate location)
+- Element of surprise
+
+**Jump Drive Disadvantages:**
+- High fuel cost
+- Requires large ship
+- Expensive to craft
+- Creates jump signature (detectable)
+
+---
+
+### Fuel System
+
+All warp and jump travel consumes fuel.
+
+#### Fuel Types
+
+| Fuel | Source | Used For |
+|------|--------|----------|
+| **Standard Fuel** | Refined hydrogen | In-system warp |
+| **Jump Fuel** | Helium-3 + Xenon | Jump drives |
+| **Emergency Fuel** | Crafted | Single emergency warp |
+
+#### Fuel Consumption
+
+| Action | Fuel Cost |
+|--------|-----------|
+| In-system warp (short) | 10-50 units |
+| In-system warp (long) | 50-200 units |
+| Jump drive activation | 500-5,000 units |
+| Afterburner (per minute) | 20 units |
+
+#### Fuel Capacity by Ship Size
+
+| Size | Fuel Tank | Range (approx) |
+|------|-----------|----------------|
+| XS | 500 units | 5-10 warps |
+| S | 1,000 units | 10-20 warps |
+| M | 2,500 units | 25-50 warps |
+| L | 5,000 units | 50-100 warps |
+| XL | 10,000 units | 100+ warps |
+
+#### Refueling
+
+| Location | Cost | Speed |
+|----------|------|-------|
+| Major city station | Market price | Instant |
+| Outpost | +20% markup | Instant |
+| Ship refinery | Craft from gases | Slow |
+| Fuel drone | Automated | Medium |
+
+**Running Out of Fuel:**
+- Ship is stranded
+- Must call for tow (expensive)
+- Or wait for rescue
+- Sitting duck for gankers
+
+---
+
+### Wormholes
+
+Random spawning connections to distant or hidden locations.
+
+| Type | Destination | Duration | Danger |
+|------|-------------|----------|--------|
+| **Stable** | Known system | 24 hours | Varies |
+| **Unstable** | Random system | 1-4 hours | High |
+| **Ancient** | Uncharted space | 30 min | Extreme |
+| **Anomaly** | Hidden locations | 10 min | Unknown |
+
+**Wormhole Mechanics:**
+- Spawn randomly in space
+- Detectable by deep scanners
+- Two-way travel (usually)
+- Collapse after time limit or mass limit
+- Can be camped by players
+
+**Wormhole Hunting:**
+- Lucrative exploration activity
+- Find shortcuts to valuable areas
+- Sell wormhole locations to others
+- Risk: Unknown what's on other side
+
+---
+
+### Navigation Interface
+
+#### Star Map
+
+| Feature | Function |
+|---------|----------|
+| **System View** | Current system, planets, gates, stations |
+| **Galaxy View** | All systems, connections, jump routes |
+| **Route Planner** | Calculate path, fuel, toll costs |
+| **Bookmark System** | Save locations for quick access |
+| **Share Location** | Send coordinates to other players |
+
+#### Navigation Markers
+
+| Marker | Meaning |
+|--------|---------|
+| 🟢 Green | Friendly zone |
+| 🟡 Yellow | Mild zone |
+| 🟠 Orange | Full PvP zone |
+| 🔴 Red | Hardcore zone |
+| ⭐ Star | Bookmarked location |
+| ⚠️ Warning | Recent PvP activity |
+| 💀 Skull | Gate camp reported |
+
+#### Intel & Scouting
+
+| Tool | Function |
+|------|----------|
+| **Local Scanner** | Ships in immediate area |
+| **System Scanner** | Ship count in system |
+| **Gate Scout** | Preview ships at gate destination |
+| **Intel Channel** | Player-reported dangers (guild/faction) |
+
+---
+
+### Safe Travel Tips
+
+#### For New Players
+1. Stay in Friendly zones until comfortable
+2. Always check fuel before leaving station
+3. Use autopilot in safe zones
+4. Scout gates before jumping in dangerous space
+
+#### For Experienced Players
+1. Use jump drives to bypass camps
+2. Travel in fleets for protection
+3. Fit warp stabilizers when hauling
+4. Use scouts/alts to check routes
+5. Avoid predictable schedules
+
+#### Emergency Protocols
+
+| Situation | Action |
+|-----------|--------|
+| Gate camped | Burn back to gate, jump out |
+| Warp scrambled | Overheat modules, fight or call help |
+| Out of fuel | Distress beacon, prepare to pay tow |
+| Lost in wormhole | Scan for exit, conserve fuel |
+
+---
+
+### Travel Costs Summary
+
+| Route Type | Cost Factor |
+|------------|-------------|
+| In-system warp | Fuel only |
+| Jump gate | Toll (500-5,000 OMEN) + fuel |
+| Jump drive | Heavy fuel only |
+| Wormhole | Free (if you find one) |
+| Towing service | 5-20% ship value |
+
+---
+
 ## Mobile UX
 
 ### Controls
