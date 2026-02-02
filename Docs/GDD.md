@@ -656,21 +656,197 @@ Player Death → Items Dropped
 
 ## Player Progression
 
-### Skills/Licenses
+### Skill System Overview
 
-| Category | Skills |
-|----------|--------|
-| **Mining** | Extraction speed, yield bonus, rare finds |
-| **Refining** | Processing speed, material efficiency |
-| **Crafting** | Quality bonus, faster crafting, less waste |
-| **Piloting** | Ship handling, fuel efficiency, speed |
-| **Trading** | Better prices, market insights, reputation |
-| **Command** | More drones, fleet size, automation efficiency |
+Players progress by earning **Experience (EXP)** in specific skill trees. Each tree unlocks higher tier crafting, better bonuses, and specialized abilities.
+
+**Core Principle:** Specialization is rewarded. Mastering one tree is more valuable than spreading thin across all.
+
+---
+
+### Skill Trees
+
+#### Crafting Skill Trees
+
+| Tree | Focus | Unlocks |
+|------|-------|---------|
+| **Metallurgy** | Ore refining, alloys | Refined metals, alloys, armor plates |
+| **Engineering** | Components, machinery | Circuit boards, engines, power cores |
+| **Weaponsmith** | Weapons, ammo | Lasers, cannons, missiles, railguns |
+| **Shipwright** | Hulls, ship modules | Ship frames, cargo holds, thrusters |
+| **Electronics** | Sensors, shields, tech | Scanners, shields, command arrays |
+| **Dronecraft** | Drones, automation | Mining drones, haulers, combat drones |
+| **Chemistry** | Fuel, consumables | Fuel cells, repair kits, boosters |
+
+#### Non-Crafting Skill Trees
+
+| Tree | Focus | Unlocks |
+|------|-------|---------|
+| **Mining** | Resource extraction | Better yields, rare finds, faster extraction |
+| **Piloting** | Ship handling | Speed bonuses, fuel efficiency, maneuvers |
+| **Trading** | Market mastery | Lower fees, price insights, bulk deals |
+| **Combat** | Fighting ability | Damage bonuses, accuracy, defense |
+| **Command** | Fleet & drones | More drones, larger fleets, AI efficiency |
+| **Exploration** | Discovery | Better scanning, hidden locations, anomalies |
+
+---
+
+### Skill Progression (Tiers 1-8)
+
+Each skill tree has 8 tiers matching the equipment tier system.
+
+| Tier | Title | EXP Required | Crafting Unlocked |
+|------|-------|--------------|-------------------|
+| **T1** | Novice | 0 | Basic items, starter gear |
+| **T2** | Apprentice | 1,000 | Common quality items |
+| **T3** | Journeyman | 5,000 | Standard quality items |
+| **T4** | Craftsman | 15,000 | Quality items |
+| **T5** | Expert | 40,000 | Superior items |
+| **T6** | Master | 100,000 | Elite items |
+| **T7** | Grandmaster | 250,000 | Prototype items |
+| **T8** | Legendary | 500,000 | Legendary items |
+
+#### Earning EXP
+
+| Activity | EXP Gained |
+|----------|------------|
+| Craft an item | Based on item tier and complexity |
+| Successful high-tier craft | Bonus EXP |
+| First-time craft | 2x EXP bonus |
+| Craft for another player | Small EXP bonus |
+| Research new blueprint | Large EXP bonus |
+
+---
+
+### Crafting Tier Bonuses
+
+As you level a crafting tree, you gain cumulative bonuses:
+
+| Tier | Material Cost | Success Rate | Craft Speed | Special |
+|------|---------------|--------------|-------------|---------|
+| T1 | 100% | 70% | 100% | - |
+| T2 | 95% | 75% | 95% | - |
+| T3 | 90% | 80% | 90% | Batch crafting (2x) |
+| T4 | 85% | 85% | 85% | - |
+| T5 | 80% | 90% | 80% | Batch crafting (5x) |
+| T6 | 75% | 95% | 75% | Critical craft chance |
+| T7 | 70% | 98% | 70% | Batch crafting (10x) |
+| T8 | 60% | 99% | 60% | Masterwork chance |
+
+**Bonus Explanations:**
+- **Material Cost** - % of base materials required
+- **Success Rate** - Chance craft succeeds (failure = partial material loss)
+- **Craft Speed** - % of base crafting time
+- **Batch Crafting** - Craft multiple items at once
+- **Critical Craft** - Chance for +1 quality tier output
+- **Masterwork** - Chance for unique bonuses on item
+
+---
+
+### Crafting Requirements
+
+Higher tier items require more than just skill level.
+
+#### Equipment Requirements by Tier
+
+| Tier | Skill Level | Station Required | Special Requirements |
+|------|-------------|------------------|---------------------|
+| T1 | T1 | Portable Workbench | None |
+| T2 | T2 | Portable Workbench | None |
+| T3 | T3 | Basic Fabricator | None |
+| T4 | T4 | Advanced Fabricator | None |
+| T5 | T5 | Advanced Fabricator | Crafting Drone assist |
+| T6 | T6 | Station Assembly Bay | Specialized tools |
+| T7 | T7 | Station Assembly Bay | Research license |
+| T8 | T8 | City Shipyard (specific) | Master certification |
+
+#### Station Locations
+
+| Station | Where Found |
+|---------|-------------|
+| Portable Workbench | Anywhere (personal) |
+| Basic Fabricator | Ships (M+ size), Stations |
+| Advanced Fabricator | Large ships, Major cities |
+| Station Assembly Bay | Major cities only |
+| City Shipyard | Specific cities (Spira best) |
+
+---
+
+### Specialization
+
+Players are encouraged to specialize in 1-2 crafting trees.
+
+**Why Specialize:**
+- EXP requirements increase exponentially
+- T8 mastery takes significant time investment
+- Specialists command premium prices
+- Reputation builds in your niche
+
+**Specialization Paths:**
+
+| Path | Primary Tree | Secondary Tree | Role |
+|------|--------------|----------------|------|
+| **Armorer** | Metallurgy | Weaponsmith | Combat gear |
+| **Shipbuilder** | Shipwright | Engineering | Ship construction |
+| **Tech Specialist** | Electronics | Engineering | High-tech components |
+| **Drone Engineer** | Dronecraft | Electronics | Automation systems |
+| **Industrial** | Metallurgy | Chemistry | Bulk materials |
+| **Combat Crafter** | Weaponsmith | Electronics | Weapons + shields |
+
+**Market Dynamics:**
+- Specialists sell to each other
+- Shipbuilder needs Armorer's plates
+- Drone Engineer needs Tech Specialist's sensors
+- Creates interdependent economy
+
+---
+
+### Blueprints
+
+Blueprints unlock specific recipes within a skill tree.
+
+#### How to Acquire Blueprints
+
+| Method | Blueprint Types |
+|--------|-----------------|
+| **Tutorial** | T1 basic blueprints (free) |
+| **Skill Level Up** | Core blueprints for that tier |
+| **Research (Cryo Haven)** | Discover new variants |
+| **Quest Rewards** | Unique/special blueprints |
+| **Boss Drops** | Rare/prototype blueprints |
+| **Exploration** | Ancient tech blueprints |
+| **Faction Rewards** | Faction-specific designs |
+
+#### Blueprint Properties
+
+| Property | Description |
+|----------|-------------|
+| **Tier** | T1-T8, must have matching skill |
+| **Category** | Which skill tree it belongs to |
+| **Materials** | Required inputs |
+| **Station** | Required crafting station |
+| **Time** | Base craft duration |
+| **Output** | What it produces |
+
+#### Blueprint Rarity
+
+| Rarity | Availability | Bonus |
+|--------|--------------|-------|
+| **Common** | Skill level up, vendors | None |
+| **Uncommon** | Research, quests | 5% material reduction |
+| **Rare** | Boss drops, exploration | 10% material reduction |
+| **Epic** | World bosses, events | 15% + special variant |
+| **Legendary** | T8 content, unique sources | 20% + unique properties |
+
+**Note:** Blueprints are account-bound, cannot be traded.
+
+---
 
 ### Reputation
 - Reputation with each major city
 - Unlocks better prices, exclusive contracts
 - Lost through illegal activities or abandoning contracts
+- High reputation unlocks city-specific blueprints
 
 ---
 
