@@ -72,6 +72,10 @@ All major cities are **Friendly Zones** - no PvP allowed within city limits.
 | **Outer Ring** | Mild | Full | Hardcore |
 | **Uncharted Space** | - | Hardcore | Hardcore |
 
+### Planet Instances
+
+All planets are **shared instances** - every player exists in the same world. What you see, others see. Resources are contested. Territory matters.
+
 ### Planet Types
 
 | Type | Resources | Hazards | Notes |
@@ -313,7 +317,6 @@ Hardcore:  ★★★★★ Risk  |  ★★★★★ Reward
 - Joint mining operations
 - Shared automation networks
 - Fleet convoys for protection
-- Guild/Corporation system
 
 ### Competitive
 - Market competition
@@ -324,7 +327,53 @@ Hardcore:  ★★★★★ Risk  |  ★★★★★ Reward
 ### Social
 - Player shops in cities
 - Contract system (hire other players)
-- Chat, guilds, friends list
+- Chat, friends list
+
+---
+
+## Guilds & Factions (Future Feature)
+
+### Guilds
+Player-created organizations for cooperative play.
+
+| Feature | Description |
+|---------|-------------|
+| **Guild Bank** | Shared resources and OMEN |
+| **Guild Station** | Shared crafting/refining facilities |
+| **Territory Claims** | Control planets or regions |
+| **Guild Contracts** | Coordinated missions and goals |
+| **Member Ranks** | Permissions and hierarchy |
+
+### Factions
+Large-scale alliances of guilds with political power.
+
+| Feature | Description |
+|---------|-------------|
+| **Faction Territory** | Control entire systems |
+| **Faction Wars** | Large-scale PvP conflicts |
+| **Faction Bonuses** | Shared perks for members |
+| **Political Influence** | Affect market taxes, zone rules |
+
+### Militia System
+Factions maintain standing military forces for territory defense.
+
+**Militia Units:**
+- **Patrol Ships** - AI-controlled faction ships that patrol territory
+- **Defense Platforms** - Stationary turrets at key points
+- **Response Fleets** - Auto-dispatch when members are attacked
+- **Bounty Hunters** - Track and hunt hostile players
+
+**Militia Funding:**
+- Funded by faction taxes on member transactions
+- Higher funding = stronger/more militia presence
+- Members can donate ships and equipment
+- Militia strength visible to all (deterrence)
+
+**Militia Rules:**
+- Only active in faction-controlled territory
+- Cannot enter Friendly zones
+- Engages anyone flagged hostile to faction
+- Does not protect non-members (mercenary contracts possible)
 
 ---
 
@@ -405,8 +454,7 @@ Hardcore:  ★★★★★ Risk  |  ★★★★★ Reward
 ## Open Questions
 
 1. **Offline progression** - How much can happen while player is away?
-2. **Planet instances** - Shared world or instanced per player?
-3. **Starting experience** - Tutorial mission or freeform?
+2. **Starting experience** - Tutorial mission or freeform?
 
 ---
 
