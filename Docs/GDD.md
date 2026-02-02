@@ -53,28 +53,56 @@ Explore Planet → Extract Resources → Refine & Craft → Sell/Trade → Upgra
 
 All major cities are **Friendly Zones** - no PvP allowed within city limits.
 
-| City | System | Specialty | Market Focus |
-|------|--------|-----------|--------------|
-| **Nova Prime** | Sol Proxima | Capital, balanced | General goods, high volume |
-| **Forge Station** | Vulcan Belt | Industrial | Raw materials, ship parts |
+| City | Planet/System | Specialty | Market Focus |
+|------|---------------|-----------|--------------|
+| **Uurf** | Uurf / Sol Proxima | Starter world, Earth-like | General goods, high volume |
+| **Spira** | Spira / Vulcan Belt | Industrial hub | Raw materials, ship parts |
 | **Cryo Haven** | Glacius | Research | Tech components, rare elements |
 | **Dust Port** | Aridian Reach | Frontier | Mining equipment, survival gear |
 | **Nexus Gate** | Outer Ring | Crossroads | Luxury goods, exotic materials |
+
+### Uurf - The Starter World
+
+Uurf is humanity's foothold in the galaxy - a lush, Earth-like planet and the first home for all new players.
+
+**Characteristics:**
+- **Environment:** Temperate, Earth-like conditions
+- **Resources:** Plentiful common minerals, abundant organics
+- **Economy:** Thriving, stable, beginner-friendly
+- **Zone:** Mostly Friendly (PvE), Mild in outer regions
+- **Population:** Highest in the galaxy
+
+**Why Start Here:**
+- Safe environment to learn game mechanics
+- Abundant resources for early progression
+- Active market with fair prices
+- Tutorial takes place here
+- Easy access to Sol Proxima system
+
+**Uurf Regions:**
+| Region | Zone | Resources | Notes |
+|--------|------|-----------|-------|
+| Central Hub | Friendly | Services only | Main city, no extraction |
+| Verdant Plains | Friendly | Common ore, organics | Tutorial area |
+| Iron Valleys | Friendly | Iron, copper, silicon | Beginner mining |
+| Coastal Flats | Friendly | Organics, crystals | Safe farming |
+| Northern Reaches | Mild | Uncommon ores | Slightly higher risk |
 
 ### City Special Capabilities
 
 Each major city has unique services that make it the best location for specific activities.
 
-#### Nova Prime (Sol Proxima) - Trade Capital
-- **Specialty:** Commerce & Banking
+#### Uurf (Sol Proxima) - Starter World & Trade Capital
+- **Specialty:** Commerce, Banking & New Player Experience
 - **Unique Perks:**
   - Lowest market transaction fees (2% vs 5% standard)
   - OMEN banking: earn interest on stored currency
   - Largest market volume - fastest buy/sell
-  - Trade license certification (unlocks advanced trading)
-- **Exclusive:** T7-T8 trade contracts only available here
+  - Tutorial and starter missions
+  - Beginner crafting stations (no fee)
+- **Exclusive:** Starter blueprints, trade license certification
 
-#### Forge Station (Vulcan Belt) - Industrial Heart
+#### Spira (Vulcan Belt) - Industrial Heart
 - **Specialty:** Ore Refining & Ship Construction
 - **Unique Perks:**
   - 25% reduced refining costs
@@ -211,9 +239,9 @@ Players must decide where to store goods based on:
 - **Cost** - Upgrading all 5 cities is expensive
 
 **Example Strategy:**
-- Store raw ore at **Forge Station** (refining bonus)
+- Store raw ore at **Spira** (refining bonus)
 - Store tech components at **Cryo Haven** (crafting bonus)
-- Store trade goods at **Nova Prime** (low fees)
+- Store trade goods at **Uurf** (low fees, high volume)
 - Store expedition gear at **Dust Port** (frontier access)
 
 ---
@@ -625,8 +653,8 @@ Factions maintain standing military forces for territory defense.
 ## Vertical Slice (Phase 1)
 
 ### Deliverables
-- [ ] 1 Star system with 3 planets
-- [ ] 1 Major city (Nova Prime) with market
+- [ ] 1 Star system (Sol Proxima) with Uurf + 2 planets
+- [ ] 1 Major city (Uurf Central Hub) with market
 - [ ] Basic ship (starter Scout/Freighter)
 - [ ] Mining loop: find → extract → refine → sell
 - [ ] 5 resource types
@@ -649,12 +677,12 @@ Factions maintain standing military forces for territory defense.
 Players complete a guided tutorial before accessing the open world.
 
 **Tutorial Sequence:**
-1. **Awakening** - Player wakes on damaged ship, learn basic controls
-2. **First Landing** - Land on tutorial planet, learn movement/interaction
+1. **Awakening** - Player wakes on damaged ship in Uurf orbit, learn basic controls
+2. **First Landing** - Land on Uurf (Verdant Plains), learn movement/interaction
 3. **Extraction 101** - Mine first resources with hand tool
 4. **Refining Basics** - Use ship's refinery to process ore
 5. **First Craft** - Create a basic mining drill
-6. **To Market** - Travel to Nova Prime, sell goods for first OMEN
+6. **To Market** - Travel to Uurf Central Hub, sell goods for first OMEN
 7. **Your Journey Begins** - Tutorial complete, open world unlocked
 
 **Tutorial Rewards:**
