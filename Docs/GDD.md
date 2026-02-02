@@ -57,6 +57,7 @@ All major cities are **Friendly Zones** - no PvP allowed within city limits.
 |------|---------------|-----------|--------------|
 | **Uurf** | Uurf / Sol Proxima | Starter world, Earth-like | General goods, high volume |
 | **Spira** | Spira / Vulcan Belt | Industrial hub | Raw materials, ship parts |
+| **Banx** | Banx / Central Nexus | Financial hub | All goods, lowest fees |
 | **Cryo Haven** | Glacius | Research | Tech components, rare elements |
 | **Dust Port** | Aridian Reach | Frontier | Mining equipment, survival gear |
 | **Nexus Gate** | Outer Ring | Crossroads | Luxury goods, exotic materials |
@@ -111,6 +112,28 @@ Each major city has unique services that make it the best location for specific 
   - Shipyard with all hull sizes available
 - **Exclusive:** Legendary alloys can ONLY be refined here
 
+#### Banx (Central Nexus) - Financial Relic
+- **Specialty:** Finance & Universal Trading
+- **Unique Perks:**
+  - Lowest marketplace fees in galaxy (1%)
+  - Cross-market trading (access all city markets remotely)
+  - OMEN exchange and currency services
+  - Escrow services for large trades
+  - Commodity futures contracts
+- **Exclusive:** Galactic Trade License (reduces fees everywhere)
+- **Lore:** An ancient station from the era of unified galactic banking. Its autonomous systems still run the most efficient financial networks known. No faction controls Banx - it remains neutral ground.
+
+**Banx Location:**
+Positioned at the Central Nexus - equidistant from all major systems. A natural crossroads for inter-system trade.
+
+| Route | Distance |
+|-------|----------|
+| Banx → Uurf | Medium |
+| Banx → Spira | Medium |
+| Banx → Cryo Haven | Medium |
+| Banx → Dust Port | Medium |
+| Banx → Nexus Gate | Medium |
+
 #### Cryo Haven (Glacius) - Research Hub
 - **Specialty:** Technology & Blueprints
 - **Unique Perks:**
@@ -144,6 +167,7 @@ Each major city has unique services that make it the best location for specific 
 |--------|------------|------------|------------|
 | **Sol Proxima** | Friendly | Mild | Mild |
 | **Vulcan Belt** | Friendly | Mild | Full |
+| **Central Nexus** | Friendly | Friendly | Mild |
 | **Glacius** | Friendly | Full | Full |
 | **Aridian Reach** | Mild | Full | Hardcore |
 | **Outer Ring** | Mild | Full | Hardcore |
