@@ -1,0 +1,53 @@
+# Unreal Engine
+Odyssey/Binaries/
+Odyssey/Build/
+Odyssey/DerivedDataCache/
+Odyssey/Intermediate/
+Odyssey/Saved/
+Odyssey/.vs/
+Odyssey/.vscode/
+Odyssey/*.sln
+Odyssey/*.xcworkspace
+Odyssey/*.xcodeproj
+
+# Compiled assets
+*.uasset.bak
+*.umap.bak
+
+# Local user settings
+Odyssey/Config/DefaultEditorPerProjectUserSettings.ini
+Odyssey/Config/DefaultEditorSettings.ini
+
+# Crash reports
+CrashReportClient/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Thumbnails
+Thumbs.db
+ehthumbs.db
+
+# Build output
+*.app
+*.ipa
+*.apk
+*.aab
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+
+# Server
+Server/node_modules/
+Server/.env
+Server/.env.local
+
+# Logs
+*.log
+logs/
