@@ -3,205 +3,340 @@
 ## Overview
 
 **Title:** Odyssey
-**Genre:** RPG/Adventure with hybrid combat
+**Genre:** Sci-Fi Space Exploration / Resource Management / Economy Sim
 **Art Style:** 2.5D Isometric
 **Platform:** Mobile-first (iOS/Android), PC/Console later
-**Target Audience:** Mid-core gamers who enjoy RPGs on mobile
-**Monetization:** Free-to-play with cosmetic/convenience IAP
+**Setting:** Futuristic galaxy with explorable planets
+**Currency:** OMEN
+**Economy:** Player-driven (all crafted goods are player-made)
 
 ---
 
 ## Core Pillars
 
-1. **Accessible Combat** - Easy to pick up, deep enough to master
-2. **Bite-sized Sessions** - Playable in 5-15 minute chunks
-3. **Meaningful Progression** - Every session should feel rewarding
-4. **Social Connection** - Co-op with friends, compete with rivals
+1. **Exploration** - Discover planets, scan for resources, uncover secrets
+2. **Extraction & Production** - Mine, refine, craft, automate
+3. **Trade & Economy** - Transport goods, play the market, build wealth
+4. **Fleet Building** - Upgrade ships, build a fleet, expand operations
 
 ---
 
 ## Core Gameplay Loop
 
 ```
-Explore → Fight → Loot → Upgrade → Explore (stronger)
+Explore Planet → Extract Resources → Refine & Craft → Sell/Trade → Upgrade → Expand
 ```
 
-### Session Loop (5-15 min)
-1. Select a quest or dungeon
-2. Navigate the area
-3. Engage in combat encounters
-4. Collect loot and rewards
-5. Return to hub/save progress
+### Session Loop (10-20 min)
+1. Travel to a planet or check automated operations
+2. Extract resources or collect from drones
+3. Refine materials, craft goods
+4. Transport to market, sell for OMEN
+5. Reinvest in upgrades or new operations
 
 ### Progression Loop (days/weeks)
-1. Complete story chapters
-2. Unlock new areas and abilities
-3. Gear up for harder content
-4. Engage in multiplayer activities
+1. Unlock new planets and regions
+2. Build larger fleets and automation networks
+3. Dominate market sectors
+4. Establish trade routes and passive income
 
 ---
 
-## Combat System
+## The Galaxy
 
-### Hybrid Approach
-Combines real-time action with strategic elements.
+### Structure
+- **5 Major Systems** - Each with a major city/station
+- **Multiple Planets per System** - Varying resources, danger levels
+- **Trade Routes** - Connections between systems
 
-**Action Elements:**
-- Direct control of character movement
-- Combo-based basic attacks
-- Dodge/roll with i-frames
-- Active skill usage with cooldowns
+### Major Cities (Trade Hubs)
 
-**Strategic Elements:**
-- Elemental rock-paper-scissors (Fire > Nature > Water > Fire)
-- Status effects (Burn, Freeze, Poison, Stun)
-- Enemy telegraph reading
-- Optional pause for skill selection (accessibility)
+| City | System | Specialty | Market Focus |
+|------|--------|-----------|--------------|
+| **Nova Prime** | Sol Proxima | Capital, balanced | General goods, high volume |
+| **Forge Station** | Vulcan Belt | Industrial | Raw materials, ship parts |
+| **Cryo Haven** | Glacius | Research | Tech components, rare elements |
+| **Dust Port** | Aridian Reach | Frontier | Mining equipment, survival gear |
+| **Nexus Gate** | Outer Ring | Crossroads | Luxury goods, exotic materials |
 
-### Controls (Mobile)
-- **Left thumb:** Virtual joystick for movement
-- **Right thumb:** Attack button, skill buttons (1-4)
-- **Gesture:** Swipe to dodge
+### Planet Types
 
----
-
-## Character System
-
-### Player Character
-- Customizable appearance (gender, face, hair, colors)
-- Class selection affects starting stats and skills
-- Can unlock cross-class skills later
-
-### Classes (Initial 3)
-| Class | Role | Primary Stat | Playstyle |
-|-------|------|--------------|-----------|
-| Warrior | Melee DPS/Tank | Strength | In your face, high damage |
-| Ranger | Ranged DPS | Agility | Kiting, positioning |
-| Mage | Burst/Support | Intelligence | High risk/reward, elemental |
-
-### Stats
-- **Health (HP)** - How much damage you can take
-- **Stamina (SP)** - Used for dodging and sprinting
-- **Strength** - Melee damage, carrying capacity
-- **Agility** - Attack speed, dodge distance, crit chance
-- **Intelligence** - Skill damage, mana pool
-- **Vitality** - HP pool, HP regen
+| Type | Resources | Hazards | Notes |
+|------|-----------|---------|-------|
+| **Terrestrial** | Common ores, organics | Mild weather | Beginner-friendly |
+| **Volcanic** | Rare metals, crystals | Heat, eruptions | High risk/reward |
+| **Ice World** | Frozen gases, cryo-elements | Cold, storms | Specialized equipment needed |
+| **Gas Giant (Moons)** | Exotic gases, radioactives | Radiation, gravity | Advanced extraction |
+| **Barren/Asteroid** | Pure minerals, ancient tech | Low gravity, debris | Efficient but sparse |
 
 ---
 
-## Progression Systems
+## Resource System
 
-### Experience & Leveling
-- XP from combat, quests, exploration
-- Each level grants stat points and unlocks
-- Level cap: 50 (expandable in updates)
+### Resource Tiers
 
-### Skills
-- Each class has a skill tree with 15-20 skills
-- Equip up to 4 active skills at once
-- Passive skills unlock at milestones
+**Tier 1 - Raw Materials** (Extracted)
+- Iron Ore, Copper Ore, Silicon
+- Carbon, Hydrogen, Oxygen
+- Common Crystals
 
-### Equipment
-- Slots: Weapon, Helmet, Chest, Boots, 2x Accessories
-- Rarity tiers: Common, Uncommon, Rare, Epic, Legendary
-- Equipment has random stat rolls
-- Enhancement system to power up gear
+**Tier 2 - Refined Materials** (Processed)
+- Steel, Alloys, Polymers
+- Fuel Cells, Coolants
+- Purified Crystals
 
----
+**Tier 3 - Components** (Crafted)
+- Circuit Boards, Power Cores
+- Thrusters, Hull Plates
+- Sensor Arrays
 
-## World & Setting
+**Tier 4 - Finished Goods** (Assembled)
+- Ship Modules, Weapons
+- Drones, Mining Rigs
+- Tools, Equipment
 
-### Premise
-You are an adventurer awakened with no memory in a world where ancient gods have vanished, leaving behind dungeons filled with their power. Seek the truth of your past while uncovering what happened to the gods.
+### Extraction Methods
 
-### Areas (Phase 1)
-1. **Verdant Hollow** - Starting forest area, tutorials
-2. **Sunstone Village** - Main hub, NPCs, shops
-3. **Ruins of Althea** - First dungeon, fallen temple
-
-### NPCs
-- **Mira** - Innkeeper, quest giver, exposition
-- **Forge Master Dorn** - Blacksmith, equipment crafting
-- **Elder Sage** - Skill trainer, lore keeper
+| Method | Speed | Yield | Automation |
+|--------|-------|-------|------------|
+| **Manual Mining** | Slow | Low | None |
+| **Mining Drill** | Medium | Medium | Semi-auto |
+| **Extractor Rig** | Fast | High | Full auto |
+| **Drone Swarm** | Fastest | Highest | Full auto, mobile |
 
 ---
 
-## Multiplayer (Future Phases)
+## Crafting System
 
-### Co-op PvE
-- 2-4 player parties
-- Instanced dungeons
-- Boss raids (4+ players)
+### Crafting Stations
 
-### PvP
-- 1v1 Arena
-- 3v3 Team Arena
-- Seasonal rankings with rewards
+| Station | Function | Location |
+|---------|----------|----------|
+| **Portable Workbench** | Basic tools, repairs | Anywhere |
+| **Refinery** | Ore → Refined materials | Ship or Planet |
+| **Fabricator** | Components, equipment | Ship or Station |
+| **Assembly Bay** | Ship parts, drones | Station only |
+| **Shipyard** | Full ships | Major city only |
 
-### MMO-lite Elements
-- Shared hub zones
-- World bosses on timers
-- Guilds with perks
+### Crafting Flow
+```
+Raw Ore → [Refinery] → Refined Metal → [Fabricator] → Components → [Assembly] → Finished Product
+```
+
+### Blueprint System
+- Blueprints unlock crafting recipes
+- Found through exploration, research, or purchased
+- Rarity affects efficiency and output quality
+- Players can sell crafted goods but NOT blueprints (knowledge is earned)
 
 ---
 
-## Monetization Strategy
+## Automation & Drones
+
+### Drone Types
+
+| Drone | Function | Complexity |
+|-------|----------|------------|
+| **Mining Drone** | Extracts resources autonomously | Basic |
+| **Hauler Drone** | Transports between points | Basic |
+| **Refinery Drone** | Mobile processing | Advanced |
+| **Scout Drone** | Surveys planets, finds deposits | Advanced |
+| **Defense Drone** | Protects operations | Advanced |
+
+### Automation Chains
+Players can set up automated workflows:
+```
+Mining Drone → Hauler → Refinery → Hauler → Ship Cargo → Auto-sell at Market
+```
+
+### Limits & Balance
+- Drone count limited by Command Module level
+- Drones require maintenance (fuel, repairs)
+- Automation requires upfront investment
+- Manual play always has efficiency bonuses
+
+---
+
+## Ships & Fleet
+
+### Ship Classes
+
+| Class | Role | Cargo | Speed | Combat |
+|-------|------|-------|-------|--------|
+| **Scout** | Exploration | Tiny | Fast | None |
+| **Freighter** | Hauling | Large | Slow | Light |
+| **Miner** | Extraction | Medium | Slow | None |
+| **Gunship** | Combat/Escort | Small | Medium | Heavy |
+| **Capital** | Command/Base | Massive | Very Slow | Medium |
+
+### Ship Components (All Player-Crafted)
+- **Hull** - Durability, cargo space
+- **Engine** - Speed, fuel efficiency
+- **Power Core** - Energy for systems
+- **Cargo Hold** - Storage capacity
+- **Weapons** - Defense capability
+- **Shields** - Damage absorption
+- **Scanner** - Detection range
+- **Command Module** - Drone control capacity
+
+### Fleet Management
+- Own multiple ships
+- Assign ships to routes (automated trade)
+- Hire NPC crew or use alone
+- Fleet size limited by player progression
+
+---
+
+## Economy & Markets
+
+### OMEN Currency
+- Universal currency across all systems
+- Earned through selling goods
+- Spent on: blueprints, station services, repairs, NPC services
+
+### Market Mechanics
+
+**Supply & Demand**
+- Prices fluctuate based on player activity
+- Each city has different demands
+- Rare goods command premiums
+- Oversupply crashes prices
+
+**Market Types**
+| Type | Description |
+|------|-------------|
+| **Buy Orders** | Players request items at set price |
+| **Sell Orders** | Players list items for sale |
+| **Instant Buy** | Buy at lowest sell price |
+| **Instant Sell** | Sell at highest buy price |
+
+**Trade Routes**
+- Buy low in one system, sell high in another
+- Distance affects profit potential
+- Danger increases with value
+
+### What CAN Be Traded
+- Raw resources (only non-crafted items)
+- Refined materials
+- Components
+- Equipment and tools
+- Ship parts and modules
+- Drones
+- Ships
+
+### What CANNOT Be Traded
+- Blueprints (must be found/earned)
+- Player progression/skills
+- Reputation
+
+---
+
+## Player Progression
+
+### Skills/Licenses
+
+| Category | Skills |
+|----------|--------|
+| **Mining** | Extraction speed, yield bonus, rare finds |
+| **Refining** | Processing speed, material efficiency |
+| **Crafting** | Quality bonus, faster crafting, less waste |
+| **Piloting** | Ship handling, fuel efficiency, speed |
+| **Trading** | Better prices, market insights, reputation |
+| **Command** | More drones, fleet size, automation efficiency |
+
+### Reputation
+- Reputation with each major city
+- Unlocks better prices, exclusive contracts
+- Lost through illegal activities or abandoning contracts
+
+---
+
+## Combat (Secondary System)
+
+### Threats
+- Pirates in trade routes
+- Hostile fauna on planets
+- Rival players (PvP zones)
+- Environmental hazards
+
+### Combat Style
+- Ship-to-ship: Tactical, positioning-based
+- On-foot: Survival-focused, avoid or defend
+
+### PvP Zones
+- Designated high-risk, high-reward areas
+- Cargo can be looted
+- Safe zones in cities and claimed territories
+
+---
+
+## Multiplayer Features
+
+### Cooperative
+- Joint mining operations
+- Shared automation networks
+- Fleet convoys for protection
+- Guild/Corporation system
+
+### Competitive
+- Market competition
+- Territory control
+- PvP combat zones
+- Leaderboards (wealth, production, exploration)
+
+### Social
+- Player shops in cities
+- Contract system (hire other players)
+- Chat, guilds, friends list
+
+---
+
+## Monetization (F2P)
 
 ### Principles
 - No pay-to-win
-- Cosmetics-focused
-- Respect player time
+- Cannot buy OMEN directly
+- Cosmetics and convenience only
 
 ### Revenue Streams
-1. **Cosmetic Shop** - Skins, pets, mounts, effects
-2. **Battle Pass** - Seasonal content track (free + premium)
-3. **Convenience** - Extra inventory, XP boosters
-4. **Currency Packs** - Premium currency for shop
+1. **Cosmetics** - Ship skins, character outfits, drone skins
+2. **Convenience** - Extra save slots, UI themes, cosmetic pets
+3. **Premium Pass** - Seasonal cosmetic rewards track
+4. **Station Services** - Faster repairs, priority docking (time-save)
 
-### What is NOT Sold
-- Direct power (stats, damage)
-- Exclusive gameplay content
-- Must-have items
-
----
-
-## Art Direction
-
-### 2.5D Isometric Style
-- Hand-painted textures on 3D geometry
-- Strong silhouettes for mobile readability
-- Vibrant but not oversaturated colors
-- Clear enemy telegraphs (glows, particles)
-
-### UI Principles
-- Large touch targets (min 44pt)
-- Clear iconography
-- Minimal text where possible
-- Consistent color language
+### NOT Sold
+- Resources, materials, items
+- OMEN currency
+- Blueprints
+- Ships or equipment
+- Competitive advantages
 
 ---
 
-## Audio Direction
+## Mobile UX
 
-### Music
-- Orchestral with folk elements
-- Dynamic layers based on combat state
-- Distinct themes per area
+### Controls
+- **Left thumb:** Virtual joystick (movement/flight)
+- **Right thumb:** Action buttons (mine, interact, fire)
+- **Tap:** Select, confirm
+- **Pinch:** Zoom
+- **Swipe:** Camera rotation
 
-### Sound Effects
-- Satisfying combat feedback
-- Clear ability cues
-- Ambient environmental sounds
+### Session Design
+- Auto-save constantly
+- Operations continue offline (limited)
+- Quick actions for checking markets
+- Notifications for completed operations
 
 ---
 
 ## Technical Targets
 
 ### Performance
-- 30 FPS stable on mid-range devices (2020+)
+- 30 FPS stable on mid-range devices
 - 60 FPS option on high-end
-- Max 3GB RAM usage
-- <100ms input latency
+- Seamless planet transitions (streaming)
+- Server-authoritative economy
 
 ### Supported Devices
 - **iOS:** iPhone 8+, iOS 14+
@@ -209,39 +344,35 @@ You are an adventurer awakened with no memory in a world where ancient gods have
 
 ---
 
-## Milestones
+## Vertical Slice (Phase 1)
 
-### Vertical Slice (Phase 1 Complete)
-- [ ] One playable area (Verdant Hollow)
-- [ ] One class fully functional (Warrior)
-- [ ] 5 enemy types
-- [ ] Basic quest loop
-- [ ] Inventory and equipment
-- [ ] Save/load
-- [ ] 10-minute playable demo
+### Deliverables
+- [ ] 1 Star system with 3 planets
+- [ ] 1 Major city (Nova Prime) with market
+- [ ] Basic ship (starter Scout/Freighter)
+- [ ] Mining loop: find → extract → refine → sell
+- [ ] 5 resource types
+- [ ] Basic crafting (tools, components)
+- [ ] 1 Drone type (Mining Drone)
+- [ ] Save/load system
+- [ ] 15-minute playable demo
 
-### Alpha
-- [ ] All 3 classes
-- [ ] 3 areas
-- [ ] Core story beats
-- [ ] Tutorial flow
-
-### Beta
-- [ ] Co-op multiplayer
-- [ ] Polish pass
-- [ ] Monetization integration
-- [ ] Localization
+### Success Criteria
+- Player can earn OMEN through gameplay loop
+- Market prices respond to supply
+- Automation provides passive income
+- Core loop feels satisfying
 
 ---
 
 ## Open Questions
 
-1. Should stamina regenerate passively or require actions?
-2. Auto-attack vs. manual attack for accessibility?
-3. Portrait or landscape orientation?
-4. Synchronous or asynchronous multiplayer?
+1. **Offline progression** - How much can happen while player is away?
+2. **Planet instances** - Shared world or instanced per player?
+3. **Ship destruction** - Lose ship or just cargo on death?
+4. **Starting experience** - Tutorial mission or freeform?
 
 ---
 
-*Document Version: 0.1*
+*Document Version: 0.2*
 *Last Updated: 2026-02-02*
