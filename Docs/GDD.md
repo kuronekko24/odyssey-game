@@ -410,9 +410,9 @@ Factions maintain standing military forces for territory defense.
 
 ### Session Design
 - Auto-save constantly
-- Operations continue offline (limited)
-- Quick actions for checking markets
-- Notifications for completed operations
+- **No offline progression** - Game pauses when you're away
+- Quick resume from where you left off
+- All operations require active play
 
 ---
 
@@ -451,12 +451,32 @@ Factions maintain standing military forces for territory defense.
 
 ---
 
-## Open Questions
+## New Player Experience
 
-1. **Offline progression** - How much can happen while player is away?
-2. **Starting experience** - Tutorial mission or freeform?
+### Tutorial Flow
+Players complete a guided tutorial before accessing the open world.
+
+**Tutorial Sequence:**
+1. **Awakening** - Player wakes on damaged ship, learn basic controls
+2. **First Landing** - Land on tutorial planet, learn movement/interaction
+3. **Extraction 101** - Mine first resources with hand tool
+4. **Refining Basics** - Use ship's refinery to process ore
+5. **First Craft** - Create a basic mining drill
+6. **To Market** - Travel to Nova Prime, sell goods for first OMEN
+7. **Your Journey Begins** - Tutorial complete, open world unlocked
+
+**Tutorial Rewards:**
+- Starter ship (basic Scout/Freighter hybrid)
+- Starter mining drill
+- 500 OMEN
+- First blueprint (Basic Components)
+
+**Post-Tutorial:**
+- Full access to Sol Proxima system
+- Other systems unlock via progression
+- Tutorial can be replayed from menu (no rewards)
 
 ---
 
-*Document Version: 0.2*
+*Document Version: 0.3*
 *Last Updated: 2026-02-02*
