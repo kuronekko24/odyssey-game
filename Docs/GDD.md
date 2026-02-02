@@ -1237,23 +1237,219 @@ Factions maintain standing military forces for territory defense.
 
 ## Monetization (F2P)
 
-### Principles
-- No pay-to-win
-- Cannot buy OMEN directly
-- Cosmetics and convenience only
+### Revenue Model Overview
 
-### Revenue Streams
-1. **Cosmetics** - Ship skins, character outfits, drone skins
-2. **Convenience** - Extra save slots, UI themes, cosmetic pets
-3. **Premium Pass** - Seasonal cosmetic rewards track
-4. **Station Services** - Faster repairs, priority docking (time-save)
+Odyssey is free-to-play with three monetization pillars:
+1. **Premium Currency (NOVA)** - Tradeable for OMEN
+2. **Vanity Skins** - Cosmetic customization
+3. **Learning Acceleration** - Faster skill progression
 
-### NOT Sold
-- Resources, materials, items
-- OMEN currency
-- Blueprints
-- Ships or equipment
-- Competitive advantages
+---
+
+### NOVA - Premium Currency
+
+NOVA is the real-money currency that bridges cash and the player economy.
+
+#### How NOVA Works
+
+```
+Real Money → Buy NOVA → Trade to Players for OMEN → Spend OMEN in-game
+                ↓
+         Players sell OMEN → Receive NOVA → Cash out (future?) or hold
+```
+
+#### NOVA Pricing
+
+| Package | NOVA | Price (USD) | Bonus |
+|---------|------|-------------|-------|
+| Starter | 100 | $0.99 | - |
+| Basic | 500 | $4.99 | - |
+| Standard | 1,100 | $9.99 | +10% |
+| Premium | 2,400 | $19.99 | +20% |
+| Elite | 6,500 | $49.99 | +30% |
+| Ultimate | 14,000 | $99.99 | +40% |
+
+#### NOVA → OMEN Exchange
+
+| Method | How It Works |
+|--------|--------------|
+| **Player Market** | List NOVA for sale, players buy with OMEN |
+| **Direct Trade** | Trade NOVA to specific player for OMEN |
+
+**Exchange Rate:**
+- Set by player market (supply/demand)
+- No fixed rate - fluctuates
+- Typical range: 1 NOVA = 100-500 OMEN (varies by economy)
+
+#### Why This Model Works
+
+**For Paying Players:**
+- Convert money to in-game wealth
+- Skip grinding for OMEN
+- Support the game
+
+**For Free Players:**
+- Earn OMEN through gameplay
+- Buy NOVA from paying players
+- Access premium items without spending real money
+
+**For the Economy:**
+- OMEN stays player-driven
+- No direct item sales that unbalance game
+- Paying players fund free players' content
+
+---
+
+### Vanity Skins
+
+Cosmetic-only items that do not affect gameplay.
+
+#### Skin Categories
+
+| Category | Examples | Price Range (NOVA) |
+|----------|----------|-------------------|
+| **Ship Skins** | Hull colors, patterns, effects | 200-2,000 |
+| **Engine Trails** | Exhaust effects, colors | 100-500 |
+| **Weapon Effects** | Laser colors, impact visuals | 150-800 |
+| **Shield Effects** | Shield bubble appearance | 150-800 |
+| **Character Outfits** | Pilot suits, helmets | 300-1,500 |
+| **Drone Skins** | Drone appearance | 100-400 |
+| **Station Decor** | Personal hangar customization | 500-2,000 |
+| **UI Themes** | Interface colors, sounds | 200-600 |
+| **Emotes** | Character animations | 50-200 |
+| **Titles** | Display name flair | 100-500 |
+
+#### Skin Acquisition
+
+| Method | Details |
+|--------|---------|
+| **NOVA Purchase** | Buy directly from store |
+| **Arena Rewards** | Exclusive ranked season skins |
+| **Event Rewards** | Limited-time event skins |
+| **Achievement** | Unlock through gameplay milestones |
+| **Battle Pass** | Seasonal cosmetic track |
+
+#### Battle Pass
+
+| Tier | Price | Contents |
+|------|-------|----------|
+| **Free Track** | Free | Basic cosmetics, small OMEN rewards |
+| **Premium Track** | 1,000 NOVA | Exclusive skins, emotes, titles |
+| **Premium+ Track** | 2,500 NOVA | All above + instant 25 tier skip |
+
+- 100 tiers per season
+- Season lasts ~3 months
+- Tiers unlocked through gameplay (XP)
+- Premium tracks have exclusive cosmetics
+
+---
+
+### Learning Acceleration Points (LAP)
+
+Speed up skill progression without skipping content.
+
+#### How LAP Works
+
+| Feature | Details |
+|---------|---------|
+| **Effect** | Multiplies XP gained in skill trees |
+| **Duration** | Time-based (hours of active play) |
+| **Stacking** | Multiple LAP buffs do NOT stack |
+| **Cap** | Cannot exceed 2x XP multiplier |
+
+#### LAP Packages
+
+| Package | Duration | Multiplier | Price (NOVA) |
+|---------|----------|------------|--------------|
+| **Quick Boost** | 1 hour | 1.5x | 50 |
+| **Day Pass** | 8 hours | 1.5x | 300 |
+| **Week Pass** | 40 hours | 1.5x | 1,200 |
+| **Month Pass** | 160 hours | 1.5x | 4,000 |
+| **Focused Boost** | 4 hours | 2.0x | 400 |
+
+**Note:** Hours are *active play time*, not real time. AFK does not consume LAP.
+
+#### LAP Philosophy
+
+**What LAP Does:**
+- Speeds up skill leveling
+- Reach higher tiers faster
+- Catch up to veteran players
+
+**What LAP Does NOT Do:**
+- Grant instant skill levels
+- Unlock blueprints directly
+- Provide any combat advantage
+- Skip gameplay requirements
+
+**Balance Reasoning:**
+- Time is the only thing being sold
+- Player still must play the game
+- No items, stats, or power sold
+- Veterans have no permanent advantage over dedicated free players
+
+---
+
+### What is NOT Sold
+
+Maintaining competitive integrity:
+
+| Item | Reason |
+|------|--------|
+| **Equipment/Ships** | Would break player-crafted economy |
+| **Resources/Materials** | Would devalue gatherers |
+| **Blueprints** | Must be earned through gameplay |
+| **Direct Power** | No stats, damage, or advantages |
+| **Skill Levels** | Only acceleration, not skipping |
+| **OMEN Directly** | Only via player trading (NOVA) |
+| **Inventory Space** | Earned through storage upgrades |
+| **Exclusive Gameplay** | All content accessible to free players |
+
+---
+
+### Monetization Ethics
+
+#### Principles
+1. **No Pay-to-Win** - Money cannot buy power
+2. **Respect Time** - Paying players save time, not skip content
+3. **Player Economy** - Money flows through players, not bypasses them
+4. **Cosmetic Focus** - Most revenue from vanity items
+5. **Transparent Value** - Clear pricing, no predatory mechanics
+
+#### Anti-Predatory Measures
+
+| Measure | Implementation |
+|---------|----------------|
+| **Spending Limits** | Optional monthly cap setting |
+| **Purchase History** | Clear transaction records |
+| **No Loot Boxes** | Direct purchase only, no gambling |
+| **Refund Window** | 24-hour refund on unused NOVA items |
+| **Age Verification** | Parental controls for minors |
+| **No FOMO Pressure** | Limited items return in rotation |
+
+---
+
+### Revenue Projections (Conceptual)
+
+| Source | % of Revenue | Notes |
+|--------|--------------|-------|
+| **NOVA Sales** | 50% | Primary revenue driver |
+| **Battle Pass** | 25% | Seasonal recurring |
+| **Direct Skin Sales** | 20% | Whale spending |
+| **LAP Sales** | 5% | Supplementary |
+
+---
+
+### Free vs Paying Player Experience
+
+| Aspect | Free Player | Paying Player |
+|--------|-------------|---------------|
+| **All Content** | ✅ Full access | ✅ Full access |
+| **Progression Speed** | Normal | Faster (with LAP) |
+| **OMEN Earning** | Gameplay only | Can buy via NOVA |
+| **Cosmetics** | Limited (events, achievements) | Full access |
+| **Competitive Viability** | ✅ Equal | ✅ Equal |
+| **Time Investment** | Higher | Lower |
 
 ---
 
