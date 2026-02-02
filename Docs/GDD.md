@@ -61,6 +61,55 @@ All major cities are **Friendly Zones** - no PvP allowed within city limits.
 | **Dust Port** | Aridian Reach | Frontier | Mining equipment, survival gear |
 | **Nexus Gate** | Outer Ring | Crossroads | Luxury goods, exotic materials |
 
+### City Special Capabilities
+
+Each major city has unique services that make it the best location for specific activities.
+
+#### Nova Prime (Sol Proxima) - Trade Capital
+- **Specialty:** Commerce & Banking
+- **Unique Perks:**
+  - Lowest market transaction fees (2% vs 5% standard)
+  - OMEN banking: earn interest on stored currency
+  - Largest market volume - fastest buy/sell
+  - Trade license certification (unlocks advanced trading)
+- **Exclusive:** T7-T8 trade contracts only available here
+
+#### Forge Station (Vulcan Belt) - Industrial Heart
+- **Specialty:** Ore Refining & Ship Construction
+- **Unique Perks:**
+  - 25% reduced refining costs
+  - 15% faster refining speed
+  - Access to T7-T8 refining (exclusive)
+  - Shipyard with all hull sizes available
+- **Exclusive:** Legendary alloys can ONLY be refined here
+
+#### Cryo Haven (Glacius) - Research Hub
+- **Specialty:** Technology & Blueprints
+- **Unique Perks:**
+  - Blueprint research lab (discover new recipes)
+  - Reverse engineering facility (learn from items)
+  - Tech component crafting bonus (+10% quality)
+  - Sensor and electronics specialization
+- **Exclusive:** Prototype (T7) blueprints only researched here
+
+#### Dust Port (Aridian Reach) - Frontier Outpost
+- **Specialty:** Mining & Survival Equipment
+- **Unique Perks:**
+  - Best prices on mining equipment
+  - Drone assembly bonus (20% cheaper)
+  - Survival gear crafting specialization
+  - Expedition contracts to Hardcore zones
+- **Exclusive:** Advanced mining drones only assembled here
+
+#### Nexus Gate (Outer Ring) - Crossroads
+- **Specialty:** Exotic Goods & Black Market
+- **Unique Perks:**
+  - Access to exotic/rare materials market
+  - Faction reputation broker (change standings)
+  - Smuggler contacts (high-risk contracts)
+  - Gateway to Uncharted Space
+- **Exclusive:** Exotic materials trading (T8 resources)
+
 ### System Zones
 
 | System | Inner Zone | Outer Zone | Deep Space |
@@ -120,6 +169,52 @@ All planets are **shared instances** - every player exists in the same world. Wh
 | **Mining Drill** | Medium | Medium | Semi-auto |
 | **Extractor Rig** | Fast | High | Full auto |
 | **Drone Swarm** | Fastest | Highest | Full auto, mobile |
+
+---
+
+## Storage System
+
+### Planetary Storage
+
+Each major city provides personal storage facilities. Storage is **per-city** - items stored at Nova Prime are not accessible at Forge Station.
+
+#### What Can Be Stored
+- Raw materials and refined goods
+- Equipment and components
+- Ships (docked)
+- Drones
+- Blueprints
+
+#### Storage Tiers
+
+| Tier | Item Capacity | Ship Bays | Cost to Upgrade |
+|------|---------------|-----------|-----------------|
+| **Basic** | 500 units | 1 | Free (starter) |
+| **Standard** | 2,000 units | 2 | 5,000 OMEN |
+| **Extended** | 10,000 units | 4 | 25,000 OMEN |
+| **Premium** | 50,000 units | 8 | 100,000 OMEN |
+| **Elite** | 250,000 units | 16 | 500,000 OMEN |
+| **Unlimited** | 1,000,000 units | 32 | 2,000,000 OMEN |
+
+**Notes:**
+- Each city's storage is upgraded separately
+- Ship bays hold one ship each regardless of size
+- Stored items are 100% safe (no risk of loss)
+- Retrieve items only when docked at that city
+
+#### Storage Strategy
+
+Players must decide where to store goods based on:
+- **Proximity** - Store near where you operate
+- **City Bonuses** - Store materials near processing facilities
+- **Market Access** - Store goods near where you sell
+- **Cost** - Upgrading all 5 cities is expensive
+
+**Example Strategy:**
+- Store raw ore at **Forge Station** (refining bonus)
+- Store tech components at **Cryo Haven** (crafting bonus)
+- Store trade goods at **Nova Prime** (low fees)
+- Store expedition gear at **Dust Port** (frontier access)
 
 ---
 
