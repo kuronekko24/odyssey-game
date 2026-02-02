@@ -850,17 +850,293 @@ Blueprints unlock specific recipes within a skill tree.
 
 ---
 
-## Combat (Secondary System)
+## Combat System (Core Feature)
 
-### Threats
-- Pirates in trade routes
-- Hostile fauna on planets
-- Rival players (PvP zones)
-- Environmental hazards
+**PvP is the primary driver of Odyssey's gameplay loop.** The best resources exist in dangerous zones where player conflict is constant. This creates demand for better ships, equipment, and fleet optimization.
 
-### Combat Style
-- Ship-to-ship: Tactical, positioning-based
-- On-foot: Survival-focused, avoid or defend
+---
+
+### The PvP Ecosystem
+
+```
+Best Resources → PvP Zones → Gatherers take risk → Gankers hunt gatherers
+      ↓                              ↓                       ↓
+ High demand              Need better gear          Need combat builds
+      ↓                              ↓                       ↓
+ High prices  ←──────────────── Crafters supply both sides
+```
+
+**Player Archetypes:**
+
+| Type | Goal | Builds For |
+|------|------|------------|
+| **Gatherer** | Extract rare resources | Speed, cargo, escape |
+| **Ganker** | Hunt and loot gatherers | Damage, tackle, detection |
+| **Escort** | Protect gatherers for pay | Tank, support, firepower |
+| **Pirate** | Raid trade routes | Ambush, speed, firepower |
+| **Bounty Hunter** | Hunt wanted players | Tracking, combat, durability |
+| **Arena Fighter** | Compete for glory | Pure combat optimization |
+
+---
+
+### Ship Combat Mechanics
+
+#### Combat Stats
+
+| Stat | Source | Effect |
+|------|--------|--------|
+| **Hull HP** | Hull tier + armor | Total damage before destruction |
+| **Shield HP** | Shield module | Regenerating damage buffer |
+| **Shield Regen** | Shield type | HP recovered per second |
+| **DPS** | Weapons | Damage output per second |
+| **Range** | Weapon type | Engagement distance |
+| **Speed** | Thrusters | Movement velocity |
+| **Agility** | Thrusters + hull size | Turn rate, dodge ability |
+| **Signature** | Hull size + modules | How easily detected |
+| **Scan Range** | Sensors | Detection distance |
+
+#### Damage Types & Resistances
+
+| Damage Type | Strong Against | Weak Against | Weapon Examples |
+|-------------|----------------|--------------|-----------------|
+| **Energy** | Shields | Armor | Lasers, beams |
+| **Kinetic** | Armor | Shields | Cannons, railguns |
+| **Explosive** | Hull | Shields | Missiles, torpedoes |
+| **EMP** | Electronics | Hull | Disruptors, scramblers |
+
+**Combat Strategy:**
+- Strip shields with Energy weapons
+- Break armor with Kinetic weapons
+- Finish hull with Explosive weapons
+- Disable systems with EMP
+
+#### Combat Flow
+
+```
+1. Detection (Sensors vs Signature)
+   ↓
+2. Engagement Decision (Fight/Flight)
+   ↓
+3. Approach (Range management)
+   ↓
+4. Shield Phase (Energy weapons optimal)
+   ↓
+5. Armor Phase (Kinetic weapons optimal)
+   ↓
+6. Hull Phase (Explosive weapons optimal)
+   ↓
+7. Destruction or Escape
+```
+
+---
+
+### Combat Modules
+
+#### Offensive Modules
+
+| Module | Type | Effect |
+|--------|------|--------|
+| **Weapons** | Various | Deal damage |
+| **Target Painter** | Utility | Increase enemy signature |
+| **Tracking Computer** | Utility | Improve weapon accuracy |
+| **Damage Amplifier** | Utility | +% weapon damage |
+
+#### Defensive Modules
+
+| Module | Type | Effect |
+|--------|------|--------|
+| **Shield Extender** | Shield | +Max shield HP |
+| **Shield Booster** | Shield | Active burst heal |
+| **Armor Plate** | Armor | +Hull HP |
+| **Armor Repairer** | Armor | Slow HP regen |
+| **Damage Control** | Utility | +All resistances |
+
+#### Electronic Warfare
+
+| Module | Effect | Counter |
+|--------|--------|---------|
+| **Warp Scrambler** | Prevent escape | Warp Stabilizer |
+| **Stasis Web** | Slow enemy speed | Afterburner |
+| **Target Jammer** | Break targeting | Sensor Backup |
+| **Energy Neutralizer** | Drain capacitor | Cap Battery |
+
+#### Utility Modules
+
+| Module | Effect |
+|--------|--------|
+| **Afterburner** | Speed boost |
+| **Cloaking Device** | Invisibility (can't attack) |
+| **Warp Stabilizer** | Resist scrambling |
+| **Repair Drone** | Auto-heal in combat |
+
+---
+
+### Escape Mechanics
+
+Gatherers need ways to survive gankers. Combat isn't always winnable.
+
+| Escape Method | How It Works | Counter |
+|---------------|--------------|---------|
+| **Warp Out** | Charge warp drive, escape | Warp Scrambler |
+| **Outrun** | Faster ship escapes | Stasis Web |
+| **Cloak** | Go invisible, slip away | Stealth Detector |
+| **Safe Logout** | 30s timer, then safe DC | Keep aggressing |
+| **Distress Beacon** | Call for help | Kill fast |
+
+**Warp Scramble Strength:**
+- Scramblers have strength 1-3
+- Stabilizers have strength 1-3
+- Stabilizer strength must exceed scrambler to escape
+- Multiple scramblers stack
+
+---
+
+### PvP Zones - Risk vs Reward
+
+#### Resource Distribution
+
+| Zone | Resource Tiers | Gatherer Density | Ganker Density |
+|------|----------------|------------------|----------------|
+| Friendly | T1-T2 | Very High | None |
+| Mild | T2-T4 | High | Low |
+| Full | T4-T6 | Medium | Medium |
+| Hardcore | T6-T8 | Low | High |
+
+#### Exclusive Resources by Zone
+
+| Resource | Zone Required | Used For |
+|----------|---------------|----------|
+| Common Ore | Friendly+ | T1-T3 gear |
+| Industrial Ore | Mild+ | T4-T5 gear |
+| Rare Ore | Full+ | T6-T7 gear |
+| Exotic Ore | Hardcore only | T8 gear |
+| Mystical Gems | Hardcore only | T8 special items |
+
+**The Core Loop:**
+Want T8 gear? Need Exotic Ore. Exotic Ore only in Hardcore. Hardcore is full of gankers. Need better gear to survive. Need to craft or buy. Crafters need materials. Materials from Hardcore...
+
+---
+
+### Ganking & Defense Strategies
+
+#### Ganker Tactics
+
+| Tactic | Description | Best Against |
+|--------|-------------|--------------|
+| **Gate Camp** | Wait at warp gates | Unscouting travelers |
+| **Belt Patrol** | Roam mining areas | Solo miners |
+| **Bait & Switch** | Fake gatherer, call friends | Opportunist attackers |
+| **Cargo Scan** | Only attack valuable targets | Everyone |
+| **Bubble Trap** | Area warp disruption | Fleets |
+
+#### Gatherer Defenses
+
+| Strategy | Description | Trade-off |
+|----------|-------------|-----------|
+| **Tank Fit** | Max shields/armor | Less cargo space |
+| **Speed Fit** | Outrun attackers | Less mining yield |
+| **Cloak Fit** | Stay hidden | Can't mine while cloaked |
+| **Scout Alt** | Second account scouts | Extra effort/cost |
+| **Group Mining** | Safety in numbers | Split resources |
+| **Escort Hire** | Pay for protection | Cuts into profits |
+
+---
+
+### PvP Arena
+
+Structured competitive PvP separate from open world.
+
+#### Arena Modes
+
+| Mode | Players | Format | Duration |
+|------|---------|--------|----------|
+| **Duel** | 1v1 | Single elimination | 5 min max |
+| **Skirmish** | 3v3 | Team deathmatch | 10 min |
+| **Fleet Battle** | 5v5 | Objective-based | 15 min |
+| **Battle Royale** | 16 FFA | Last ship standing | 20 min |
+
+#### Arena Rules
+- Ships and equipment provided (standardized)
+- OR bring your own (risk losing it)
+- No escape - fight to destruction
+- Respawn in some modes
+
+#### Arena Rewards
+
+| Placement | Rewards |
+|-----------|---------|
+| **Winner** | OMEN prize pool, Arena Points, rare cosmetics |
+| **Top 3** | OMEN share, Arena Points |
+| **Participation** | Small Arena Points |
+
+#### Arena Points
+
+Earned through Arena combat, spent on:
+- Exclusive cosmetic skins
+- Arena-only ship variants (cosmetic)
+- Titles and badges
+- Leaderboard ranking
+
+#### Ranked Seasons
+
+| Rank | Rating | Season Rewards |
+|------|--------|----------------|
+| Bronze | 0-999 | Basic cosmetic |
+| Silver | 1000-1499 | Uncommon cosmetic |
+| Gold | 1500-1999 | Rare cosmetic + title |
+| Platinum | 2000-2499 | Epic cosmetic + badge |
+| Diamond | 2500-2999 | Legendary cosmetic set |
+| Champion | Top 100 | Unique title + trophy |
+
+---
+
+### Bounty System
+
+Players can place bounties on enemies.
+
+| Feature | Details |
+|---------|---------|
+| **Set Bounty** | Pay OMEN, placed on target's head |
+| **Minimum** | 1,000 OMEN |
+| **Stacking** | Multiple bounties accumulate |
+| **Claim** | Kill target in PvP zone |
+| **Payout** | Killer receives bounty (minus 10% fee) |
+| **Visibility** | High bounty players marked on map |
+
+**Wanted Levels:**
+| Bounty | Status | Effect |
+|--------|--------|--------|
+| <10K | Low | No special marking |
+| 10K-100K | Medium | Visible to nearby players |
+| 100K-1M | High | Visible system-wide |
+| >1M | Most Wanted | Visible galaxy-wide, NPC hunters spawn |
+
+---
+
+### Combat Skill Tree Bonuses
+
+| Tier | Bonus |
+|------|-------|
+| T1 | Basic weapon handling |
+| T2 | +5% weapon damage |
+| T3 | +5% shield HP |
+| T4 | +10% weapon damage |
+| T5 | +10% shield HP, unlock E-War modules |
+| T6 | +15% weapon damage |
+| T7 | +15% shield HP, +5% speed in combat |
+| T8 | +20% all combat stats, Masterwork weapons |
+
+---
+
+### Threats (PvE Combat)
+
+| Threat | Location | Danger | Drops |
+|--------|----------|--------|-------|
+| **Pirates** | Trade routes, belts | Medium | Salvage, OMEN |
+| **Drones (hostile)** | Abandoned stations | Low-Medium | Components |
+| **Creatures** | Planet surfaces | Varies | Organics, rare mats |
+| **World Bosses** | Scheduled spawns | Very High | T6-T8 loot |
+| **Anomalies** | Random spawns | Extreme | Exotic materials |
 
 ### Zone System
 
