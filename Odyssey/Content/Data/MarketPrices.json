@@ -1,0 +1,60 @@
+{
+  "MarketPrices": [
+    {
+      "ResourceType": 1,
+      "BasePrice": 3,
+      "PriceVolatility": 0.1,
+      "MinPrice": 2,
+      "MaxPrice": 5,
+      "bCanBuy": false,
+      "bCanSell": true,
+      "Name": "Silicate"
+    },
+    {
+      "ResourceType": 2,
+      "BasePrice": 4,
+      "PriceVolatility": 0.15,
+      "MinPrice": 3,
+      "MaxPrice": 7,
+      "bCanBuy": false,
+      "bCanSell": true,
+      "Name": "Carbon"
+    },
+    {
+      "ResourceType": 10,
+      "BasePrice": 12,
+      "PriceVolatility": 0.2,
+      "MinPrice": 8,
+      "MaxPrice": 18,
+      "bCanBuy": false,
+      "bCanSell": true,
+      "Name": "Refined Silicate"
+    },
+    {
+      "ResourceType": 11,
+      "BasePrice": 18,
+      "PriceVolatility": 0.2,
+      "MinPrice": 12,
+      "MaxPrice": 25,
+      "bCanBuy": false,
+      "bCanSell": true,
+      "Name": "Refined Carbon"
+    },
+    {
+      "ResourceType": 20,
+      "BasePrice": 45,
+      "PriceVolatility": 0.25,
+      "MinPrice": 30,
+      "MaxPrice": 65,
+      "bCanBuy": false,
+      "bCanSell": true,
+      "Name": "Composite Material"
+    }
+  ],
+  "MarketSettings": {
+    "UpdateIntervalSeconds": 30,
+    "SellPriceMultiplier": 0.8,
+    "GlobalVolatilityModifier": 1.0,
+    "DemandDrivenPricing": false
+  }
+}

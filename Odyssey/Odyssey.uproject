@@ -1,0 +1,43 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.4",
+	"Category": "",
+	"Description": "Odyssey - Sci-fi space exploration RPG mobile preview",
+	"Modules": [
+		{
+			"Name": "Odyssey",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "MobileUtils",
+			"Enabled": true
+		},
+		{
+			"Name": "TouchInterface",
+			"Enabled": true
+		},
+		{
+			"Name": "AndroidPermission",
+			"Enabled": true
+		},
+		{
+			"Name": "AppleARKit",
+			"Enabled": false,
+			"SupportedTargetPlatforms": [
+				"IOS"
+			]
+		},
+		{
+			"Name": "AndroidDeviceProfileSelector",
+			"Enabled": true
+		}
+	],
+	"TargetPlatforms": [
+		"Android",
+		"IOS"
+	],
+	"EpicSampleNameHash": "0"
+}

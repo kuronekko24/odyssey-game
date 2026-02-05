@@ -1,0 +1,156 @@
+{
+  "TutorialSteps": [
+    {
+      "StepID": "0",
+      "StepType": 0,
+      "StepTitle": "Welcome to Odyssey",
+      "StepDescription": "A universe of exploration awaits",
+      "DetailedInstructions": "Welcome, Explorer! You are about to embark on a journey through the cosmos as a freelance space miner. In the next 10 minutes, you'll learn everything needed to master the art of space exploration and resource trading.",
+      "TriggerType": 1,
+      "AutoTriggerDelay": 3.0,
+      "RequiredActions": [],
+      "CompletionConditions": ["time_elapsed"],
+      "bShowUIHighlight": false,
+      "UIElementToHighlight": "",
+      "bPauseGameplay": false
+    },
+    {
+      "StepID": "1",
+      "StepType": 1,
+      "StepTitle": "Master Navigation",
+      "StepDescription": "Learn to pilot your ship",
+      "DetailedInstructions": "Use the virtual joystick on the left side of your screen to move your ship. The isometric camera will follow you as you explore. Try moving in different directions to get a feel for the controls.",
+      "TriggerType": 1,
+      "AutoTriggerDelay": 0.0,
+      "RequiredActions": ["move_ship"],
+      "CompletionConditions": ["player_moved"],
+      "bShowUIHighlight": true,
+      "UIElementToHighlight": "VirtualJoystick",
+      "bPauseGameplay": false
+    },
+    {
+      "StepID": "2",
+      "StepType": 2,
+      "StepTitle": "Extract Resources",
+      "StepDescription": "Mine your first materials",
+      "DetailedInstructions": "Approach the glowing resource nodes you see around you. When you get close enough, tap the interact button on the right side of your screen to start mining. Silicate and Carbon are the foundation of all space industry.",
+      "TriggerType": 1,
+      "AutoTriggerDelay": 0.0,
+      "RequiredActions": ["mine_resource"],
+      "CompletionConditions": ["resource_mined"],
+      "bShowUIHighlight": true,
+      "UIElementToHighlight": "InteractButton",
+      "bPauseGameplay": false
+    },
+    {
+      "StepID": "3",
+      "StepType": 3,
+      "StepTitle": "Manage Inventory",
+      "StepDescription": "Check your cargo hold",
+      "DetailedInstructions": "Your ship automatically stores mined resources in your cargo hold. Open your inventory to see what you've collected. Each resource type stacks up to a certain limit, and your total cargo capacity can be upgraded.",
+      "TriggerType": 1,
+      "AutoTriggerDelay": 0.0,
+      "RequiredActions": ["open_inventory"],
+      "CompletionConditions": ["inventory_opened"],
+      "bShowUIHighlight": true,
+      "UIElementToHighlight": "InventoryButton",
+      "bPauseGameplay": false
+    },
+    {
+      "StepID": "4",
+      "StepType": 4,
+      "StepTitle": "Craft Advanced Materials",
+      "StepDescription": "Transform raw materials",
+      "DetailedInstructions": "Approach the crafting station and interact with it. Raw materials can be refined into much more valuable goods. Try crafting Refined Silicate or Refined Carbon - these sell for much higher prices than raw materials.",
+      "TriggerType": 1,
+      "AutoTriggerDelay": 0.0,
+      "RequiredActions": ["craft_item"],
+      "CompletionConditions": ["item_crafted"],
+      "bShowUIHighlight": true,
+      "UIElementToHighlight": "CraftingStation",
+      "bPauseGameplay": false
+    },
+    {
+      "StepID": "5",
+      "StepType": 5,
+      "StepTitle": "Trade for OMEN",
+      "StepDescription": "Sell your goods",
+      "DetailedInstructions": "Visit the trading station to sell your materials for OMEN, the galactic currency. Refined materials sell for much more than raw ones. OMEN is used to purchase ship upgrades and equipment.",
+      "TriggerType": 1,
+      "AutoTriggerDelay": 0.0,
+      "RequiredActions": ["sell_resource"],
+      "CompletionConditions": ["resource_sold"],
+      "bShowUIHighlight": true,
+      "UIElementToHighlight": "TradingStation",
+      "bPauseGameplay": false
+    },
+    {
+      "StepID": "6",
+      "StepType": 6,
+      "StepTitle": "Upgrade Your Ship",
+      "StepDescription": "Invest in improvements",
+      "DetailedInstructions": "Use your earned OMEN to purchase upgrades at the trading station. You can improve your mining power, mining speed, cargo capacity, or crafting efficiency. Each upgrade makes you more effective at earning OMEN.",
+      "TriggerType": 1,
+      "AutoTriggerDelay": 0.0,
+      "RequiredActions": ["purchase_upgrade"],
+      "CompletionConditions": ["upgrade_purchased"],
+      "bShowUIHighlight": true,
+      "UIElementToHighlight": "UpgradeMenu",
+      "bPauseGameplay": false
+    },
+    {
+      "StepID": "7",
+      "StepType": 7,
+      "StepTitle": "Exploration Mastery",
+      "StepDescription": "You've learned the core loop!",
+      "DetailedInstructions": "Congratulations! You've mastered the fundamental Odyssey gameplay loop: Mine → Craft → Trade → Upgrade → Repeat. In the full game, you'll explore vast galaxies, discover rare materials, build industrial empires, and uncover the mysteries of deep space. The universe awaits your exploration!",
+      "TriggerType": 0,
+      "AutoTriggerDelay": 5.0,
+      "RequiredActions": [],
+      "CompletionConditions": ["tutorial_complete"],
+      "bShowUIHighlight": false,
+      "UIElementToHighlight": "",
+      "bPauseGameplay": false
+    }
+  ],
+  "DemoSettings": {
+    "TotalTimeMinutes": 10,
+    "ShowProgressBar": true,
+    "AllowSkip": true,
+    "AutoAdvanceOnCompletion": true,
+    "ShowHints": true,
+    "HintDurationSeconds": 3.0
+  },
+  "UIHighlights": {
+    "VirtualJoystick": {
+      "HighlightColor": "0,255,255,128",
+      "PulseEffect": true,
+      "ShowArrow": true
+    },
+    "InteractButton": {
+      "HighlightColor": "255,255,0,128",
+      "PulseEffect": true,
+      "ShowArrow": true
+    },
+    "InventoryButton": {
+      "HighlightColor": "0,255,0,128",
+      "PulseEffect": false,
+      "ShowArrow": true
+    },
+    "CraftingStation": {
+      "HighlightColor": "255,0,255,128",
+      "PulseEffect": true,
+      "ShowArrow": false
+    },
+    "TradingStation": {
+      "HighlightColor": "255,165,0,128",
+      "PulseEffect": true,
+      "ShowArrow": false
+    },
+    "UpgradeMenu": {
+      "HighlightColor": "255,0,0,128",
+      "PulseEffect": false,
+      "ShowArrow": true
+    }
+  }
+}

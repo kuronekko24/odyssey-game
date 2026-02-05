@@ -1,0 +1,177 @@
+{
+  "CraftingRecipes": [
+    {
+      "RecipeID": "RefinesilicateBasic",
+      "RecipeName": "Refine Silicate",
+      "Description": "Process raw silicate ore into refined silicate material",
+      "Ingredients": [
+        {
+          "ResourceType": 1,
+          "Amount": 3
+        }
+      ],
+      "Outputs": [
+        {
+          "ResourceType": 10,
+          "Amount": 1,
+          "SuccessChance": 1.0
+        }
+      ],
+      "CraftingTime": 2.0,
+      "RequiredCraftingLevel": 1,
+      "bIsUnlocked": true,
+      "ExperienceReward": 15,
+      "Category": "Basic Refining"
+    },
+    {
+      "RecipeID": "RefineCarbonBasic",
+      "RecipeName": "Refine Carbon",
+      "Description": "Process raw carbon deposits into refined carbon material",
+      "Ingredients": [
+        {
+          "ResourceType": 2,
+          "Amount": 2
+        }
+      ],
+      "Outputs": [
+        {
+          "ResourceType": 11,
+          "Amount": 1,
+          "SuccessChance": 1.0
+        }
+      ],
+      "CraftingTime": 2.5,
+      "RequiredCraftingLevel": 1,
+      "bIsUnlocked": true,
+      "ExperienceReward": 20,
+      "Category": "Basic Refining"
+    },
+    {
+      "RecipeID": "CompositeBasic",
+      "RecipeName": "Composite Material",
+      "Description": "Combine refined materials to create advanced composite material",
+      "Ingredients": [
+        {
+          "ResourceType": 10,
+          "Amount": 2
+        },
+        {
+          "ResourceType": 11,
+          "Amount": 1
+        }
+      ],
+      "Outputs": [
+        {
+          "ResourceType": 20,
+          "Amount": 1,
+          "SuccessChance": 0.85
+        }
+      ],
+      "CraftingTime": 5.0,
+      "RequiredCraftingLevel": 3,
+      "bIsUnlocked": false,
+      "ExperienceReward": 50,
+      "Category": "Advanced Materials"
+    },
+    {
+      "RecipeID": "SilicateBatch",
+      "RecipeName": "Batch Refine Silicate",
+      "Description": "Efficiently process large quantities of silicate ore",
+      "Ingredients": [
+        {
+          "ResourceType": 1,
+          "Amount": 10
+        }
+      ],
+      "Outputs": [
+        {
+          "ResourceType": 10,
+          "Amount": 4,
+          "SuccessChance": 1.0
+        }
+      ],
+      "CraftingTime": 6.0,
+      "RequiredCraftingLevel": 5,
+      "bIsUnlocked": false,
+      "ExperienceReward": 60,
+      "Category": "Batch Processing"
+    },
+    {
+      "RecipeID": "CarbonBatch",
+      "RecipeName": "Batch Refine Carbon",
+      "Description": "Efficiently process large quantities of carbon deposits",
+      "Ingredients": [
+        {
+          "ResourceType": 2,
+          "Amount": 8
+        }
+      ],
+      "Outputs": [
+        {
+          "ResourceType": 11,
+          "Amount": 5,
+          "SuccessChance": 1.0
+        }
+      ],
+      "CraftingTime": 7.0,
+      "RequiredCraftingLevel": 5,
+      "bIsUnlocked": false,
+      "ExperienceReward": 75,
+      "Category": "Batch Processing"
+    },
+    {
+      "RecipeID": "CompositeAdvanced",
+      "RecipeName": "Advanced Composite",
+      "Description": "Create high-quality composite material with improved yield",
+      "Ingredients": [
+        {
+          "ResourceType": 10,
+          "Amount": 3
+        },
+        {
+          "ResourceType": 11,
+          "Amount": 2
+        },
+        {
+          "ResourceType": 1,
+          "Amount": 1
+        }
+      ],
+      "Outputs": [
+        {
+          "ResourceType": 20,
+          "Amount": 2,
+          "SuccessChance": 0.95
+        }
+      ],
+      "CraftingTime": 8.0,
+      "RequiredCraftingLevel": 7,
+      "bIsUnlocked": false,
+      "ExperienceReward": 100,
+      "Category": "Advanced Materials"
+    }
+  ],
+  "Categories": [
+    "Basic Refining",
+    "Advanced Materials",
+    "Batch Processing"
+  ],
+  "UnlockConditions": {
+    "CompositeBasic": {
+      "RequiredLevel": 3,
+      "RequiredRecipes": ["RefinesilicateBasic", "RefineCarbonBasic"]
+    },
+    "SilicateBatch": {
+      "RequiredLevel": 5,
+      "RequiredRecipesCrafted": {"RefinesilicateBasic": 10}
+    },
+    "CarbonBatch": {
+      "RequiredLevel": 5,
+      "RequiredRecipesCrafted": {"RefineCarbonBasic": 10}
+    },
+    "CompositeAdvanced": {
+      "RequiredLevel": 7,
+      "RequiredRecipesCrafted": {"CompositeBasic": 5}
+    }
+  }
+}
