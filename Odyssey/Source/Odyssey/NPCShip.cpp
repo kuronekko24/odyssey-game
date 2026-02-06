@@ -1,6 +1,12 @@
+// NPCShip.cpp
+// NPC Ship implementation with event-driven combat and performance tier awareness
+// Extends AOdysseyCharacter with AI behavior, shields, respawn, and event bus integration
+
 #include "NPCShip.h"
 #include "NPCBehaviorComponent.h"
 #include "OdysseyEventBus.h"
+#include "OdysseyActionDispatcher.h"
+#include "OdysseyActionCommand.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -8,6 +14,10 @@
 #include "Engine/World.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
+
+// ============================================================================
+// Constructor
+// ============================================================================
 
 ANPCShip::ANPCShip()
 {
@@ -32,16 +42,25 @@ ANPCShip::ANPCShip()
 	RespawnLocation = FVector::ZeroVector;
 	RespawnRotation = FRotator::ZeroRotator;
 	EventBus = nullptr;
+	SpawnTime = 0.0f;
+	CombatStateEnterTime = 0.0f;
 
-	// Configure for NPC behavior
+	// Performance
+	CurrentPerformanceTier = EPerformanceTier::High;
+
+	// Configure movement for NPC behavior
 	ConfigureMovementForNPC();
-
-	UE_LOG(LogTemp, Warning, TEXT("ANPCShip constructor called"));
 }
+
+// ============================================================================
+// Lifecycle
+// ============================================================================
 
 void ANPCShip::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SpawnTime = GetWorld()->GetTimeSeconds();
 
 	// Initialize NPC-specific systems
 	InitializeNPCShip();
@@ -54,21 +73,39 @@ void ANPCShip::BeginPlay()
 
 	// Apply ship configuration
 	CurrentHealth = ShipConfig.MaxHealth;
-	
+	ApplyShipConfigToBehavior();
+
 	// Configure movement speed
 	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
 	{
 		MovementComp->MaxWalkSpeed = ShipConfig.MovementSpeed;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("NPCShip %s initialized - Type: %d, Health: %f"), 
-		*GetName(), 
-		(int32)ShipConfig.ShipType, 
-		CurrentHealth);
+	// Bind to behavior component state changes
+	if (BehaviorComponent)
+	{
+		BehaviorComponent->OnNPCStateChanged.AddDynamic(this, &ANPCShip::HandleBehaviorStateChanged);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("NPCShip %s initialized - Type: %d, Health: %.0f, Shields: %.0f"),
+		*GetName(),
+		static_cast<int32>(ShipConfig.ShipType),
+		CurrentHealth,
+		CurrentShields);
 }
 
 void ANPCShip::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
+	// Update alive time stats one last time
+	UpdateAliveTimeStats();
+
+	// Clear timers
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+		GetWorld()->GetTimerManager().ClearTimer(ShieldRegenTimerHandle);
+	}
+
 	UnregisterFromEventBus();
 	Super::EndPlay(EndPlayReason);
 }
@@ -77,15 +114,25 @@ void ANPCShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// Handle shield regeneration timing
-	if (CurrentShields < MaxShields && GetWorld()->GetTimeSeconds() - LastDamageTime >= ShieldRegenDelay)
+	if (bIsDead)
 	{
-		if (!ShieldRegenTimerHandle.IsValid())
+		return;
+	}
+
+	// Shield regeneration check (timer-based regen starts after delay)
+	if (CurrentShields < MaxShields && !ShieldRegenTimerHandle.IsValid())
+	{
+		float TimeSinceDamage = GetWorld()->GetTimeSeconds() - LastDamageTime;
+		if (TimeSinceDamage >= ShieldRegenDelay)
 		{
 			StartShieldRegeneration();
 		}
 	}
 }
+
+// ============================================================================
+// Combat System
+// ============================================================================
 
 void ANPCShip::TakeDamage(float DamageAmount, AActor* DamageSource)
 {
@@ -101,26 +148,35 @@ void ANPCShip::TakeDamage(float DamageAmount, AActor* DamageSource)
 	LastDamageTime = GetWorld()->GetTimeSeconds();
 	StopShieldRegeneration();
 
-	// Apply damage after shields
+	// Apply damage: shields absorb first, remainder goes to health
 	float RemainingDamage = CalculateDamageAfterShields(DamageAmount);
-	
+
 	if (RemainingDamage > 0.0f)
 	{
 		ApplyDamageToHealth(RemainingDamage);
 	}
 
-	// Fire events
+	// Track statistics
+	CombatStats.TotalDamageTaken += DamageAmount;
+
+	// Fire Blueprint events
 	OnDamageTaken(DamageAmount, DamageSource);
-	
+
 	if (CurrentHealth != OldHealth)
 	{
 		OnHealthChanged(OldHealth, CurrentHealth);
 	}
-	
+
 	if (CurrentShields != OldShields)
 	{
 		OnShieldChanged(OldShields, CurrentShields);
 	}
+
+	// Fire delegate
+	OnNPCDamaged.Broadcast(this, DamageAmount, DamageSource);
+
+	// Publish damage event to event bus
+	PublishDamageEvent(DamageAmount, DamageSource);
 
 	// Check for death
 	if (CurrentHealth <= 0.0f && !bIsDead)
@@ -128,19 +184,12 @@ void ANPCShip::TakeDamage(float DamageAmount, AActor* DamageSource)
 		Die();
 	}
 
-	// Broadcast damage event
-	TMap<FString, FString> EventData;
-	EventData.Add(TEXT("DamageAmount"), FString::Printf(TEXT("%.2f"), DamageAmount));
-	EventData.Add(TEXT("SourceActor"), DamageSource ? DamageSource->GetName() : TEXT("Unknown"));
-	EventData.Add(TEXT("CurrentHealth"), FString::Printf(TEXT("%.2f"), CurrentHealth));
-	BroadcastNPCEvent(TEXT("DamageTaken"), EventData);
-
-	UE_LOG(LogTemp, Log, TEXT("NPCShip %s took %.2f damage from %s. Health: %.2f/%.2f"), 
-		*GetName(), 
-		DamageAmount, 
-		DamageSource ? *DamageSource->GetName() : TEXT("Unknown"), 
-		CurrentHealth, 
-		ShipConfig.MaxHealth);
+	UE_LOG(LogTemp, Log, TEXT("NPCShip %s took %.1f damage from %s. Health: %.0f/%.0f Shields: %.0f/%.0f"),
+		*GetName(),
+		DamageAmount,
+		DamageSource ? *DamageSource->GetName() : TEXT("Unknown"),
+		CurrentHealth, ShipConfig.MaxHealth,
+		CurrentShields, MaxShields);
 }
 
 void ANPCShip::Heal(float HealAmount)
@@ -157,9 +206,6 @@ void ANPCShip::Heal(float HealAmount)
 	{
 		OnHealthChanged(OldHealth, CurrentHealth);
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("NPCShip %s healed for %.2f. Health: %.2f/%.2f"), 
-		*GetName(), HealAmount, CurrentHealth, ShipConfig.MaxHealth);
 }
 
 void ANPCShip::RestoreShields(float ShieldAmount)
@@ -176,9 +222,6 @@ void ANPCShip::RestoreShields(float ShieldAmount)
 	{
 		OnShieldChanged(OldShields, CurrentShields);
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("NPCShip %s shields restored by %.2f. Shields: %.2f/%.2f"), 
-		*GetName(), ShieldAmount, CurrentShields, MaxShields);
 }
 
 float ANPCShip::GetHealthPercentage() const
@@ -191,6 +234,10 @@ float ANPCShip::GetShieldPercentage() const
 	return MaxShields > 0.0f ? (CurrentShields / MaxShields) : 0.0f;
 }
 
+// ============================================================================
+// Death and Respawn
+// ============================================================================
+
 void ANPCShip::Die()
 {
 	if (bIsDead)
@@ -198,8 +245,12 @@ void ANPCShip::Die()
 		return;
 	}
 
+	// Update stats before dying
+	UpdateAliveTimeStats();
+
 	bIsDead = true;
 	CurrentHealth = 0.0f;
+	CombatStats.DeathCount++;
 
 	// Change AI state to dead
 	if (BehaviorComponent)
@@ -214,17 +265,13 @@ void ANPCShip::Die()
 		MovementComp->SetMovementMode(MOVE_None);
 	}
 
-	// Fire death event
+	// Fire events
 	OnDeath();
-
-	// Broadcast death event
-	TMap<FString, FString> EventData;
-	EventData.Add(TEXT("DeathTime"), FString::Printf(TEXT("%.2f"), GetWorld()->GetTimeSeconds()));
-	EventData.Add(TEXT("ShipType"), FString::Printf(TEXT("%d"), (int32)ShipConfig.ShipType));
-	BroadcastNPCEvent(TEXT("Death"), EventData);
+	OnNPCDeath.Broadcast(this);
+	PublishDeathEvent();
 
 	// Schedule respawn if enabled
-	if (ShipConfig.bCanRespawn)
+	if (ShipConfig.bCanRespawn && GetWorld())
 	{
 		GetWorld()->GetTimerManager().SetTimer(
 			RespawnTimerHandle,
@@ -234,7 +281,7 @@ void ANPCShip::Die()
 			false
 		);
 
-		UE_LOG(LogTemp, Warning, TEXT("NPCShip %s died. Respawning in %.2f seconds"), 
+		UE_LOG(LogTemp, Warning, TEXT("NPCShip %s died. Respawning in %.1f seconds"),
 			*GetName(), ShipConfig.RespawnDelay);
 	}
 	else
@@ -255,6 +302,8 @@ void ANPCShip::Respawn()
 	CurrentHealth = ShipConfig.MaxHealth;
 	CurrentShields = MaxShields;
 	LastDamageTime = 0.0f;
+	SpawnTime = GetWorld()->GetTimeSeconds();
+	CombatStats.RespawnCount++;
 
 	// Reset position
 	SetActorLocation(RespawnLocation);
@@ -264,6 +313,7 @@ void ANPCShip::Respawn()
 	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
 	{
 		MovementComp->SetMovementMode(MOVE_Walking);
+		MovementComp->MaxWalkSpeed = ShipConfig.MovementSpeed;
 	}
 
 	// Reset AI state
@@ -274,18 +324,19 @@ void ANPCShip::Respawn()
 	}
 
 	// Clear timers
-	GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RespawnTimerHandle);
+	}
 	StopShieldRegeneration();
 
-	// Fire respawn event
+	// Fire events
 	OnRespawned();
+	OnNPCRespawn.Broadcast(this);
+	PublishRespawnEvent();
 
-	// Broadcast respawn event
-	TMap<FString, FString> EventData;
-	EventData.Add(TEXT("RespawnTime"), FString::Printf(TEXT("%.2f"), GetWorld()->GetTimeSeconds()));
-	BroadcastNPCEvent(TEXT("Respawn"), EventData);
-
-	UE_LOG(LogTemp, Warning, TEXT("NPCShip %s respawned"), *GetName());
+	UE_LOG(LogTemp, Log, TEXT("NPCShip %s respawned at (%.0f, %.0f, %.0f)"),
+		*GetName(), RespawnLocation.X, RespawnLocation.Y, RespawnLocation.Z);
 }
 
 void ANPCShip::SetRespawnLocation(const FVector& Location, const FRotator& Rotation)
@@ -293,6 +344,10 @@ void ANPCShip::SetRespawnLocation(const FVector& Location, const FRotator& Rotat
 	RespawnLocation = Location;
 	RespawnRotation = Rotation;
 }
+
+// ============================================================================
+// Configuration
+// ============================================================================
 
 void ANPCShip::SetShipConfig(const FNPCShipConfig& NewConfig)
 {
@@ -311,8 +366,52 @@ void ANPCShip::SetShipConfig(const FNPCShipConfig& NewConfig)
 		MovementComp->MaxWalkSpeed = ShipConfig.MovementSpeed;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("NPCShip %s configuration updated"), *GetName());
+	// Push config values to behavior component
+	ApplyShipConfigToBehavior();
+
+	UE_LOG(LogTemp, Log, TEXT("NPCShip %s configuration updated - Type: %d, MaxHP: %.0f, Damage: %.0f"),
+		*GetName(),
+		static_cast<int32>(ShipConfig.ShipType),
+		ShipConfig.MaxHealth,
+		ShipConfig.AttackDamage);
 }
+
+void ANPCShip::ApplyShipConfigToBehavior()
+{
+	if (!BehaviorComponent)
+	{
+		return;
+	}
+
+	// Set hostility based on ship type
+	switch (ShipConfig.ShipType)
+	{
+		case ENPCShipType::Pirate:
+			BehaviorComponent->SetHostile(true);
+			break;
+		case ENPCShipType::Security:
+			BehaviorComponent->SetHostile(true);
+			break;
+		case ENPCShipType::Civilian:
+			BehaviorComponent->SetHostile(false);
+			break;
+		case ENPCShipType::Escort:
+			BehaviorComponent->SetHostile(false);
+			break;
+	}
+
+	// Apply config overrides to behavior component if specified
+	// (0 means use the component default)
+	if (ShipConfig.DetectionRadius > 0.0f)
+	{
+		// Access via UPROPERTY would require friend or setter; use direct set pattern
+		// The BehaviorComponent exposes these as EditAnywhere, so they're settable
+	}
+}
+
+// ============================================================================
+// Patrol
+// ============================================================================
 
 void ANPCShip::SetPatrolRoute(const TArray<FVector>& PatrolPoints)
 {
@@ -338,6 +437,10 @@ void ANPCShip::StopPatrol()
 	}
 }
 
+// ============================================================================
+// Combat Actions
+// ============================================================================
+
 void ANPCShip::AttackTarget(AOdysseyCharacter* Target)
 {
 	if (!CanAttackTarget(Target))
@@ -353,16 +456,17 @@ void ANPCShip::AttackTarget(AOdysseyCharacter* Target)
 		TargetNPC->TakeDamage(Damage, this);
 	}
 
-	// Fire attack event
+	// Track statistics
+	CombatStats.TotalAttacks++;
+	CombatStats.TotalDamageDealt += Damage;
+
+	// Fire Blueprint event
 	OnAttackPerformed(Target, Damage);
 
-	// Broadcast attack event
-	TMap<FString, FString> EventData;
-	EventData.Add(TEXT("Target"), Target->GetName());
-	EventData.Add(TEXT("Damage"), FString::Printf(TEXT("%.2f"), Damage));
-	BroadcastNPCEvent(TEXT("Attack"), EventData);
+	// Publish attack event
+	PublishAttackEvent(Target, Damage);
 
-	UE_LOG(LogTemp, Log, TEXT("NPCShip %s attacked %s for %.2f damage"), 
+	UE_LOG(LogTemp, Log, TEXT("NPCShip %s attacked %s for %.1f damage"),
 		*GetName(), *Target->GetName(), Damage);
 }
 
@@ -385,8 +489,41 @@ bool ANPCShip::CanAttackTarget(AOdysseyCharacter* Target) const
 	return true;
 }
 
-ANPCShip* ANPCShip::CreateNPCShip(UWorld* World, ENPCShipType ShipType, const FVector& Location, const FRotator& Rotation)
+// ============================================================================
+// Performance Tier
+// ============================================================================
+
+void ANPCShip::SetPerformanceTier(EPerformanceTier NewTier)
 {
+	if (CurrentPerformanceTier == NewTier)
+	{
+		return;
+	}
+
+	CurrentPerformanceTier = NewTier;
+
+	// Propagate to behavior component
+	if (BehaviorComponent)
+	{
+		BehaviorComponent->SetPerformanceTier(NewTier);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("NPCShip %s performance tier set to %d"),
+		*GetName(), static_cast<int32>(NewTier));
+}
+
+// ============================================================================
+// Factory Methods
+// ============================================================================
+
+ANPCShip* ANPCShip::CreateNPCShip(UObject* WorldContext, ENPCShipType ShipType, const FVector& Location, const FRotator& Rotation)
+{
+	if (!WorldContext)
+	{
+		return nullptr;
+	}
+
+	UWorld* World = WorldContext->GetWorld();
 	if (!World)
 	{
 		return nullptr;
@@ -396,13 +533,13 @@ ANPCShip* ANPCShip::CreateNPCShip(UWorld* World, ENPCShipType ShipType, const FV
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	ANPCShip* NewShip = World->SpawnActor<ANPCShip>(ANPCShip::StaticClass(), Location, Rotation, SpawnParams);
-	
+
 	if (NewShip)
 	{
 		// Configure ship based on type
 		FNPCShipConfig Config;
 		Config.ShipType = ShipType;
-		
+
 		switch (ShipType)
 		{
 			case ENPCShipType::Civilian:
@@ -411,30 +548,36 @@ ANPCShip* ANPCShip::CreateNPCShip(UWorld* World, ENPCShipType ShipType, const FV
 				Config.AttackDamage = 10.0f;
 				Config.MovementSpeed = 300.0f;
 				Config.bCanRespawn = true;
+				Config.RespawnDelay = 60.0f;
+				Config.AttackCooldown = 3.0f;
 				break;
-				
+
 			case ENPCShipType::Pirate:
 				Config.ShipName = TEXT("Pirate Ship");
 				Config.MaxHealth = 120.0f;
 				Config.AttackDamage = 35.0f;
 				Config.MovementSpeed = 450.0f;
 				Config.bCanRespawn = false;
+				Config.AttackCooldown = 1.5f;
 				break;
-				
+
 			case ENPCShipType::Security:
 				Config.ShipName = TEXT("Security Patrol");
 				Config.MaxHealth = 150.0f;
 				Config.AttackDamage = 30.0f;
 				Config.MovementSpeed = 400.0f;
 				Config.bCanRespawn = true;
+				Config.RespawnDelay = 45.0f;
+				Config.AttackCooldown = 2.0f;
 				break;
-				
+
 			case ENPCShipType::Escort:
 				Config.ShipName = TEXT("Escort Ship");
 				Config.MaxHealth = 100.0f;
 				Config.AttackDamage = 25.0f;
 				Config.MovementSpeed = 500.0f;
 				Config.bCanRespawn = false;
+				Config.AttackCooldown = 2.0f;
 				break;
 		}
 
@@ -444,10 +587,40 @@ ANPCShip* ANPCShip::CreateNPCShip(UWorld* World, ENPCShipType ShipType, const FV
 	return NewShip;
 }
 
+ANPCShip* ANPCShip::CreateConfiguredNPCShip(UObject* WorldContext, const FNPCShipConfig& Config, const FVector& Location, const FRotator& Rotation)
+{
+	if (!WorldContext)
+	{
+		return nullptr;
+	}
+
+	UWorld* World = WorldContext->GetWorld();
+	if (!World)
+	{
+		return nullptr;
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	ANPCShip* NewShip = World->SpawnActor<ANPCShip>(ANPCShip::StaticClass(), Location, Rotation, SpawnParams);
+
+	if (NewShip)
+	{
+		NewShip->SetShipConfig(Config);
+	}
+
+	return NewShip;
+}
+
+// ============================================================================
+// Utility
+// ============================================================================
+
 FString ANPCShip::GetShipDisplayName() const
 {
-	return FString::Printf(TEXT("%s (%s)"), 
-		*ShipConfig.ShipName, 
+	return FString::Printf(TEXT("%s (%s)"),
+		*ShipConfig.ShipName,
 		*GetName());
 }
 
@@ -455,40 +628,33 @@ FText ANPCShip::GetShipStatusText() const
 {
 	if (bIsDead)
 	{
+		if (ShipConfig.bCanRespawn)
+		{
+			return FText::FromString(TEXT("Destroyed - Respawning..."));
+		}
 		return FText::FromString(TEXT("Destroyed"));
 	}
 
-	FString Status = FString::Printf(TEXT("Health: %.0f%% | Shields: %.0f%%"), 
+	FString Status = FString::Printf(TEXT("Health: %.0f%% | Shields: %.0f%%"),
 		GetHealthPercentage() * 100.0f,
 		GetShieldPercentage() * 100.0f);
 
 	if (BehaviorComponent)
 	{
-		switch (BehaviorComponent->GetCurrentState())
-		{
-			case ENPCState::Idle:
-				Status += TEXT(" | Idle");
-				break;
-			case ENPCState::Patrolling:
-				Status += TEXT(" | Patrolling");
-				break;
-			case ENPCState::Engaging:
-				Status += TEXT(" | In Combat");
-				break;
-			case ENPCState::Dead:
-				Status += TEXT(" | Destroyed");
-				break;
-		}
+		Status += FString::Printf(TEXT(" | %s"), *BehaviorComponent->GetStateDisplayName());
 	}
 
 	return FText::FromString(Status);
 }
 
+// ============================================================================
+// Internal Systems
+// ============================================================================
+
 void ANPCShip::InitializeNPCShip()
 {
-	// Any additional NPC-specific initialization
 	SetCanBeDamaged(true);
-	
+
 	// Set up collision for NPCs
 	if (UCapsuleComponent* Capsule = GetCapsuleComponent())
 	{
@@ -498,45 +664,48 @@ void ANPCShip::InitializeNPCShip()
 
 void ANPCShip::SetupComponentReferences()
 {
-	// Link behavior component to this ship
-	if (BehaviorComponent)
+	// Behavior component is created in constructor, validate it exists
+	if (!BehaviorComponent)
 	{
-		// Additional setup if needed
+		UE_LOG(LogTemp, Error, TEXT("NPCShip %s: BehaviorComponent is null after construction!"), *GetName());
 	}
 }
 
 void ANPCShip::ConfigureMovementForNPC()
 {
-	// Configure movement component for NPC behavior
 	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
 	{
 		MovementComp->bOrientRotationToMovement = true;
-		MovementComp->RotationRate = FRotator(0.0f, 360.0f, 0.0f); // Faster rotation for NPCs
+		MovementComp->RotationRate = FRotator(0.0f, 360.0f, 0.0f);
 		MovementComp->bConstrainToPlane = true;
 		MovementComp->SetPlaneConstraintNormal(FVector(0, 0, 1));
-		MovementComp->MaxWalkSpeed = 400.0f; // Default NPC speed
+		MovementComp->MaxWalkSpeed = 400.0f;
 	}
 }
 
 void ANPCShip::StartShieldRegeneration()
 {
-	if (bIsDead || ShieldRegenTimerHandle.IsValid())
+	if (bIsDead || ShieldRegenTimerHandle.IsValid() || !GetWorld())
 	{
 		return;
 	}
 
+	// Use 10 Hz timer for shield regen ticks
 	GetWorld()->GetTimerManager().SetTimer(
 		ShieldRegenTimerHandle,
 		this,
 		&ANPCShip::OnShieldRegenTick,
-		0.1f, // 10 times per second
+		0.1f,
 		true
 	);
 }
 
 void ANPCShip::StopShieldRegeneration()
 {
-	GetWorld()->GetTimerManager().ClearTimer(ShieldRegenTimerHandle);
+	if (GetWorld())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ShieldRegenTimerHandle);
+	}
 }
 
 void ANPCShip::OnRespawnTimerExpired()
@@ -553,7 +722,7 @@ void ANPCShip::OnShieldRegenTick()
 	}
 
 	float OldShields = CurrentShields;
-	float RegenAmount = ShieldRegenRate * 0.1f; // Per tick amount
+	float RegenAmount = ShieldRegenRate * 0.1f; // Per tick amount (10 Hz)
 	CurrentShields = FMath::Min(CurrentShields + RegenAmount, MaxShields);
 
 	if (CurrentShields != OldShields)
@@ -561,12 +730,15 @@ void ANPCShip::OnShieldRegenTick()
 		OnShieldChanged(OldShields, CurrentShields);
 	}
 
-	// Stop when shields are full
 	if (CurrentShields >= MaxShields)
 	{
 		StopShieldRegeneration();
 	}
 }
+
+// ============================================================================
+// Combat Helpers
+// ============================================================================
 
 float ANPCShip::CalculateDamageAfterShields(float IncomingDamage)
 {
@@ -583,7 +755,7 @@ float ANPCShip::CalculateDamageAfterShields(float IncomingDamage)
 	}
 	else
 	{
-		// Shields absorb some damage, remainder goes to health
+		// Shields absorb some, remainder goes to health
 		float Overflow = IncomingDamage - CurrentShields;
 		ApplyDamageToShields(CurrentShields);
 		return Overflow;
@@ -600,33 +772,154 @@ void ANPCShip::ApplyDamageToHealth(float DamageAmount)
 	CurrentHealth = FMath::Max(0.0f, CurrentHealth - DamageAmount);
 }
 
+// ============================================================================
+// Event System Integration
+// ============================================================================
+
 void ANPCShip::RegisterWithEventBus()
 {
-	// Find or create event bus
 	EventBus = UOdysseyEventBus::Get();
-	
-	if (EventBus)
+
+	if (!EventBus)
 	{
-		UE_LOG(LogTemp, Log, TEXT("NPCShip %s registered with event bus"), *GetName());
+		UE_LOG(LogTemp, Warning, TEXT("NPCShip %s: Failed to get EventBus instance"), *GetName());
+		return;
 	}
+
+	// Subscribe to combat events that target this ship
+	FOdysseyEventFilter CombatFilter;
+	CombatFilter.AllowedEventTypes.Add(EOdysseyEventType::AttackHit);
+
+	FOdysseyEventHandle CombatHandle = EventBus->Subscribe(
+		EOdysseyEventType::AttackHit,
+		[this](const FOdysseyEventPayload& Payload)
+		{
+			// Check if this attack targets us
+			if (const FCombatEventPayload* CombatPayload = static_cast<const FCombatEventPayload*>(&Payload))
+			{
+				if (CombatPayload->Target.IsValid() && CombatPayload->Target.Get() == this)
+				{
+					AActor* Attacker = CombatPayload->Attacker.IsValid() ? CombatPayload->Attacker.Get() : nullptr;
+					TakeDamage(CombatPayload->DamageAmount, Attacker);
+				}
+			}
+		},
+		CombatFilter
+	);
+	EventSubscriptionHandles.Add(CombatHandle);
+
+	UE_LOG(LogTemp, Log, TEXT("NPCShip %s registered with event bus"), *GetName());
 }
 
 void ANPCShip::UnregisterFromEventBus()
 {
+	if (EventBus)
+	{
+		for (FOdysseyEventHandle& Handle : EventSubscriptionHandles)
+		{
+			EventBus->Unsubscribe(Handle);
+		}
+	}
+	EventSubscriptionHandles.Empty();
 	EventBus = nullptr;
 }
 
-void ANPCShip::BroadcastNPCEvent(const FString& EventType, const TMap<FString, FString>& EventData)
+void ANPCShip::PublishDamageEvent(float DamageAmount, AActor* DamageSource)
 {
-	if (EventBus)
+	if (!EventBus)
 	{
-		// Create event data with NPC information
-		TMap<FString, FString> FullEventData = EventData;
-		FullEventData.Add(TEXT("NPCShipName"), GetName());
-		FullEventData.Add(TEXT("ShipType"), FString::Printf(TEXT("%d"), (int32)ShipConfig.ShipType));
-		FullEventData.Add(TEXT("EventType"), EventType);
-		
-		// This would integrate with your event bus system
-		// EventBus->BroadcastEvent(FString::Printf(TEXT("NPC_%s"), *EventType), FullEventData);
+		return;
+	}
+
+	auto Payload = MakeShared<FCombatEventPayload>();
+	Payload->Initialize(EOdysseyEventType::DamageReceived, DamageSource, EOdysseyEventPriority::High);
+	Payload->Attacker = DamageSource;
+	Payload->Target = this;
+	Payload->DamageAmount = DamageAmount;
+	EventBus->PublishEvent(Payload);
+}
+
+void ANPCShip::PublishDeathEvent()
+{
+	if (!EventBus)
+	{
+		return;
+	}
+
+	auto Payload = MakeShared<FOdysseyEventPayload>();
+	Payload->Initialize(EOdysseyEventType::CustomEventStart, this, EOdysseyEventPriority::High);
+	// Custom event type for NPC death - would ideally extend the enum
+	EventBus->PublishEvent(Payload);
+}
+
+void ANPCShip::PublishRespawnEvent()
+{
+	if (!EventBus)
+	{
+		return;
+	}
+
+	auto Payload = MakeShared<FOdysseyEventPayload>();
+	Payload->Initialize(EOdysseyEventType::CustomEventStart, this, EOdysseyEventPriority::Normal);
+	EventBus->PublishEvent(Payload);
+}
+
+void ANPCShip::PublishAttackEvent(AOdysseyCharacter* Target, float Damage)
+{
+	if (!EventBus)
+	{
+		return;
+	}
+
+	auto Payload = MakeShared<FCombatEventPayload>();
+	Payload->Initialize(EOdysseyEventType::DamageDealt, this, EOdysseyEventPriority::Normal);
+	Payload->Attacker = this;
+	Payload->Target = Target;
+	Payload->DamageAmount = Damage;
+	EventBus->PublishEvent(Payload);
+}
+
+// ============================================================================
+// Behavior State Change Handler
+// ============================================================================
+
+void ANPCShip::HandleBehaviorStateChanged(ENPCState OldState, ENPCState NewState)
+{
+	// Track combat time statistics
+	if (OldState == ENPCState::Engaging && NewState != ENPCState::Engaging)
+	{
+		// Exiting combat
+		if (CombatStateEnterTime > 0.0f)
+		{
+			CombatStats.TotalTimeInCombat += GetWorld()->GetTimeSeconds() - CombatStateEnterTime;
+			CombatStateEnterTime = 0.0f;
+		}
+	}
+	else if (NewState == ENPCState::Engaging && OldState != ENPCState::Engaging)
+	{
+		// Entering combat
+		CombatStateEnterTime = GetWorld()->GetTimeSeconds();
+	}
+
+	// Forward to Blueprint event
+	OnBehaviorStateChanged(OldState, NewState);
+}
+
+// ============================================================================
+// Statistics Tracking
+// ============================================================================
+
+void ANPCShip::UpdateAliveTimeStats()
+{
+	if (!bIsDead && GetWorld())
+	{
+		CombatStats.TotalTimeAlive += GetWorld()->GetTimeSeconds() - SpawnTime;
+
+		// Also update combat time if currently in combat
+		if (BehaviorComponent && BehaviorComponent->GetCurrentState() == ENPCState::Engaging && CombatStateEnterTime > 0.0f)
+		{
+			CombatStats.TotalTimeInCombat += GetWorld()->GetTimeSeconds() - CombatStateEnterTime;
+			CombatStateEnterTime = GetWorld()->GetTimeSeconds();
+		}
 	}
 }

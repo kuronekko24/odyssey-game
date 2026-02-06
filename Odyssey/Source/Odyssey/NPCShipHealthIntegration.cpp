@@ -1,61 +1,73 @@
 // NPCShipHealthIntegration.cpp
-// Implementation showing how to integrate the new health system with NPCShip
+// Implementation showing how the new health component integrates with NPCShip
+// Phase 1: Health & Damage Foundation
 
 #include "NPCShipHealthIntegration.h"
 #include "NPCBehaviorComponent.h"
 #include "Engine/Engine.h"
 
+// ============================================================================
+// Log Category
+// ============================================================================
+
+DEFINE_LOG_CATEGORY_STATIC(LogNPCShipHealth, Log, All);
+
+// ============================================================================
+// Constructor
+// ============================================================================
+
 ANPCShipEnhanced::ANPCShipEnhanced()
 {
-	// Create the advanced health component
 	AdvancedHealthComponent = CreateDefaultSubobject<UNPCHealthComponent>(TEXT("AdvancedHealthComponent"));
-
-	UE_LOG(LogTemp, Log, TEXT("ANPCShipEnhanced constructor: Advanced health component created"));
 }
+
+// ============================================================================
+// Lifecycle
+// ============================================================================
 
 void ANPCShipEnhanced::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	// Initialize the advanced health system
+
 	InitializeAdvancedHealthSystem();
-	
-	// Configure damage processor (singleton, only needs to be done once)
-	ConfigureDamageProcessor();
-	
-	// Synchronize with existing health system if needed
-	SynchronizeHealthSystems();
-	
-	UE_LOG(LogTemp, Log, TEXT("NPCShipEnhanced %s initialized with advanced health system"), *GetName());
+	EnsureDamageProcessorConfigured();
+	SynchronizeLegacyHealthVariables();
+
+	UE_LOG(LogNPCShipHealth, Log, TEXT("[%s] Enhanced NPC ship initialized (Hull=%.0f, Shields=%.0f)"),
+		*GetName(),
+		AdvancedHealthComponent ? AdvancedHealthComponent->GetCurrentHealth() : 0.0f,
+		AdvancedHealthComponent ? AdvancedHealthComponent->GetCurrentShields() : 0.0f);
 }
 
 void ANPCShipEnhanced::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	// Cleanup is handled automatically by the components
 	Super::EndPlay(EndPlayReason);
 }
 
+// ============================================================================
+// Legacy Interface Override
+// ============================================================================
+
 void ANPCShipEnhanced::TakeDamage(float DamageAmount, AActor* DamageSource)
 {
-	// Use the advanced health component instead of the basic system
 	if (AdvancedHealthComponent && !AdvancedHealthComponent->IsDead())
 	{
-		// Let the advanced health component handle damage with all its features
 		AdvancedHealthComponent->TakeDamage(DamageAmount, DamageSource, TEXT("Combat"));
-		
-		// Also update legacy health variables for backward compatibility
-		CurrentHealth = AdvancedHealthComponent->GetCurrentHealth();
-		
-		UE_LOG(LogTemp, Log, TEXT("NPCShipEnhanced %s took damage via advanced system: %.1f damage, %.1f/%.1f health"), 
-			*GetName(), DamageAmount, CurrentHealth, AdvancedHealthComponent->GetMaxHealth());
+
+		// Sync legacy variables for backward compatibility
+		SynchronizeLegacyHealthVariables();
 	}
 	else
 	{
-		// Fallback to basic system if component is not available
+		// Fallback to base class if component is missing
 		Super::TakeDamage(DamageAmount, DamageSource);
-		UE_LOG(LogTemp, Warning, TEXT("NPCShipEnhanced %s falling back to basic damage system"), *GetName());
+		UE_LOG(LogNPCShipHealth, Warning, TEXT("[%s] Falling back to legacy damage system"), *GetName());
 	}
 }
+
+// ============================================================================
+// Enhanced Queries
+// ============================================================================
 
 EHealthState ANPCShipEnhanced::GetDetailedHealthState() const
 {
@@ -63,23 +75,30 @@ EHealthState ANPCShipEnhanced::GetDetailedHealthState() const
 	{
 		return AdvancedHealthComponent->GetHealthState();
 	}
-	
-	// Fallback: convert basic health to health state
-	float HealthPercent = GetHealthPercentage();
-	if (HealthPercent <= 0.0f) return EHealthState::Dead;
-	if (HealthPercent <= 0.25f) return EHealthState::Dying;
-	if (HealthPercent <= 0.5f) return EHealthState::Critical;
-	if (HealthPercent <= 0.75f) return EHealthState::Damaged;
+
+	// Fallback estimation from legacy values
+	float Percent = GetHealthPercentage();
+	if (Percent <= 0.0f) return EHealthState::Dead;
+	if (Percent <= 0.25f) return EHealthState::Dying;
+	if (Percent <= 0.5f) return EHealthState::Critical;
+	if (Percent <= 0.75f) return EHealthState::Damaged;
 	return EHealthState::Healthy;
 }
 
 bool ANPCShipEnhanced::IsHealthRegenerating() const
 {
-	// This would require adding a getter to NPCHealthComponent
-	// For now, return a reasonable estimate
-	return AdvancedHealthComponent && 
-		   !AdvancedHealthComponent->IsDead() && 
-		   !AdvancedHealthComponent->IsAtFullHealth();
+	if (!AdvancedHealthComponent) return false;
+	// Regen is active when not dead, not at full health, and past the regen delay
+	return !AdvancedHealthComponent->IsDead()
+		&& !AdvancedHealthComponent->IsAtFullHealth()
+		&& !AdvancedHealthComponent->IsInCombat();
+}
+
+bool ANPCShipEnhanced::IsShieldRegenerating() const
+{
+	if (!AdvancedHealthComponent) return false;
+	return AdvancedHealthComponent->GetCurrentShields() < AdvancedHealthComponent->GetMaxShields()
+		&& !AdvancedHealthComponent->IsDead();
 }
 
 float ANPCShipEnhanced::GetDamageResistance(FName DamageType) const
@@ -91,143 +110,155 @@ float ANPCShipEnhanced::GetDamageResistance(FName DamageType) const
 	return 0.0f;
 }
 
+// ============================================================================
+// Ship-Type Configuration
+// ============================================================================
+
 void ANPCShipEnhanced::ConfigureShipResistances()
 {
-	if (!AdvancedHealthComponent)
-	{
-		return;
-	}
+	if (!AdvancedHealthComponent) return;
 
-	// Configure resistances based on ship type
 	switch (ShipConfig.ShipType)
 	{
 		case ENPCShipType::Civilian:
-			// Civilian ships have minimal resistances
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.05f);  // 5% energy resistance
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.05f);
+			AdvancedHealthComponent->SetFlatDamageReduction(0.0f);
 			break;
-			
+
 		case ENPCShipType::Pirate:
-			// Pirate ships have moderate kinetic resistance (improvised armor)
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Kinetic"), 0.15f); // 15% kinetic resistance
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.05f);  // 5% energy resistance
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Kinetic"), 0.15f);
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.05f);
+			AdvancedHealthComponent->SetFlatDamageReduction(1.0f);
 			break;
-			
+
 		case ENPCShipType::Security:
-			// Security ships have balanced resistances
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Kinetic"), 0.20f); // 20% kinetic resistance
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.15f);  // 15% energy resistance
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Plasma"), 0.10f);  // 10% plasma resistance
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Kinetic"), 0.20f);
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.15f);
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Plasma"), 0.10f);
+			AdvancedHealthComponent->SetFlatDamageReduction(2.0f);
 			break;
-			
+
 		case ENPCShipType::Escort:
-			// Escort ships have high energy resistance (advanced shields)
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.25f);  // 25% energy resistance
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Plasma"), 0.20f);  // 20% plasma resistance
-			AdvancedHealthComponent->SetDamageResistance(TEXT("Kinetic"), 0.10f); // 10% kinetic resistance
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Energy"), 0.25f);
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Plasma"), 0.20f);
+			AdvancedHealthComponent->SetDamageResistance(TEXT("Kinetic"), 0.10f);
+			AdvancedHealthComponent->SetFlatDamageReduction(1.5f);
 			break;
 	}
-	
-	UE_LOG(LogTemp, Log, TEXT("NPCShipEnhanced %s configured resistances for ship type %d"), 
-		*GetName(), (int32)ShipConfig.ShipType);
+
+	UE_LOG(LogNPCShipHealth, Log, TEXT("[%s] Resistances configured for ship type %d"),
+		*GetName(), static_cast<int32>(ShipConfig.ShipType));
 }
 
 void ANPCShipEnhanced::SetupHealthRegeneration()
 {
-	if (!AdvancedHealthComponent)
-	{
-		return;
-	}
+	if (!AdvancedHealthComponent) return;
 
-	// Configure regeneration based on ship type
 	switch (ShipConfig.ShipType)
 	{
 		case ENPCShipType::Civilian:
-			// Civilian ships have slow regeneration
 			AdvancedHealthComponent->SetHealthRegenEnabled(true);
-			AdvancedHealthComponent->SetHealthRegenRate(2.0f);    // 2 HP/sec
+			AdvancedHealthComponent->SetHealthRegenRate(2.0f);
 			break;
-			
+
 		case ENPCShipType::Pirate:
-			// Pirate ships have no regeneration (poor maintenance)
+			// Pirates have poor maintenance; no hull regen
 			AdvancedHealthComponent->SetHealthRegenEnabled(false);
 			break;
-			
+
 		case ENPCShipType::Security:
-			// Security ships have moderate regeneration
 			AdvancedHealthComponent->SetHealthRegenEnabled(true);
-			AdvancedHealthComponent->SetHealthRegenRate(4.0f);    // 4 HP/sec
+			AdvancedHealthComponent->SetHealthRegenRate(4.0f);
 			break;
-			
+
 		case ENPCShipType::Escort:
-			// Escort ships have fast regeneration (advanced tech)
 			AdvancedHealthComponent->SetHealthRegenEnabled(true);
-			AdvancedHealthComponent->SetHealthRegenRate(6.0f);    // 6 HP/sec
+			AdvancedHealthComponent->SetHealthRegenRate(6.0f);
 			break;
 	}
-	
-	UE_LOG(LogTemp, Log, TEXT("NPCShipEnhanced %s configured health regeneration"), *GetName());
+
+	UE_LOG(LogNPCShipHealth, Log, TEXT("[%s] Health regeneration configured"), *GetName());
 }
+
+void ANPCShipEnhanced::ConfigureShipShields()
+{
+	if (!AdvancedHealthComponent) return;
+
+	switch (ShipConfig.ShipType)
+	{
+		case ENPCShipType::Civilian:
+			AdvancedHealthComponent->SetMaxShields(20.0f);
+			AdvancedHealthComponent->SetShieldRegenEnabled(true);
+			AdvancedHealthComponent->SetShieldRegenRate(4.0f);
+			break;
+
+		case ENPCShipType::Pirate:
+			AdvancedHealthComponent->SetMaxShields(30.0f);
+			AdvancedHealthComponent->SetShieldRegenEnabled(true);
+			AdvancedHealthComponent->SetShieldRegenRate(5.0f);
+			break;
+
+		case ENPCShipType::Security:
+			AdvancedHealthComponent->SetMaxShields(60.0f);
+			AdvancedHealthComponent->SetShieldRegenEnabled(true);
+			AdvancedHealthComponent->SetShieldRegenRate(8.0f);
+			break;
+
+		case ENPCShipType::Escort:
+			AdvancedHealthComponent->SetMaxShields(80.0f);
+			AdvancedHealthComponent->SetShieldRegenEnabled(true);
+			AdvancedHealthComponent->SetShieldRegenRate(12.0f);
+			break;
+	}
+
+	// Initialize shields to full
+	AdvancedHealthComponent->SetShields(AdvancedHealthComponent->GetMaxShields());
+
+	UE_LOG(LogNPCShipHealth, Log, TEXT("[%s] Shields configured: %.0f max"),
+		*GetName(), AdvancedHealthComponent->GetMaxShields());
+}
+
+// ============================================================================
+// Event Handlers
+// ============================================================================
 
 void ANPCShipEnhanced::OnAdvancedHealthChanged(const FHealthEventPayload& HealthData)
 {
-	// Update UI, effects, etc.
-	UE_LOG(LogTemp, Log, TEXT("NPCShip %s health changed: %.1f -> %.1f (%.1f%%)"), 
-		*GetName(), 
-		HealthData.PreviousHealth, 
-		HealthData.CurrentHealth,
-		HealthData.GetHealthPercentage() * 100.0f);
-	
-	// Trigger existing Blueprint events for compatibility
-	OnHealthChanged(HealthData.PreviousHealth, HealthData.CurrentHealth);
-	
-	// Add visual effects based on damage amount
+	// Sync legacy variables
+	SynchronizeLegacyHealthVariables();
+
+	// Forward to existing Blueprint events for compatibility
 	if (HealthData.DamageAmount > 0.0f)
 	{
-		// Trigger damage effects, screen shake, etc.
 		OnDamageTaken(HealthData.DamageAmount, HealthData.DamageSource.Get());
+	}
+
+	OnHealthChanged(HealthData.PreviousHealth, HealthData.CurrentHealth);
+
+	if (!FMath::IsNearlyEqual(HealthData.PreviousShields, HealthData.CurrentShields, 0.01f))
+	{
+		OnShieldChanged(HealthData.PreviousShields, HealthData.CurrentShields);
 	}
 }
 
 void ANPCShipEnhanced::OnAdvancedHealthStateChanged(EHealthState NewState)
 {
-	UE_LOG(LogTemp, Warning, TEXT("NPCShip %s health state changed to %d"), *GetName(), (int32)NewState);
-	
-	// Update AI behavior based on health state
+	UE_LOG(LogNPCShipHealth, Log, TEXT("[%s] Health state -> %d"), *GetName(), static_cast<int32>(NewState));
+
+	// Map health states to behavior modifications
 	if (BehaviorComponent)
 	{
 		switch (NewState)
 		{
 			case EHealthState::Critical:
-				// Ship becomes more aggressive or starts retreating
-				UE_LOG(LogTemp, Warning, TEXT("NPCShip %s entering critical health state - modifying behavior"), *GetName());
+				UE_LOG(LogNPCShipHealth, Warning, TEXT("[%s] CRITICAL: modifying combat behavior"), *GetName());
 				break;
-				
+
 			case EHealthState::Dying:
-				// Ship tries to escape or becomes desperate
-				UE_LOG(LogTemp, Warning, TEXT("NPCShip %s is dying - emergency behavior activated"), *GetName());
+				UE_LOG(LogNPCShipHealth, Warning, TEXT("[%s] DYING: emergency behavior activated"), *GetName());
 				break;
-				
-			case EHealthState::Dead:
-				// This will be handled by OnAdvancedActorDied
-				break;
-				
+
 			default:
-				// Normal behavior
-				break;
-		}
-	}
-	
-	// Trigger existing state change events for compatibility
-	if (BehaviorComponent)
-	{
-		// You might want to map health states to existing NPC states
-		ENPCState NewNPCState = BehaviorComponent->GetCurrentState(); // Keep current state by default
-		
-		switch (NewState)
-		{
-			case EHealthState::Critical:
-			case EHealthState::Dying:
-				// Could set to a retreat or defensive state if available
 				break;
 		}
 	}
@@ -235,88 +266,103 @@ void ANPCShipEnhanced::OnAdvancedHealthStateChanged(EHealthState NewState)
 
 void ANPCShipEnhanced::OnAdvancedActorDied(AActor* DiedActor)
 {
-	if (DiedActor == this)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("NPCShip %s died via advanced health system"), *GetName());
-		
-		// Update legacy death flag for compatibility
-		bIsDead = true;
-		CurrentHealth = 0.0f;
-		
-		// Trigger existing death logic
-		Die();
-		
-		// Trigger Blueprint event
-		OnDeath();
-	}
+	if (DiedActor != this) return;
+
+	UE_LOG(LogNPCShipHealth, Warning, TEXT("[%s] Died via advanced health system"), *GetName());
+
+	// Sync legacy death state
+	bIsDead = true;
+	CurrentHealth = 0.0f;
+	CurrentShields = 0.0f;
+
+	// Trigger existing death path
+	Die();
+	OnDeath();
 }
+
+void ANPCShipEnhanced::OnAdvancedShieldBroken(AActor* Owner, AActor* DamageSource)
+{
+	UE_LOG(LogNPCShipHealth, Warning, TEXT("[%s] Shields BROKEN by %s!"),
+		*GetName(), DamageSource ? *DamageSource->GetName() : TEXT("Unknown"));
+
+	// Sync legacy shield variable
+	CurrentShields = 0.0f;
+}
+
+void ANPCShipEnhanced::OnAdvancedShieldRestored(AActor* Owner, float ShieldAmount)
+{
+	UE_LOG(LogNPCShipHealth, Log, TEXT("[%s] Shields fully restored (%.0f)"), *GetName(), ShieldAmount);
+
+	// Sync legacy shield variable
+	CurrentShields = ShieldAmount;
+}
+
+// ============================================================================
+// Integration Helpers
+// ============================================================================
 
 void ANPCShipEnhanced::InitializeAdvancedHealthSystem()
 {
 	if (!AdvancedHealthComponent)
 	{
-		UE_LOG(LogTemp, Error, TEXT("NPCShipEnhanced %s: AdvancedHealthComponent is null!"), *GetName());
+		UE_LOG(LogNPCShipHealth, Error, TEXT("[%s] AdvancedHealthComponent is null!"), *GetName());
 		return;
 	}
-	
-	// Set up health component with ship configuration
+
+	// Configure from ShipConfig
 	AdvancedHealthComponent->SetMaxHealth(ShipConfig.MaxHealth);
-	AdvancedHealthComponent->SetHealth(ShipConfig.MaxHealth * 1.0f); // Start at full health
-	
-	// Configure health regeneration and resistances
+	AdvancedHealthComponent->SetHealth(ShipConfig.MaxHealth);
+
+	// Configure ship-type-specific settings
+	ConfigureShipShields();
 	ConfigureShipResistances();
 	SetupHealthRegeneration();
-	
-	// Bind to health events
+
+	// Bind delegates
 	AdvancedHealthComponent->OnHealthChanged.AddDynamic(this, &ANPCShipEnhanced::OnAdvancedHealthChanged);
 	AdvancedHealthComponent->OnHealthStateChanged.AddDynamic(this, &ANPCShipEnhanced::OnAdvancedHealthStateChanged);
 	AdvancedHealthComponent->OnActorDied.AddDynamic(this, &ANPCShipEnhanced::OnAdvancedActorDied);
-	
-	UE_LOG(LogTemp, Log, TEXT("NPCShipEnhanced %s: Advanced health system initialized with %.1f max health"), 
-		*GetName(), AdvancedHealthComponent->GetMaxHealth());
+	AdvancedHealthComponent->OnShieldBroken.AddDynamic(this, &ANPCShipEnhanced::OnAdvancedShieldBroken);
+	AdvancedHealthComponent->OnShieldRestored.AddDynamic(this, &ANPCShipEnhanced::OnAdvancedShieldRestored);
+
+	UE_LOG(LogNPCShipHealth, Log, TEXT("[%s] Advanced health system initialized (Hull=%.0f, Shields=%.0f)"),
+		*GetName(), AdvancedHealthComponent->GetMaxHealth(), AdvancedHealthComponent->GetMaxShields());
 }
 
-void ANPCShipEnhanced::SynchronizeHealthSystems()
+void ANPCShipEnhanced::SynchronizeLegacyHealthVariables()
 {
-	// Synchronize the legacy health variables with the new health component
-	// This ensures backward compatibility
-	
-	if (AdvancedHealthComponent)
-	{
-		// Update legacy variables to match advanced component
-		CurrentHealth = AdvancedHealthComponent->GetCurrentHealth();
-		// Note: ShipConfig.MaxHealth should already match since we set it during initialization
-	}
-	
-	UE_LOG(LogTemp, Log, TEXT("NPCShipEnhanced %s: Health systems synchronized"), *GetName());
+	if (!AdvancedHealthComponent) return;
+
+	CurrentHealth = AdvancedHealthComponent->GetCurrentHealth();
+	CurrentShields = AdvancedHealthComponent->GetCurrentShields();
+	MaxShields = AdvancedHealthComponent->GetMaxShields();
 }
 
-void ANPCShipEnhanced::ConfigureDamageProcessor()
+void ANPCShipEnhanced::EnsureDamageProcessorConfigured()
 {
-	// Get the global damage processor instance
-	UOdysseyDamageProcessor* DamageProcessor = UOdysseyDamageProcessor::Get();
-	if (!DamageProcessor)
+	UOdysseyDamageProcessor* DP = UOdysseyDamageProcessor::Get();
+	if (!DP) return;
+
+	if (!DP->IsInitialized())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Could not get OdysseyDamageProcessor instance"));
-		return;
-	}
-	
-	// Initialize if not already done
-	if (!DamageProcessor->IsInitialized())
-	{
-		DamageProcessor->Initialize();
-		
-		// Configure global damage settings
-		DamageProcessor->SetGlobalDamageMultiplier(1.0f);           // Normal damage
-		DamageProcessor->SetGlobalCriticalChance(0.05f);           // 5% critical chance
-		DamageProcessor->SetGlobalCriticalMultiplier(2.0f);        // 2x critical damage
-		DamageProcessor->SetCriticalHitsEnabled(true);
-		
-		// Configure damage type multipliers
-		DamageProcessor->SetDamageTypeMultiplier(TEXT("Kinetic"), 1.0f);  // Normal kinetic damage
-		DamageProcessor->SetDamageTypeMultiplier(TEXT("Energy"), 1.2f);   // Energy weapons do 20% more damage
-		DamageProcessor->SetDamageTypeMultiplier(TEXT("Plasma"), 1.5f);   // Plasma weapons do 50% more damage
-		
-		UE_LOG(LogTemp, Log, TEXT("OdysseyDamageProcessor configured for combat system"));
+		DP->Initialize();
+
+		// Global combat tuning
+		DP->SetGlobalDamageMultiplier(1.0f);
+		DP->SetGlobalCriticalChance(0.05f);
+		DP->SetGlobalCriticalMultiplier(2.0f);
+		DP->SetCriticalHitsEnabled(true);
+		DP->SetMinimumDamage(1.0f);
+
+		// Damage type multipliers
+		DP->SetDamageTypeMultiplier(TEXT("Kinetic"), 1.0f);
+		DP->SetDamageTypeMultiplier(TEXT("Energy"), 1.2f);
+		DP->SetDamageTypeMultiplier(TEXT("Plasma"), 1.5f);
+
+		// Distance falloff (optional, disabled by default)
+		DP->SetDistanceFalloffEnabled(false);
+		DP->SetDistanceFalloffParams(500.0f, 2000.0f, 1.0f);
+
+		UE_LOG(LogNPCShipHealth, Log, TEXT("OdysseyDamageProcessor configured for combat"));
 	}
 }

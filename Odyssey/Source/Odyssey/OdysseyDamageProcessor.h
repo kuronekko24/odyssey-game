@@ -1,19 +1,24 @@
 // OdysseyDamageProcessor.h
 // Central damage processing system that bridges combat events to actual damage application
 // Handles damage calculation, validation, and routing to health components
+// Phase 1: Health & Damage Foundation
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "OdysseyActionEvent.h"
+#include "NPCHealthComponent.h"
 #include "OdysseyDamageProcessor.generated.h"
 
 class UOdysseyEventBus;
-class UNPCHealthComponent;
+
+// ============================================================================
+// Damage Calculation Structures
+// ============================================================================
 
 /**
- * Damage calculation parameters
+ * Input parameters for a damage calculation pass
  */
 USTRUCT(BlueprintType)
 struct ODYSSEY_API FDamageCalculationParams
@@ -35,27 +40,35 @@ struct ODYSSEY_API FDamageCalculationParams
 	UPROPERTY(BlueprintReadWrite, Category = "Damage")
 	FVector HitLocation;
 
+	/** Per-attack critical chance override (-1 = use global) */
 	UPROPERTY(BlueprintReadWrite, Category = "Damage")
 	float CriticalChance;
 
+	/** Per-attack critical multiplier override (-1 = use global) */
 	UPROPERTY(BlueprintReadWrite, Category = "Damage")
 	float CriticalMultiplier;
 
+	/** Named multipliers stacked onto the base damage */
 	UPROPERTY(BlueprintReadWrite, Category = "Damage")
 	TMap<FName, float> DamageModifiers;
+
+	/** Distance between attacker and target (populated by processor if <= 0) */
+	UPROPERTY(BlueprintReadWrite, Category = "Damage")
+	float Distance;
 
 	FDamageCalculationParams()
 		: BaseDamage(0.0f)
 		, DamageType(NAME_None)
 		, HitLocation(FVector::ZeroVector)
-		, CriticalChance(0.05f)
-		, CriticalMultiplier(2.0f)
+		, CriticalChance(-1.0f)
+		, CriticalMultiplier(-1.0f)
+		, Distance(-1.0f)
 	{
 	}
 };
 
 /**
- * Result of damage calculation
+ * Output of a damage calculation
  */
 USTRUCT(BlueprintType)
 struct ODYSSEY_API FDamageCalculationResult
@@ -75,6 +88,9 @@ struct ODYSSEY_API FDamageCalculationResult
 	float DamageMultiplier;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Damage")
+	float DistanceFalloff;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Damage")
 	FString CalculationDetails;
 
 	FDamageCalculationResult()
@@ -82,12 +98,13 @@ struct ODYSSEY_API FDamageCalculationResult
 		, bIsCritical(false)
 		, bWasBlocked(false)
 		, DamageMultiplier(1.0f)
+		, DistanceFalloff(1.0f)
 	{
 	}
 };
 
 /**
- * Damage processing statistics
+ * Lifetime statistics for the damage processor
  */
 USTRUCT(BlueprintType)
 struct ODYSSEY_API FDamageProcessorStats
@@ -99,6 +116,9 @@ struct ODYSSEY_API FDamageProcessorStats
 
 	UPROPERTY(BlueprintReadOnly, Category = "Stats")
 	int64 TotalDamageDealt;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Stats")
+	int64 TotalShieldDamageAbsorbed;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Stats")
 	int64 CriticalHits;
@@ -115,6 +135,7 @@ struct ODYSSEY_API FDamageProcessorStats
 	FDamageProcessorStats()
 		: TotalDamageEventsProcessed(0)
 		, TotalDamageDealt(0)
+		, TotalShieldDamageAbsorbed(0)
 		, CriticalHits(0)
 		, BlockedAttacks(0)
 		, KillsProcessed(0)
@@ -123,23 +144,29 @@ struct ODYSSEY_API FDamageProcessorStats
 	}
 };
 
-/**
- * Delegate for damage processing events
- */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FDamageProcessedDelegate, AActor*, Attacker, AActor*, Target, const FDamageCalculationResult&, DamageResult);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FActorKilledDelegate, AActor*, Killer, AActor*, Victim);
+// ============================================================================
+// Delegate Declarations
+// ============================================================================
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnDamageProcessed, AActor*, Attacker, AActor*, Target, const FDamageCalculationResult&, DamageResult);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActorKilledByDamage, AActor*, Killer, AActor*, Victim);
+
+// ============================================================================
+// UOdysseyDamageProcessor
+// ============================================================================
 
 /**
- * Central damage processing system for the Odyssey combat system
- * 
- * Features:
- * - Event-driven damage processing with OdysseyEventBus integration
- * - Advanced damage calculation with modifiers, criticals, and blocking
- * - Mobile-optimized with object pooling and minimal allocations
- * - Comprehensive damage statistics and debugging
- * - Blueprint-friendly interface for designers
- * - Support for damage types, resistances, and custom calculations
- * - Integration with health components for actual damage application
+ * Central damage processing singleton for the Odyssey combat system.
+ *
+ * Responsibilities:
+ * - Listens to AttackHit events on the OdysseyEventBus
+ * - Calculates final damage (global multipliers, type multipliers, crits, falloff)
+ * - Routes calculated damage to the target's UNPCHealthComponent
+ * - Publishes DamageDealt events back to the bus for UI/stats
+ * - Tracks per-session combat statistics
+ *
+ * The processor is a UObject singleton (not an actor) to keep it lightweight.
+ * It is created on first access via Get() and rooted to prevent GC.
  */
 UCLASS(BlueprintType, Blueprintable)
 class ODYSSEY_API UOdysseyDamageProcessor : public UObject
@@ -149,15 +176,11 @@ class ODYSSEY_API UOdysseyDamageProcessor : public UObject
 public:
 	UOdysseyDamageProcessor();
 
-	/**
-	 * Initialize the damage processor and set up event subscriptions
-	 */
+	/** Initialize the damage processor and subscribe to combat events */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processor")
 	void Initialize();
 
-	/**
-	 * Shutdown the damage processor and clean up
-	 */
+	/** Shutdown and unsubscribe from events */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processor")
 	void Shutdown();
 
@@ -166,38 +189,28 @@ public:
 	// ============================================================================
 
 	/**
-	 * Process damage from an attack hit event
-	 * @param AttackEvent The attack hit event to process
-	 * @return True if damage was successfully processed
+	 * Process an AttackHit combat event payload end-to-end
+	 * @return True if damage was successfully applied
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	bool ProcessAttackHit(const FCombatEventPayload& AttackEvent);
 
 	/**
-	 * Calculate damage based on parameters
-	 * @param Params Damage calculation parameters
-	 * @return Calculated damage result
+	 * Calculate damage from parameters without applying it
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	FDamageCalculationResult CalculateDamage(const FDamageCalculationParams& Params);
 
 	/**
-	 * Apply calculated damage to target actor
-	 * @param Target Actor to receive damage
-	 * @param DamageResult Calculated damage to apply
-	 * @param Attacker Actor dealing the damage
-	 * @return Actual damage applied
+	 * Apply a pre-calculated damage result to the target's health component
+	 * @return Actual hull damage dealt
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
-	float ApplyDamageToTarget(AActor* Target, const FDamageCalculationResult& DamageResult, AActor* Attacker);
+	float ApplyDamageToTarget(AActor* Target, const FDamageCalculationResult& DamageResult, AActor* Attacker, FName DamageType = NAME_None);
 
 	/**
-	 * Direct damage application (bypasses event system)
-	 * @param Target Actor to damage
-	 * @param DamageAmount Amount of damage
-	 * @param DamageType Type of damage
-	 * @param Attacker Source of damage
-	 * @return Actual damage applied
+	 * Convenience: calculate and apply in one call (bypasses event bus)
+	 * @return Actual hull damage dealt
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	float DealDamage(AActor* Target, float DamageAmount, FName DamageType, AActor* Attacker = nullptr);
@@ -206,81 +219,67 @@ public:
 	// Configuration
 	// ============================================================================
 
-	/**
-	 * Set global damage multiplier (affects all damage)
-	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	void SetGlobalDamageMultiplier(float Multiplier);
 
-	/**
-	 * Set damage multiplier for specific damage type
-	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	void SetDamageTypeMultiplier(FName DamageType, float Multiplier);
 
-	/**
-	 * Enable or disable critical hits globally
-	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	void SetCriticalHitsEnabled(bool bEnabled);
 
-	/**
-	 * Set global critical hit chance modifier
-	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	void SetGlobalCriticalChance(float CriticalChance);
 
-	/**
-	 * Set global critical damage multiplier
-	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	void SetGlobalCriticalMultiplier(float CriticalMultiplier);
 
-	// ============================================================================
-	// Queries and Statistics
-	// ============================================================================
+	/** Enable/disable distance-based damage falloff */
+	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
+	void SetDistanceFalloffEnabled(bool bEnabled);
 
 	/**
-	 * Get damage processing statistics
+	 * Configure distance falloff curve
+	 * @param MinRange Full-damage range (no falloff)
+	 * @param MaxRange Zero-damage range (beyond this, damage = 0)
+	 * @param Exponent Falloff curve exponent (1.0 = linear, 2.0 = quadratic)
 	 */
+	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
+	void SetDistanceFalloffParams(float MinRange, float MaxRange, float Exponent = 1.0f);
+
+	/** Set minimum damage floor (damage can never go below this after all reductions) */
+	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
+	void SetMinimumDamage(float MinDamage);
+
+	// ============================================================================
+	// Queries & Statistics
+	// ============================================================================
+
 	UFUNCTION(BlueprintPure, Category = "Damage Processing")
 	FDamageProcessorStats GetStatistics() const { return ProcessorStats; }
 
-	/**
-	 * Reset damage processing statistics
-	 */
 	UFUNCTION(BlueprintCallable, Category = "Damage Processing")
 	void ResetStatistics();
 
-	/**
-	 * Check if damage processor is initialized
-	 */
 	UFUNCTION(BlueprintPure, Category = "Damage Processing")
 	bool IsInitialized() const { return bIsInitialized; }
 
 	// ============================================================================
-	// Events and Delegates
+	// Events
 	// ============================================================================
 
-	/**
-	 * Called when damage is processed and applied
-	 */
+	/** Broadcast after damage is processed and applied */
 	UPROPERTY(BlueprintAssignable, Category = "Damage Processing|Events")
-	FDamageProcessedDelegate OnDamageProcessed;
+	FOnDamageProcessed OnDamageProcessed;
 
-	/**
-	 * Called when an actor is killed by damage
-	 */
+	/** Broadcast when an actor is killed by damage routed through this processor */
 	UPROPERTY(BlueprintAssignable, Category = "Damage Processing|Events")
-	FActorKilledDelegate OnActorKilled;
+	FOnActorKilledByDamage OnActorKilled;
 
 	// ============================================================================
 	// Singleton Access
 	// ============================================================================
 
-	/**
-	 * Get the global damage processor instance
-	 */
 	UFUNCTION(BlueprintPure, Category = "Damage Processing", meta = (CallInEditor = "true"))
 	static UOdysseyDamageProcessor* Get();
 
@@ -289,39 +288,41 @@ protected:
 	// Configuration Properties
 	// ============================================================================
 
-	/**
-	 * Global damage multiplier applied to all damage
-	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing", meta = (ClampMin = "0.0"))
 	float GlobalDamageMultiplier;
 
-	/**
-	 * Whether critical hits are enabled globally
-	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Critical Hits")
 	bool bCriticalHitsEnabled;
 
-	/**
-	 * Global critical hit chance modifier
-	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Critical Hits", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float GlobalCriticalChance;
 
-	/**
-	 * Global critical damage multiplier
-	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Critical Hits", meta = (ClampMin = "1.0"))
 	float GlobalCriticalMultiplier;
 
-	/**
-	 * Damage type multipliers
-	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing")
 	TMap<FName, float> DamageTypeMultipliers;
 
-	/**
-	 * Whether to log detailed damage calculations
-	 */
+	/** Whether distance-based falloff is enabled */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Falloff")
+	bool bDistanceFalloffEnabled;
+
+	/** Range within which full damage is dealt */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Falloff", meta = (ClampMin = "0.0"))
+	float FalloffMinRange;
+
+	/** Range beyond which damage is zero */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Falloff", meta = (ClampMin = "0.0"))
+	float FalloffMaxRange;
+
+	/** Falloff curve exponent (1 = linear, 2 = quadratic) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Falloff", meta = (ClampMin = "0.1"))
+	float FalloffExponent;
+
+	/** Minimum damage floor after all reductions */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing", meta = (ClampMin = "0.0"))
+	float MinimumDamage;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Processing|Debug")
 	bool bVerboseLogging;
 
@@ -329,31 +330,17 @@ protected:
 	// Runtime State
 	// ============================================================================
 
-	/**
-	 * Whether the damage processor is initialized
-	 */
 	bool bIsInitialized;
 
-	/**
-	 * Reference to the global event bus
-	 */
 	UPROPERTY()
 	UOdysseyEventBus* EventBus;
 
-	/**
-	 * Event subscription handles for cleanup
-	 */
 	TArray<FOdysseyEventHandle> EventSubscriptionHandles;
 
-	/**
-	 * Damage processing statistics
-	 */
 	UPROPERTY(BlueprintReadOnly, Category = "Damage Processing")
 	FDamageProcessorStats ProcessorStats;
 
-	/**
-	 * Performance tracking
-	 */
+	// Performance tracking accumulators
 	mutable double TotalProcessingTime;
 	mutable int64 ProcessingTimeSamples;
 
@@ -361,62 +348,33 @@ protected:
 	// Internal Methods
 	// ============================================================================
 
-	/**
-	 * Initialize event bus subscriptions
-	 */
 	void InitializeEventSubscriptions();
-
-	/**
-	 * Clean up event bus subscriptions
-	 */
 	void CleanupEventSubscriptions();
 
-	/**
-	 * Handle incoming attack hit events
-	 */
+	/** EventBus callback for AttackHit events */
 	void OnAttackHitEvent(const FOdysseyEventPayload& Payload);
 
-	/**
-	 * Calculate if an attack is a critical hit
-	 */
-	bool CalculateCriticalHit(const FDamageCalculationParams& Params) const;
+	/** Determine if the attack scores a critical hit */
+	bool RollCriticalHit(const FDamageCalculationParams& Params) const;
 
-	/**
-	 * Calculate damage blocking
-	 */
-	bool CalculateBlocking(const FDamageCalculationParams& Params) const;
+	/** Calculate distance-based damage falloff multiplier */
+	float CalculateDistanceFalloff(float Distance) const;
 
-	/**
-	 * Apply damage modifiers to base damage
-	 */
-	float ApplyDamageModifiers(float BaseDamage, const FDamageCalculationParams& Params) const;
-
-	/**
-	 * Find health component on target actor
-	 */
+	/** Locate the health component on the target */
 	UNPCHealthComponent* FindHealthComponent(AActor* Target) const;
 
-	/**
-	 * Update processing statistics
-	 */
-	void UpdateStatistics(const FDamageCalculationResult& Result, double ProcessingTimeMs);
+	/** Update running statistics */
+	void UpdateStatistics(const FDamageCalculationResult& Result, float ShieldAbsorbed, double ProcessingTimeMs);
 
-	/**
-	 * Broadcast damage processed event
-	 */
-	void BroadcastDamageEvent(AActor* Attacker, AActor* Target, const FDamageCalculationResult& Result);
+	/** Publish DamageDealt event to the event bus */
+	void PublishDamageDealtEvent(AActor* Attacker, AActor* Target, const FDamageCalculationResult& Result);
 
-	/**
-	 * Handle actor death
-	 */
+	/** Handle post-kill logic and event broadcast */
 	void HandleActorKilled(AActor* Killer, AActor* Victim);
 
 	// ============================================================================
 	// Singleton
 	// ============================================================================
 
-	/**
-	 * Global instance of the damage processor
-	 */
 	static UOdysseyDamageProcessor* GlobalInstance;
 };

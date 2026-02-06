@@ -1,17 +1,25 @@
+// NPCShip.h
+// NPC Ship class extending AOdysseyCharacter with AI behavior management
+// Component-based architecture with event-driven combat and performance tier awareness
+
 #pragma once
 
 #include "CoreMinimal.h"
 #include "OdysseyCharacter.h"
 #include "NPCBehaviorComponent.h"
+#include "OdysseyMobileOptimizer.h"
 #include "NPCShip.generated.h"
 
 // Forward declarations
 class UNPCBehaviorComponent;
+class UNPCHealthComponent;
 class UOdysseyEventBus;
+class UOdysseyActionDispatcher;
+class UOdysseyActionCommand;
 
 /**
  * NPC Ship Type enumeration
- * Defines different types of NPCs with different behaviors
+ * Defines different types of NPCs with different behaviors and combat profiles
  */
 UENUM(BlueprintType)
 enum class ENPCShipType : uint8
@@ -24,7 +32,7 @@ enum class ENPCShipType : uint8
 
 /**
  * NPC Ship Configuration
- * Contains all the settings for configuring NPC behavior
+ * Contains all the settings for configuring NPC behavior and combat stats
  */
 USTRUCT(BlueprintType)
 struct ODYSSEY_API FNPCShipConfig
@@ -52,22 +60,113 @@ struct ODYSSEY_API FNPCShipConfig
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Config")
 	float RespawnDelay;
 
+	/** Detection radius override (0 = use component default) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Config")
+	float DetectionRadius;
+
+	/** Engagement range override (0 = use component default) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Config")
+	float EngagementRange;
+
+	/** Attack cooldown in seconds */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Config")
+	float AttackCooldown;
+
 	FNPCShipConfig()
+		: ShipType(ENPCShipType::Civilian)
+		, ShipName(TEXT("Unknown Ship"))
+		, MaxHealth(100.0f)
+		, AttackDamage(25.0f)
+		, MovementSpeed(400.0f)
+		, bCanRespawn(false)
+		, RespawnDelay(30.0f)
+		, DetectionRadius(0.0f)
+		, EngagementRange(0.0f)
+		, AttackCooldown(2.0f)
 	{
-		ShipType = ENPCShipType::Civilian;
-		ShipName = TEXT("Unknown Ship");
-		MaxHealth = 100.0f;
-		AttackDamage = 25.0f;
-		MovementSpeed = 400.0f;
-		bCanRespawn = false;
-		RespawnDelay = 30.0f;
 	}
 };
 
 /**
+ * NPC combat statistics for tracking and debugging
+ */
+USTRUCT(BlueprintType)
+struct ODYSSEY_API FNPCCombatStats
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly, Category = "NPC Stats")
+	int32 TotalAttacks;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NPC Stats")
+	float TotalDamageDealt;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NPC Stats")
+	float TotalDamageTaken;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NPC Stats")
+	int32 DeathCount;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NPC Stats")
+	int32 RespawnCount;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NPC Stats")
+	float TotalTimeAlive;
+
+	UPROPERTY(BlueprintReadOnly, Category = "NPC Stats")
+	float TotalTimeInCombat;
+
+	FNPCCombatStats()
+		: TotalAttacks(0)
+		, TotalDamageDealt(0.0f)
+		, TotalDamageTaken(0.0f)
+		, DeathCount(0)
+		, RespawnCount(0)
+		, TotalTimeAlive(0.0f)
+		, TotalTimeInCombat(0.0f)
+	{
+	}
+
+	void Reset()
+	{
+		TotalAttacks = 0;
+		TotalDamageDealt = 0.0f;
+		TotalDamageTaken = 0.0f;
+		DeathCount = 0;
+		RespawnCount = 0;
+		TotalTimeAlive = 0.0f;
+		TotalTimeInCombat = 0.0f;
+	}
+};
+
+/**
+ * Delegate for NPC lifecycle events
+ */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNPCShipDeathDelegate, ANPCShip*, DeadShip);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FNPCShipRespawnDelegate, ANPCShip*, RespawnedShip);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FNPCShipDamageDelegate, ANPCShip*, DamagedShip, float, DamageAmount, AActor*, DamageSource);
+
+/**
  * ANPCShip
- * NPC ship class extending AOdysseyCharacter with AI behavior
- * Designed for mobile-friendly performance with component-based architecture
+ * NPC ship class extending AOdysseyCharacter with AI behavior management
+ *
+ * Architecture:
+ * - Extends AOdysseyCharacter to reuse component system (mesh, interaction, inventory)
+ * - UNPCBehaviorComponent handles all AI state machine logic
+ * - Combat integrates with OdysseyEventBus and action command patterns
+ * - Performance tier awareness for mobile optimization
+ * - Shield regeneration with configurable delay
+ * - Respawn system with timer-based resurrection
+ *
+ * Component Composition:
+ * - ShipMesh (from AOdysseyCharacter)
+ * - InteractionSphere (from AOdysseyCharacter)
+ * - InventoryComponent (from AOdysseyCharacter) - for loot drops
+ * - BehaviorComponent (NPC-specific AI state machine)
+ *
+ * Event Integration:
+ * - Publishes: DamageDealt, DamageReceived, Death, Respawn events
+ * - Subscribes: Performance tier changes, combat events targeting this ship
  */
 UCLASS(BlueprintType, Blueprintable)
 class ODYSSEY_API ANPCShip : public AOdysseyCharacter
@@ -122,9 +221,26 @@ protected:
 	UPROPERTY()
 	float LastDamageTime;
 
+	// === Combat Statistics ===
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Statistics")
+	FNPCCombatStats CombatStats;
+
+	// === Performance Tier ===
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Performance")
+	EPerformanceTier CurrentPerformanceTier;
+
 	// === Event Integration ===
 	UPROPERTY()
 	UOdysseyEventBus* EventBus;
+
+	/** Event subscription handles for cleanup */
+	TArray<FOdysseyEventHandle> EventSubscriptionHandles;
+
+	/** Time when this ship spawned or last respawned */
+	float SpawnTime;
+
+	/** Accumulated time in engaging state for stats */
+	float CombatStateEnterTime;
 
 protected:
 	virtual void BeginPlay() override;
@@ -135,7 +251,7 @@ public:
 
 	// === Combat System ===
 	UFUNCTION(BlueprintCallable, Category = "Combat")
-	void TakeDamage(float DamageAmount, AActor* DamageSource = nullptr);
+	virtual void TakeDamage(float DamageAmount, AActor* DamageSource = nullptr);
 
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	void Heal(float HealAmount);
@@ -152,6 +268,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	float GetShieldPercentage() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	float GetCurrentHealth() const { return CurrentHealth; }
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	float GetMaxHealth() const { return ShipConfig.MaxHealth; }
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	float GetCurrentShields() const { return CurrentShields; }
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	float GetMaxShields() const { return MaxShields; }
+
 	// === Death and Respawn ===
 	UFUNCTION(BlueprintCallable, Category = "Death")
 	void Die();
@@ -161,6 +289,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Respawn")
 	void SetRespawnLocation(const FVector& Location, const FRotator& Rotation);
+
+	UFUNCTION(BlueprintCallable, Category = "Respawn")
+	bool CanRespawn() const { return ShipConfig.bCanRespawn; }
 
 	// === Configuration ===
 	UFUNCTION(BlueprintCallable, Category = "Configuration")
@@ -193,7 +324,31 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat Actions")
 	bool CanAttackTarget(AOdysseyCharacter* Target) const;
 
-	// === Events ===
+	// === Performance Tier ===
+	UFUNCTION(BlueprintCallable, Category = "Performance")
+	void SetPerformanceTier(EPerformanceTier NewTier);
+
+	UFUNCTION(BlueprintCallable, Category = "Performance")
+	EPerformanceTier GetPerformanceTier() const { return CurrentPerformanceTier; }
+
+	// === Statistics ===
+	UFUNCTION(BlueprintCallable, Category = "Statistics")
+	FNPCCombatStats GetCombatStats() const { return CombatStats; }
+
+	UFUNCTION(BlueprintCallable, Category = "Statistics")
+	void ResetCombatStats() { CombatStats.Reset(); }
+
+	// === Delegates ===
+	UPROPERTY(BlueprintAssignable, Category = "NPC Events")
+	FNPCShipDeathDelegate OnNPCDeath;
+
+	UPROPERTY(BlueprintAssignable, Category = "NPC Events")
+	FNPCShipRespawnDelegate OnNPCRespawn;
+
+	UPROPERTY(BlueprintAssignable, Category = "NPC Events")
+	FNPCShipDamageDelegate OnNPCDamaged;
+
+	// === Blueprint Events ===
 	UFUNCTION(BlueprintImplementableEvent, Category = "Combat Events")
 	void OnHealthChanged(float OldHealth, float NewHealth);
 
@@ -216,8 +371,12 @@ public:
 	void OnBehaviorStateChanged(ENPCState OldState, ENPCState NewState);
 
 	// === Static Factory Methods ===
-	UFUNCTION(BlueprintCallable, Category = "Factory", CallInEditor = true, meta = (Category = "NPC Factory"))
-	static ANPCShip* CreateNPCShip(UWorld* World, ENPCShipType ShipType, const FVector& Location, const FRotator& Rotation = FRotator::ZeroRotator);
+	UFUNCTION(BlueprintCallable, Category = "Factory", meta = (WorldContext = "WorldContext"))
+	static ANPCShip* CreateNPCShip(UObject* WorldContext, ENPCShipType ShipType, const FVector& Location, const FRotator& Rotation = FRotator::ZeroRotator);
+
+	/** Create an NPC ship with a full configuration struct */
+	UFUNCTION(BlueprintCallable, Category = "Factory", meta = (WorldContext = "WorldContext"))
+	static ANPCShip* CreateConfiguredNPCShip(UObject* WorldContext, const FNPCShipConfig& Config, const FVector& Location, const FRotator& Rotation = FRotator::ZeroRotator);
 
 	// === Utility ===
 	UFUNCTION(BlueprintCallable, Category = "Utility")
@@ -231,6 +390,7 @@ protected:
 	void InitializeNPCShip();
 	void SetupComponentReferences();
 	void ConfigureMovementForNPC();
+	void ApplyShipConfigToBehavior();
 	void StartShieldRegeneration();
 	void StopShieldRegeneration();
 
@@ -249,5 +409,15 @@ protected:
 	// === Event System Integration ===
 	void RegisterWithEventBus();
 	void UnregisterFromEventBus();
-	void BroadcastNPCEvent(const FString& EventType, const TMap<FString, FString>& EventData);
+	void PublishDamageEvent(float DamageAmount, AActor* DamageSource);
+	void PublishDeathEvent();
+	void PublishRespawnEvent();
+	void PublishAttackEvent(AOdysseyCharacter* Target, float Damage);
+
+	// === Behavior State Change Handler ===
+	UFUNCTION()
+	void HandleBehaviorStateChanged(ENPCState OldState, ENPCState NewState);
+
+	// === Statistics Tracking ===
+	void UpdateAliveTimeStats();
 };

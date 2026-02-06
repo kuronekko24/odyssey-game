@@ -1,141 +1,131 @@
-# Odyssey Health & Damage Foundation System
+# Odyssey Health & Damage Foundation System (Phase 1)
 
 ## Overview
 
-This implementation provides a robust, event-driven health and damage system for Odyssey's NPC Ship Combat. The system consists of two main components:
+Phase 1 implements the core health and damage systems that bridge existing combat events to actual damage application for NPC ships. The system provides dual-layer defense (shields + hull), per-type damage resistances, regeneration, damage-over-time effects, and visual health bar support -- all optimized for mobile.
 
-1. **UNPCHealthComponent** - Advanced health management for ships
-2. **UOdysseyDamageProcessor** - Centralized damage calculation and routing
+## Architecture
 
-## Key Features
+```
+AttackHit Event (OdysseyEventBus)
+       |
+       v
+UOdysseyDamageProcessor (singleton)
+  - Global & type multipliers
+  - Critical hit roll
+  - Distance falloff
+  - Minimum damage floor
+       |
+       v
+UNPCHealthComponent (per-actor)
+  - Resistance reduction
+  - Flat damage reduction
+  - Shield absorption
+  - Hull health application
+  - Health state update
+       |
+       v
+FHealthEventPayload (broadcast)
+  - Local delegates (OnHealthChanged, OnActorDied, etc.)
+  - Global OdysseyEventBus (DamageDealt event)
+  - UI systems (health bars, damage numbers)
+```
 
-### NPCHealthComponent
-- Event-driven health management with OdysseyEventBus integration
-- Health state system (Healthy, Damaged, Critical, Dying, Dead)
-- Configurable health regeneration with combat awareness
-- Damage type resistances
-- Mobile-optimized performance
-- Blueprint-friendly interface
-- Visual health bar support through events
+## Components
 
-### OdysseyDamageProcessor  
-- Centralized damage processing from combat events
-- Advanced damage calculation with modifiers and critical hits
-- Bridges AttackHit events to actual damage application
-- Performance metrics and debugging support
-- Singleton pattern for global access
-- Support for custom damage types and calculations
+### UNPCHealthComponent
+
+Component-based health tracking attached to any actor.
+
+**Key features:**
+- Dual-layer defense: shields absorb damage before hull
+- Per-type damage resistances (0-100% reduction per FName)
+- Flat damage reduction (subtracted after percentage resistance)
+- True damage type bypasses all resistances
+- Shield bleed-through ratio (configurable % of shield-absorbed damage leaks to hull)
+- Health regeneration with combat-awareness (configurable delay and out-of-combat requirement)
+- Shield regeneration with separate delay
+- Damage-over-time effects (multiple concurrent, each with own tick interval)
+- Health state tiers: Healthy > Damaged > Critical > Dying > Dead
+- Immortality option (`bCanDie = false` clamps hull to 1 HP)
+- Visual helpers: `GetHealthBarColor()`, `GetShieldBarColor()`, `ShouldShowHealthBar()`
+- Mobile-optimized: 10 Hz tick rate for regen/DOT, minimal allocations
+
+**Events:**
+| Delegate | Signature | Trigger |
+|---|---|---|
+| `OnHealthChanged` | `FHealthEventPayload` | Any health/shield change |
+| `OnHealthStateChanged` | `EHealthState` | State tier transition |
+| `OnActorDied` | `AActor*` | Hull reaches 0 |
+| `OnShieldBroken` | `AActor* Owner, AActor* Source` | Shields fully depleted |
+| `OnShieldRestored` | `AActor* Owner, float Amount` | Shields regenerate to full |
+
+### UOdysseyDamageProcessor
+
+Centralized singleton that receives AttackHit events and routes calculated damage.
+
+**Calculation pipeline:**
+1. Base damage x Global multiplier
+2. x Damage type multiplier
+3. x Per-attack named modifiers
+4. x Distance falloff (optional, configurable min/max range + exponent)
+5. x Critical hit multiplier (if rolled)
+6. Floor at minimum damage (default 1.0)
+
+**Features:**
+- Subscribes to `AttackHit` events on the OdysseyEventBus
+- Publishes `DamageDealt` events after processing
+- Lifetime combat statistics (events, crits, kills, avg processing time)
+- Verbose logging mode for debugging
+- Fallback to UE built-in damage for actors without health component
+
+### ANPCShipEnhanced
+
+Integration subclass that bridges existing `ANPCShip` to the new system.
+
+**Features:**
+- Overrides `TakeDamage()` to route through `UNPCHealthComponent`
+- Auto-configures resistances, shields, and regen per `ENPCShipType`
+- Synchronizes legacy variables (`CurrentHealth`, `CurrentShields`) for backward compatibility
+- Forwards health events to existing Blueprint events (`OnHealthChanged`, `OnDamageTaken`, etc.)
+- Maps health state changes to behavior modifications
+
+## Ship Type Configuration
+
+| Ship Type | Hull | Shields | Hull Regen | Shield Regen | Notable Resistances |
+|-----------|------|---------|------------|--------------|---------------------|
+| Civilian | 75 | 20 | 2/s | 4/s | 5% Energy |
+| Pirate | 120 | 30 | None | 5/s | 15% Kinetic, +1 flat |
+| Security | 150 | 60 | 4/s | 8/s | 20% Kinetic, 15% Energy, 10% Plasma, +2 flat |
+| Escort | 100 | 80 | 6/s | 12/s | 25% Energy, 20% Plasma, 10% Kinetic, +1.5 flat |
 
 ## Integration Guide
 
-### Step 1: Adding Health Component to NPCShip
+### Adding to a new actor
 
-The existing NPCShip class has a basic health system. You can either:
-
-**Option A: Replace existing health system (Recommended)**
 ```cpp
-// In NPCShip.h, replace existing health variables with:
-UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+// In your actor header
+UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 UNPCHealthComponent* HealthComponent;
 
-// Remove these existing properties:
-// float CurrentHealth;
-// float MaxShields; 
-// float CurrentShields;
-// etc.
-```
-
-**Option B: Add alongside existing system**
-```cpp
-// In NPCShip.h, add the component:
-UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-UNPCHealthComponent* HealthComponent;
-
-// Keep existing health system for backward compatibility
-```
-
-### Step 2: Initialize Components
-
-In NPCShip constructor:
-```cpp
-// Create health component
+// In constructor
 HealthComponent = CreateDefaultSubobject<UNPCHealthComponent>(TEXT("HealthComponent"));
+
+// In BeginPlay
+HealthComponent->SetMaxHealth(200.0f);
+HealthComponent->SetMaxShields(50.0f);
+HealthComponent->SetShields(50.0f);
+HealthComponent->SetDamageResistance(TEXT("Energy"), 0.15f);
+HealthComponent->SetHealthRegenEnabled(true);
+HealthComponent->SetHealthRegenRate(3.0f);
+
+HealthComponent->OnHealthChanged.AddDynamic(this, &AMyActor::OnHealthChanged);
+HealthComponent->OnActorDied.AddDynamic(this, &AMyActor::OnDied);
 ```
 
-In NPCShip::BeginPlay():
+### Dealing damage via event bus (recommended)
+
 ```cpp
-// Configure health component
-if (HealthComponent)
-{
-    HealthComponent->SetMaxHealth(ShipConfig.MaxHealth);
-    HealthComponent->SetHealthRegenEnabled(true);
-    HealthComponent->SetHealthRegenRate(2.0f);
-    HealthComponent->SetDamageResistance(TEXT("Energy"), 0.1f); // 10% energy resistance
-}
-
-// Initialize damage processor (once per game)
-UOdysseyDamageProcessor* DamageProcessor = UOdysseyDamageProcessor::Get();
-if (DamageProcessor && !DamageProcessor->IsInitialized())
-{
-    DamageProcessor->Initialize();
-}
-```
-
-### Step 3: Replace Damage Methods
-
-Replace existing NPCShip::TakeDamage with:
-```cpp
-void ANPCShip::TakeDamage(float DamageAmount, AActor* DamageSource)
-{
-    if (HealthComponent)
-    {
-        HealthComponent->TakeDamage(DamageAmount, DamageSource, TEXT("Combat"));
-    }
-}
-```
-
-### Step 4: Event Integration
-
-Subscribe to health events for UI updates:
-```cpp
-// In BeginPlay()
-if (HealthComponent)
-{
-    HealthComponent->OnHealthChanged.AddDynamic(this, &ANPCShip::OnNPCHealthChanged);
-    HealthComponent->OnHealthStateChanged.AddDynamic(this, &ANPCShip::OnNPCHealthStateChanged);
-    HealthComponent->OnActorDied.AddDynamic(this, &ANPCShip::OnNPCDied);
-}
-```
-
-Add corresponding methods:
-```cpp
-UFUNCTION()
-void OnNPCHealthChanged(const FHealthEventPayload& HealthData);
-
-UFUNCTION()
-void OnNPCHealthStateChanged(EHealthState NewState);
-
-UFUNCTION()
-void OnNPCDied(AActor* DiedActor);
-```
-
-## Usage Examples
-
-### Basic Damage Application
-```cpp
-// Direct damage
-UOdysseyDamageProcessor::Get()->DealDamage(TargetShip, 50.0f, TEXT("Laser"), AttackerShip);
-
-// Through health component
-if (UNPCHealthComponent* Health = TargetShip->FindComponentByClass<UNPCHealthComponent>())
-{
-    Health->TakeDamage(50.0f, AttackerShip, TEXT("Missile"));
-}
-```
-
-### Event-Driven Combat
-```cpp
-// Publish attack event - damage processor will handle it automatically
 FCombatEventPayload AttackEvent;
 AttackEvent.Initialize(EOdysseyEventType::AttackHit, AttackerShip);
 AttackEvent.Attacker = AttackerShip;
@@ -145,118 +135,85 @@ AttackEvent.DamageType = TEXT("Plasma");
 AttackEvent.HitLocation = HitResult.Location;
 
 UOdysseyEventBus::Get()->PublishEvent(MakeShared<FCombatEventPayload>(AttackEvent));
+// DamageProcessor picks it up automatically
 ```
 
-### Health State Reactions
+### Dealing damage directly
+
 ```cpp
-void ANPCShip::OnNPCHealthStateChanged(EHealthState NewState)
-{
-    switch (NewState)
-    {
-        case EHealthState::Critical:
-            // Start emergency behavior, smoke effects
-            BehaviorComponent->SetState(ENPCState::Retreating);
-            break;
-            
-        case EHealthState::Dying:
-            // Disable weapons, prepare for death
-            BehaviorComponent->SetState(ENPCState::Disabled);
-            break;
-            
-        case EHealthState::Dead:
-            // Death animation, loot drop, etc.
-            Die();
-            break;
-    }
-}
+// Through the processor (applies global modifiers, crits, falloff)
+UOdysseyDamageProcessor::Get()->DealDamage(TargetShip, 50.0f, TEXT("Laser"), AttackerShip);
+
+// Through the health component directly (raw damage, only resistances apply)
+UNPCHealthComponent* HC = Target->FindComponentByClass<UNPCHealthComponent>();
+HC->TakeDamage(50.0f, AttackerShip, TEXT("Missile"));
 ```
 
-### Configuration Examples
-```cpp
-// Damage processor configuration
-UOdysseyDamageProcessor* DP = UOdysseyDamageProcessor::Get();
-DP->SetGlobalDamageMultiplier(1.5f);  // 50% more damage globally
-DP->SetDamageTypeMultiplier(TEXT("Kinetic"), 0.8f);  // Kinetic weapons do 20% less damage
-DP->SetGlobalCriticalChance(0.15f);   // 15% critical chance
-DP->SetCriticalHitsEnabled(true);
+### Applying damage-over-time
 
-// Health component configuration
-HealthComponent->SetHealthRegenEnabled(true);
-HealthComponent->SetHealthRegenRate(5.0f);           // 5 HP/second
-HealthComponent->SetHealthRegenDelay(3.0f);          // 3 second delay after damage
-HealthComponent->SetDamageResistance(TEXT("Energy"), 0.25f);  // 25% energy resistance
-HealthComponent->SetDamageResistance(TEXT("Kinetic"), 0.10f); // 10% kinetic resistance
+```cpp
+UNPCHealthComponent* HC = Target->FindComponentByClass<UNPCHealthComponent>();
+// 5 damage every 0.5s for 4 seconds = 40 total damage
+HC->ApplyDamageOverTime(5.0f, 0.5f, 4.0f, TEXT("Plasma"), AttackerShip);
 ```
 
-## Performance Considerations
+### Querying health for UI
 
-### Mobile Optimization
-- Components use efficient tick intervals (0.1s for health regen)
-- Event system uses object pooling to minimize allocations
-- Damage calculations are optimized for mobile CPUs
-- Health state changes are cached to avoid redundant updates
-
-### Memory Management
-- Health events use shared pointers for efficient memory usage
-- Event subscriptions are automatically cleaned up
-- Components properly unregister from event bus on destruction
-
-## Debugging and Monitoring
-
-### Statistics
 ```cpp
-// Get damage processor statistics
-FDamageProcessorStats Stats = UOdysseyDamageProcessor::Get()->GetStatistics();
-UE_LOG(LogTemp, Log, TEXT("Total Damage Events: %lld, Average Processing: %.2fms"), 
-    Stats.TotalDamageEventsProcessed, Stats.AverageProcessingTimeMs);
-
-// Enable verbose logging for debugging
-UOdysseyDamageProcessor::Get()->bVerboseLogging = true;
-```
-
-### Health Component Queries
-```cpp
-// Check health status
-if (HealthComponent->GetHealthState() == EHealthState::Critical)
-{
-    // Ship is in critical condition
-}
-
-// Get health percentage for UI
-float HealthPercent = HealthComponent->GetHealthPercentage();
-HealthBar->SetPercent(HealthPercent);
+float HullPercent = HC->GetHealthPercentage();
+float ShieldPercent = HC->GetShieldPercentage();
+FLinearColor BarColor = HC->GetHealthBarColor();
+bool bShowBar = HC->ShouldShowHealthBar();
+EHealthState State = HC->GetHealthState();
 ```
 
 ## Event Flow
 
-1. **Attack Initiated** → AttackHit event published
-2. **Damage Processor** → Receives event, calculates damage
-3. **Health Component** → Receives calculated damage
-4. **Health Events** → Published for UI/gameplay systems
-5. **State Changes** → Health state updates trigger behavior changes
+```
+1. Weapon fires       -> publishes AttackHit event
+2. DamageProcessor    -> subscribes, receives AttackHit
+3. CalculateDamage()  -> global mult, type mult, crits, falloff
+4. ApplyDamageToTarget()
+   |-> FindHealthComponent()
+   |-> HealthComponent->TakeDamageEx()
+       |-> CalculateActualDamage()  (resistance, flat reduction)
+       |-> ApplyDamageToShieldsAndHealth()  (shields first, then hull)
+       |-> UpdateHealthState()  (tier transitions)
+       |-> BroadcastHealthChangeEvent()  (local delegates + event bus)
+5. DamageProcessor    -> publishes DamageDealt event
+6. UI systems         -> subscribe to DamageDealt for floating numbers, health bars
+```
 
-## Future Enhancements
+## Performance Considerations
 
-- Shield system integration
-- Armor/damage reduction systems
-- Damage over time effects
-- Healing abilities and items
-- Critical hit locations and damage multipliers
-- Advanced blocking/dodging mechanics
+- **Health component ticks at 10 Hz** (0.1s interval) -- sufficient for regen and DOT
+- **Damage calculations are O(n)** where n = number of modifiers (typically < 5)
+- **No heap allocations during normal damage processing** (stack-allocated payloads)
+- **Event bus broadcasts use shared pointers** only for the global bus path
+- **DOT effects use RemoveAtSwap** for O(1) removal
+- **Distance falloff is a simple power curve** -- no trig functions
 
-## Files Created
+## Files
 
-- `/Source/Odyssey/NPCHealthComponent.h`
-- `/Source/Odyssey/NPCHealthComponent.cpp`
-- `/Source/Odyssey/OdysseyDamageProcessor.h`
-- `/Source/Odyssey/OdysseyDamageProcessor.cpp`
+| File | Purpose |
+|------|---------|
+| `NPCHealthComponent.h/cpp` | Core health component |
+| `OdysseyDamageProcessor.h/cpp` | Central damage routing singleton |
+| `NPCShipHealthIntegration.h/cpp` | ANPCShip integration subclass |
 
 ## Dependencies
 
-The system integrates with existing Odyssey components:
-- OdysseyEventBus (for event-driven architecture)
-- OdysseyActionEvent (for event payloads)
-- AOdysseyCharacter (base character class)
-- Existing mobile optimization systems
+- `OdysseyEventBus` -- event-driven architecture
+- `OdysseyActionEvent` -- event payload definitions (FCombatEventPayload)
+- `AOdysseyCharacter` -- base character class (via ANPCShip)
+- `UNPCBehaviorComponent` -- NPC AI state machine (for health-driven behavior)
 
-This system provides a solid foundation for expanding Odyssey's combat mechanics while maintaining performance and architectural consistency.
+## Future (Phase 2+)
+
+- Armor/blocking system in DamageProcessor
+- Damage vulnerability multipliers (opposite of resistances)
+- AOE damage with falloff per-target
+- Healing-over-time effects
+- Shield types (kinetic shield vs energy shield)
+- Hit location multipliers (weak points)
+- Damage log / combat replay

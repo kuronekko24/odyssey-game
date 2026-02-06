@@ -6,6 +6,15 @@ public class Odyssey : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+		PublicIncludePaths.AddRange(new string[] {
+			ModuleDirectory,
+			System.IO.Path.Combine(ModuleDirectory, "Procedural"),
+			System.IO.Path.Combine(ModuleDirectory, "Combat"),
+			System.IO.Path.Combine(ModuleDirectory, "Crafting"),
+			System.IO.Path.Combine(ModuleDirectory, "Economy"),
+			System.IO.Path.Combine(ModuleDirectory, "Social")
+		});
+
 		PublicDependencyModuleNames.AddRange(new string[] {
 			"Core",
 			"CoreUObject",

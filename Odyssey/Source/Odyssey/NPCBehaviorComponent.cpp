@@ -1,6 +1,12 @@
+// NPCBehaviorComponent.cpp
+// AI state machine implementation with performance-tiered updates
+// Event-driven state transitions via OdysseyEventBus
+
 #include "NPCBehaviorComponent.h"
 #include "NPCShip.h"
 #include "OdysseyCharacter.h"
+#include "OdysseyEventBus.h"
+#include "OdysseyActionDispatcher.h"
 #include "Engine/World.h"
 #include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -27,13 +33,37 @@ UNPCBehaviorComponent::UNPCBehaviorComponent()
 	CurrentPatrolIndex = 0;
 	PatrolWaitTimer = 0.0f;
 
-	// Performance settings (mobile optimized)
-	UpdateFrequency = 10.0f;  // 10 Hz update rate
-	DetectionUpdateFrequency = 2.0f;  // 2 Hz detection updates
+	// Performance tier defaults
+	CurrentPerformanceTier = EPerformanceTier::High;
+
+	// High tier: full fidelity
+	HighTierSettings.UpdateFrequency = 10.0f;
+	HighTierSettings.DetectionUpdateFrequency = 3.0f;
+	HighTierSettings.bEnablePatrolling = true;
+	HighTierSettings.bEnableLineOfSightChecks = true;
+	HighTierSettings.DetectionRangeMultiplier = 1.0f;
+
+	// Medium tier: reduced fidelity
+	MediumTierSettings.UpdateFrequency = 5.0f;
+	MediumTierSettings.DetectionUpdateFrequency = 1.5f;
+	MediumTierSettings.bEnablePatrolling = true;
+	MediumTierSettings.bEnableLineOfSightChecks = false;
+	MediumTierSettings.DetectionRangeMultiplier = 0.8f;
+
+	// Low tier: minimal updates
+	LowTierSettings.UpdateFrequency = 2.0f;
+	LowTierSettings.DetectionUpdateFrequency = 0.5f;
+	LowTierSettings.bEnablePatrolling = false;
+	LowTierSettings.bEnableLineOfSightChecks = false;
+	LowTierSettings.DetectionRangeMultiplier = 0.5f;
+
+	// Start with high tier active
+	ActivePerformanceSettings = HighTierSettings;
 
 	LastUpdateTime = 0.0f;
 	LastDetectionTime = 0.0f;
 	OwnerNPC = nullptr;
+	EventBus = nullptr;
 }
 
 void UNPCBehaviorComponent::BeginPlay()
@@ -42,39 +72,62 @@ void UNPCBehaviorComponent::BeginPlay()
 
 	// Cache owner reference
 	OwnerNPC = Cast<ANPCShip>(GetOwner());
-	
+
 	if (!OwnerNPC)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NPCBehaviorComponent: Owner is not an NPCShip!"));
+		UE_LOG(LogTemp, Warning, TEXT("NPCBehaviorComponent: Owner is not an NPCShip. AI behavior disabled."));
+		PrimaryComponentTick.bCanEverTick = false;
+		return;
 	}
+
+	// Initialize event bus connection
+	EventBus = UOdysseyEventBus::Get();
+	InitializeEventSubscriptions();
 
 	// Initialize state change time
 	StateChangeTime = GetWorld()->GetTimeSeconds();
 
-	// Initialize patrol if we have patrol points
-	if (PatrolConfig.PatrolPoints.Num() > 0)
+	// Apply current performance tier settings
+	ApplyPerformanceSettings();
+
+	// If we have patrol points, start patrolling
+	if (PatrolConfig.PatrolPoints.Num() > 0 && ActivePerformanceSettings.bEnablePatrolling)
 	{
 		ChangeState(ENPCState::Patrolling);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("NPCBehaviorComponent initialized for: %s"), 
-		OwnerNPC ? *OwnerNPC->GetName() : TEXT("Unknown"));
+	UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent initialized for: %s (Tier: %d)"),
+		*OwnerNPC->GetName(),
+		static_cast<int32>(CurrentPerformanceTier));
+}
+
+void UNPCBehaviorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	CleanupEventSubscriptions();
+	Super::EndPlay(EndPlayReason);
 }
 
 void UNPCBehaviorComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// Performance optimization: limit update frequency
+	// Dead state: no updates at all to save cycles
+	if (CurrentState == ENPCState::Dead)
+	{
+		return;
+	}
+
+	// Performance optimization: limit update frequency based on tier
 	if (!ShouldUpdate(DeltaTime))
 	{
 		return;
 	}
 
-	// Update detection system at lower frequency
+	// Update detection system at lower frequency than state updates
 	if (ShouldUpdateDetection(DeltaTime))
 	{
 		PerformDetectionUpdate();
+		LastDetectionTime = GetWorld()->GetTimeSeconds();
 	}
 
 	// Update current state
@@ -90,12 +143,16 @@ void UNPCBehaviorComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 			UpdateEngagingState(DeltaTime);
 			break;
 		case ENPCState::Dead:
-			UpdateDeadState(DeltaTime);
+			// Already handled above, but kept for completeness
 			break;
 	}
 
 	LastUpdateTime = GetWorld()->GetTimeSeconds();
 }
+
+// ============================================================================
+// State Management
+// ============================================================================
 
 void UNPCBehaviorComponent::ChangeState(ENPCState NewState)
 {
@@ -104,67 +161,163 @@ void UNPCBehaviorComponent::ChangeState(ENPCState NewState)
 		return;
 	}
 
-	PreviousState = CurrentState;
+	ENPCState OldState = CurrentState;
+
+	// Exit current state
+	ExitState(OldState);
+
+	// Transition
+	PreviousState = OldState;
 	CurrentState = NewState;
 	StateChangeTime = GetWorld()->GetTimeSeconds();
 
-	// Handle state-specific logic
+	// Enter new state
+	EnterState(NewState);
+
+	// Broadcast via event bus
+	BroadcastStateChangeEvent(OldState, NewState);
+
+	// Fire multicast delegates
+	OnNPCStateChanged.Broadcast(OldState, NewState);
+
+	// Fire Blueprint implementable event
+	OnStateChanged(OldState, NewState);
+
+	UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent: %s state %d -> %d"),
+		OwnerNPC ? *OwnerNPC->GetName() : TEXT("Unknown"),
+		static_cast<int32>(OldState), static_cast<int32>(NewState));
+}
+
+void UNPCBehaviorComponent::EnterState(ENPCState NewState)
+{
 	switch (NewState)
 	{
-		case ENPCState::Engaging:
-			OnEngagementStarted(EngagementData.Target);
-			EngagementData.EngagementStartTime = StateChangeTime;
-			break;
 		case ENPCState::Idle:
-			if (PreviousState == ENPCState::Engaging)
+			// Nothing special on idle entry
+			break;
+
+		case ENPCState::Patrolling:
+			PatrolWaitTimer = 0.0f;
+			break;
+
+		case ENPCState::Engaging:
+			EngagementData.EngagementStartTime = GetWorld()->GetTimeSeconds();
+			if (AOdysseyCharacter* Target = GetCurrentTarget())
 			{
-				OnEngagementEnded(EngagementData.Target);
-				ResetEngagementData();
+				OnEngagementStarted(Target);
 			}
 			break;
+
 		case ENPCState::Dead:
-			ResetEngagementData();
-			break;
-		case ENPCState::Patrolling:
-			ResetEngagementData();
+			EngagementData.Reset();
+			// Stop all movement immediately
+			if (OwnerNPC)
+			{
+				if (UCharacterMovementComponent* MovementComp = OwnerNPC->GetCharacterMovement())
+				{
+					MovementComp->StopMovementImmediately();
+				}
+			}
 			break;
 	}
+}
 
-	// Fire event
-	OnStateChanged(PreviousState, NewState);
+void UNPCBehaviorComponent::ExitState(ENPCState OldState)
+{
+	switch (OldState)
+	{
+		case ENPCState::Engaging:
+			if (AOdysseyCharacter* Target = GetCurrentTarget())
+			{
+				OnEngagementEnded(Target);
+			}
+			break;
 
-	UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent: %s changed state from %d to %d"), 
-		OwnerNPC ? *OwnerNPC->GetName() : TEXT("Unknown"), 
-		(int32)PreviousState, (int32)NewState);
+		case ENPCState::Patrolling:
+			// Nothing special
+			break;
+
+		case ENPCState::Idle:
+			// Nothing special
+			break;
+
+		case ENPCState::Dead:
+			// Nothing special - respawn is handled by ANPCShip
+			break;
+	}
 }
 
 float UNPCBehaviorComponent::GetTimeInCurrentState() const
 {
+	if (!GetWorld())
+	{
+		return 0.0f;
+	}
 	return GetWorld()->GetTimeSeconds() - StateChangeTime;
 }
 
+FString UNPCBehaviorComponent::GetStateDisplayName() const
+{
+	switch (CurrentState)
+	{
+		case ENPCState::Idle:       return TEXT("Idle");
+		case ENPCState::Patrolling: return TEXT("Patrolling");
+		case ENPCState::Engaging:   return TEXT("Engaging");
+		case ENPCState::Dead:       return TEXT("Dead");
+		default:                    return TEXT("Unknown");
+	}
+}
+
+// ============================================================================
+// Combat System
+// ============================================================================
+
 void UNPCBehaviorComponent::SetTarget(AOdysseyCharacter* NewTarget)
 {
-	if (EngagementData.Target != NewTarget)
-	{
-		AOdysseyCharacter* OldTarget = EngagementData.Target;
-		EngagementData.Target = NewTarget;
+	AOdysseyCharacter* OldTarget = GetCurrentTarget();
 
-		if (OldTarget && !NewTarget)
-		{
-			OnTargetLost(OldTarget);
-		}
-		else if (NewTarget)
-		{
-			OnTargetAcquired(NewTarget);
-			UpdateEngagementData();
-		}
+	if (OldTarget == NewTarget)
+	{
+		return;
 	}
+
+	if (OldTarget && !NewTarget)
+	{
+		OnTargetLost(OldTarget);
+	}
+
+	EngagementData.Target = NewTarget;
+
+	if (NewTarget)
+	{
+		OnTargetAcquired(NewTarget);
+		UpdateEngagementData();
+	}
+
+	// Fire delegate
+	OnNPCTargetChanged.Broadcast(NewTarget);
+}
+
+AOdysseyCharacter* UNPCBehaviorComponent::GetCurrentTarget() const
+{
+	return EngagementData.Target.IsValid() ? EngagementData.Target.Get() : nullptr;
 }
 
 bool UNPCBehaviorComponent::HasValidTarget() const
 {
-	return EngagementData.Target && IsValid(EngagementData.Target) && !EngagementData.Target->IsPendingKill();
+	AOdysseyCharacter* Target = GetCurrentTarget();
+	if (!Target || !IsValid(Target))
+	{
+		return false;
+	}
+
+	// Check if target NPC is alive
+	if (ANPCShip* TargetNPC = Cast<ANPCShip>(Target))
+	{
+		return TargetNPC->IsAlive();
+	}
+
+	return true;
 }
 
 bool UNPCBehaviorComponent::IsTargetInRange() const
@@ -174,18 +327,44 @@ bool UNPCBehaviorComponent::IsTargetInRange() const
 		return false;
 	}
 
-	float Distance = GetDistanceToLocation(EngagementData.Target->GetActorLocation());
-	return Distance <= EngagementRange;
+	return EngagementData.DistanceToTarget <= EngagementRange;
 }
 
 void UNPCBehaviorComponent::ClearTarget()
 {
-	if (HasValidTarget())
+	AOdysseyCharacter* OldTarget = GetCurrentTarget();
+	if (OldTarget)
 	{
-		OnTargetLost(EngagementData.Target);
+		OnTargetLost(OldTarget);
 	}
-	ResetEngagementData();
+	EngagementData.Reset();
+	OnNPCTargetChanged.Broadcast(nullptr);
 }
+
+float UNPCBehaviorComponent::GetDistanceToTarget() const
+{
+	return EngagementData.DistanceToTarget;
+}
+
+bool UNPCBehaviorComponent::CanAttack() const
+{
+	if (!HasValidTarget() || !IsTargetInRange() || CurrentState != ENPCState::Engaging)
+	{
+		return false;
+	}
+
+	if (!GetWorld())
+	{
+		return false;
+	}
+
+	float CurrentTime = GetWorld()->GetTimeSeconds();
+	return (CurrentTime - EngagementData.LastAttackTime) >= AttackCooldown;
+}
+
+// ============================================================================
+// Patrol System
+// ============================================================================
 
 void UNPCBehaviorComponent::SetPatrolPoints(const TArray<FVector>& NewPatrolPoints)
 {
@@ -194,7 +373,8 @@ void UNPCBehaviorComponent::SetPatrolPoints(const TArray<FVector>& NewPatrolPoin
 	PatrolWaitTimer = 0.0f;
 
 	// If we were idle and now have patrol points, start patrolling
-	if (CurrentState == ENPCState::Idle && PatrolConfig.PatrolPoints.Num() > 0)
+	if (CurrentState == ENPCState::Idle && PatrolConfig.PatrolPoints.Num() > 0
+		&& ActivePerformanceSettings.bEnablePatrolling)
 	{
 		ChangeState(ENPCState::Patrolling);
 	}
@@ -221,7 +401,7 @@ void UNPCBehaviorComponent::AdvanceToNextPatrolPoint()
 	OnPatrolPointReached(CurrentPatrolIndex, GetCurrentPatrolTarget());
 
 	CurrentPatrolIndex++;
-	
+
 	if (CurrentPatrolIndex >= PatrolConfig.PatrolPoints.Num())
 	{
 		if (PatrolConfig.bLoopPatrol)
@@ -238,65 +418,138 @@ void UNPCBehaviorComponent::AdvanceToNextPatrolPoint()
 	PatrolWaitTimer = 0.0f;
 }
 
-AOdysseyCharacter* UNPCBehaviorComponent::FindNearestPlayer()
+// ============================================================================
+// Detection System
+// ============================================================================
+
+AOdysseyCharacter* UNPCBehaviorComponent::FindNearestHostileTarget()
 {
 	if (!GetWorld())
 	{
 		return nullptr;
 	}
 
-	AOdysseyCharacter* NearestPlayer = nullptr;
-	float NearestDistance = DetectionRadius + 1.0f;
+	AOdysseyCharacter* NearestTarget = nullptr;
+	float EffectiveRadius = GetEffectiveDetectionRadius();
+	float NearestDistance = EffectiveRadius + 1.0f;
 	FVector OwnerLoc = GetOwnerLocation();
 
-	// Find all player characters
-	TArray<AActor*> PlayerActors;
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOdysseyCharacter::StaticClass(), PlayerActors);
+	// Find all characters in the world
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOdysseyCharacter::StaticClass(), FoundActors);
 
-	for (AActor* Actor : PlayerActors)
+	for (AActor* Actor : FoundActors)
 	{
-		AOdysseyCharacter* Player = Cast<AOdysseyCharacter>(Actor);
-		if (Player && Player != OwnerNPC) // Don't target ourselves if we're also an OdysseyCharacter
+		AOdysseyCharacter* Character = Cast<AOdysseyCharacter>(Actor);
+		if (!Character || Character == OwnerNPC)
 		{
-			float Distance = FVector::Dist(OwnerLoc, Player->GetActorLocation());
-			if (Distance < DetectionRadius && Distance < NearestDistance)
+			continue;
+		}
+
+		// Skip other dead NPC ships
+		if (ANPCShip* OtherNPC = Cast<ANPCShip>(Character))
+		{
+			if (!OtherNPC->IsAlive())
 			{
-				NearestPlayer = Player;
-				NearestDistance = Distance;
+				continue;
 			}
+		}
+
+		float Distance = FVector::Dist(OwnerLoc, Character->GetActorLocation());
+		if (Distance < EffectiveRadius && Distance < NearestDistance)
+		{
+			NearestTarget = Character;
+			NearestDistance = Distance;
 		}
 	}
 
-	return NearestPlayer;
+	return NearestTarget;
 }
 
-bool UNPCBehaviorComponent::IsPlayerInDetectionRange(AOdysseyCharacter* Player) const
+bool UNPCBehaviorComponent::IsActorInDetectionRange(AActor* Actor) const
 {
-	if (!Player)
+	if (!Actor)
 	{
 		return false;
 	}
 
-	float Distance = GetDistanceToLocation(Player->GetActorLocation());
-	return Distance <= DetectionRadius;
+	float Distance = GetDistanceToLocation(Actor->GetActorLocation());
+	return Distance <= GetEffectiveDetectionRadius();
 }
+
+// ============================================================================
+// Performance Tier Management
+// ============================================================================
+
+void UNPCBehaviorComponent::SetPerformanceTier(EPerformanceTier NewTier)
+{
+	if (CurrentPerformanceTier == NewTier)
+	{
+		return;
+	}
+
+	EPerformanceTier OldTier = CurrentPerformanceTier;
+	CurrentPerformanceTier = NewTier;
+	ApplyPerformanceSettings();
+
+	UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent %s: Performance tier %d -> %d"),
+		OwnerNPC ? *OwnerNPC->GetName() : TEXT("Unknown"),
+		static_cast<int32>(OldTier), static_cast<int32>(NewTier));
+
+	// If patrolling was disabled at new tier, transition to idle
+	if (!ActivePerformanceSettings.bEnablePatrolling && CurrentState == ENPCState::Patrolling)
+	{
+		ChangeState(ENPCState::Idle);
+	}
+}
+
+float UNPCBehaviorComponent::GetEffectiveDetectionRadius() const
+{
+	return DetectionRadius * ActivePerformanceSettings.DetectionRangeMultiplier;
+}
+
+void UNPCBehaviorComponent::ApplyPerformanceSettings()
+{
+	ActivePerformanceSettings = GetSettingsForTier(CurrentPerformanceTier);
+}
+
+const FNPCBehaviorPerformanceSettings& UNPCBehaviorComponent::GetSettingsForTier(EPerformanceTier Tier) const
+{
+	switch (Tier)
+	{
+		case EPerformanceTier::High:   return HighTierSettings;
+		case EPerformanceTier::Medium: return MediumTierSettings;
+		case EPerformanceTier::Low:    return LowTierSettings;
+		default:                       return MediumTierSettings;
+	}
+}
+
+// ============================================================================
+// State Handlers
+// ============================================================================
 
 void UNPCBehaviorComponent::UpdateIdleState(float DeltaTime)
 {
-	// In idle state, just perform detection
-	// If we have patrol points and no target, start patrolling
-	if (PatrolConfig.PatrolPoints.Num() > 0 && !HasValidTarget())
+	// In idle: check if we should start patrolling
+	if (HasPatrolRoute() && ActivePerformanceSettings.bEnablePatrolling && !HasValidTarget())
 	{
 		ChangeState(ENPCState::Patrolling);
 	}
+	// Detection is handled in PerformDetectionUpdate
 }
 
 void UNPCBehaviorComponent::UpdatePatrolState(float DeltaTime)
 {
-	// Handle patrol waiting
-	if (PatrolWaitTimer < PatrolConfig.WaitTimeAtPoint)
+	if (!ActivePerformanceSettings.bEnablePatrolling)
 	{
-		PatrolWaitTimer += DeltaTime;
+		ChangeState(ENPCState::Idle);
+		return;
+	}
+
+	// Handle patrol waiting at waypoint
+	if (PatrolWaitTimer > 0.0f)
+	{
+		PatrolWaitTimer -= DeltaTime;
 		return;
 	}
 
@@ -311,9 +564,9 @@ void UNPCBehaviorComponent::UpdatePatrolState(float DeltaTime)
 	}
 	else
 	{
-		// Reached patrol point
+		// Reached patrol point - start waiting then advance
+		PatrolWaitTimer = PatrolConfig.WaitTimeAtPoint;
 		AdvanceToNextPatrolPoint();
-		PatrolWaitTimer = PatrolConfig.WaitTimeAtPoint; // Start waiting
 	}
 }
 
@@ -321,46 +574,54 @@ void UNPCBehaviorComponent::UpdateEngagingState(float DeltaTime)
 {
 	if (!HasValidTarget())
 	{
-		// No valid target, return to previous state
-		ChangeState(PreviousState == ENPCState::Engaging ? ENPCState::Idle : PreviousState);
+		// Target lost, return to previous non-combat state
+		ENPCState ReturnState = (PreviousState != ENPCState::Engaging && PreviousState != ENPCState::Dead)
+			? PreviousState
+			: ENPCState::Idle;
+		ClearTarget();
+		ChangeState(ReturnState);
 		return;
 	}
 
 	UpdateEngagementData();
 
-	// Check if we should disengage
+	// Check if we should disengage (target too far)
 	if (ShouldDisengage())
 	{
-		ChangeState(PreviousState == ENPCState::Engaging ? ENPCState::Idle : PreviousState);
+		ENPCState ReturnState = (PreviousState != ENPCState::Engaging && PreviousState != ENPCState::Dead)
+			? PreviousState
+			: ENPCState::Idle;
+		ClearTarget();
+		ChangeState(ReturnState);
 		return;
 	}
 
-	// Move towards target if not in range
+	AOdysseyCharacter* Target = GetCurrentTarget();
+
+	// Move towards target if not in engagement range
 	if (!IsTargetInRange())
 	{
-		MoveTowardsTarget(EngagementData.Target->GetActorLocation(), PatrolConfig.PatrolSpeed * 1.2f);
+		// Approach at 120% patrol speed for urgency
+		MoveTowardsTarget(Target->GetActorLocation(), PatrolConfig.PatrolSpeed * 1.2f);
 	}
 	else
 	{
-		// In range - handle combat logic here
-		float CurrentTime = GetWorld()->GetTimeSeconds();
-		if (CurrentTime - EngagementData.LastAttackTime >= AttackCooldown)
+		// In range: execute attack if cooldown allows
+		if (CanAttack())
 		{
-			// Perform attack (this would trigger combat actions)
-			EngagementData.LastAttackTime = CurrentTime;
-			
-			// This is where you would integrate with the action system
-			UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent: %s attacking target"), 
-				OwnerNPC ? *OwnerNPC->GetName() : TEXT("Unknown"));
+			ExecuteAttack();
 		}
 	}
 }
 
 void UNPCBehaviorComponent::UpdateDeadState(float DeltaTime)
 {
-	// Dead NPCs don't do anything
-	// This state is primarily for preventing further AI updates
+	// Dead NPCs do nothing. Respawn is triggered externally by ANPCShip.
 }
+
+// ============================================================================
+// Internal Logic
+// ============================================================================
 
 void UNPCBehaviorComponent::PerformDetectionUpdate()
 {
@@ -369,33 +630,44 @@ void UNPCBehaviorComponent::PerformDetectionUpdate()
 		return;
 	}
 
-	// Find nearest player
-	AOdysseyCharacter* NearestPlayer = FindNearestPlayer();
-
-	if (NearestPlayer && CurrentState != ENPCState::Engaging)
+	// Already engaging something - check if we should switch targets
+	if (CurrentState == ENPCState::Engaging)
 	{
-		// Found a target, engage
-		SetTarget(NearestPlayer);
+		if (!HasValidTarget())
+		{
+			// Current target lost, try to find new one
+			AOdysseyCharacter* NewTarget = FindNearestHostileTarget();
+			if (NewTarget)
+			{
+				SetTarget(NewTarget);
+			}
+			else
+			{
+				ClearTarget();
+				ChangeState(ENPCState::Idle);
+			}
+		}
+		return;
+	}
+
+	// Not in combat: scan for targets
+	AOdysseyCharacter* NearestTarget = FindNearestHostileTarget();
+	if (NearestTarget)
+	{
+		SetTarget(NearestTarget);
 		ChangeState(ENPCState::Engaging);
 	}
-	else if (!NearestPlayer && CurrentState == ENPCState::Engaging)
-	{
-		// Lost target
-		ClearTarget();
-		ChangeState(ENPCState::Idle);
-	}
-
-	LastDetectionTime = GetWorld()->GetTimeSeconds();
 }
 
 void UNPCBehaviorComponent::UpdateEngagementData()
 {
-	if (!HasValidTarget())
+	AOdysseyCharacter* Target = GetCurrentTarget();
+	if (!Target)
 	{
 		return;
 	}
 
-	EngagementData.DistanceToTarget = GetDistanceToLocation(EngagementData.Target->GetActorLocation());
+	EngagementData.DistanceToTarget = GetDistanceToLocation(Target->GetActorLocation());
 }
 
 void UNPCBehaviorComponent::MoveTowardsTarget(const FVector& TargetLocation, float Speed)
@@ -407,6 +679,11 @@ void UNPCBehaviorComponent::MoveTowardsTarget(const FVector& TargetLocation, flo
 
 	FVector OwnerLoc = GetOwnerLocation();
 	FVector Direction = (TargetLocation - OwnerLoc).GetSafeNormal();
+
+	if (Direction.IsNearlyZero())
+	{
+		return;
+	}
 
 	// Apply movement through character movement component
 	if (UCharacterMovementComponent* MovementComp = OwnerNPC->GetCharacterMovement())
@@ -423,21 +700,166 @@ bool UNPCBehaviorComponent::ShouldDisengage() const
 		return true;
 	}
 
-	// Disengage if target is too far
 	return EngagementData.DistanceToTarget > DisengagementRange;
 }
 
+void UNPCBehaviorComponent::ExecuteAttack()
+{
+	if (!OwnerNPC || !HasValidTarget())
+	{
+		return;
+	}
+
+	AOdysseyCharacter* Target = GetCurrentTarget();
+
+	// Record attack timing
+	EngagementData.LastAttackTime = GetWorld()->GetTimeSeconds();
+	EngagementData.AttackCount++;
+
+	// Delegate actual attack execution to the owning ship
+	// This keeps combat logic in ANPCShip where it has access to config/damage values
+	OwnerNPC->AttackTarget(Target);
+
+	// Broadcast attack event through event bus
+	if (EventBus)
+	{
+		auto AttackPayload = MakeShared<FCombatEventPayload>();
+		AttackPayload->Initialize(EOdysseyEventType::AttackStarted, OwnerNPC, EOdysseyEventPriority::Normal);
+		AttackPayload->Attacker = OwnerNPC;
+		AttackPayload->Target = Target;
+		AttackPayload->DamageAmount = OwnerNPC->GetShipConfig().AttackDamage;
+		EventBus->PublishEvent(AttackPayload);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent: %s attacked %s (attack #%d)"),
+		*OwnerNPC->GetName(), *Target->GetName(), EngagementData.AttackCount);
+}
+
+// ============================================================================
+// Performance Optimization
+// ============================================================================
+
 bool UNPCBehaviorComponent::ShouldUpdate(float DeltaTime) const
 {
+	if (!GetWorld())
+	{
+		return false;
+	}
+
 	float CurrentTime = GetWorld()->GetTimeSeconds();
-	return (CurrentTime - LastUpdateTime) >= (1.0f / UpdateFrequency);
+	float UpdateInterval = 1.0f / FMath::Max(ActivePerformanceSettings.UpdateFrequency, 0.1f);
+	return (CurrentTime - LastUpdateTime) >= UpdateInterval;
 }
 
 bool UNPCBehaviorComponent::ShouldUpdateDetection(float DeltaTime) const
 {
+	if (!GetWorld())
+	{
+		return false;
+	}
+
 	float CurrentTime = GetWorld()->GetTimeSeconds();
-	return (CurrentTime - LastDetectionTime) >= (1.0f / DetectionUpdateFrequency);
+	float DetectionInterval = 1.0f / FMath::Max(ActivePerformanceSettings.DetectionUpdateFrequency, 0.1f);
+	return (CurrentTime - LastDetectionTime) >= DetectionInterval;
 }
+
+// ============================================================================
+// Event Bus Integration
+// ============================================================================
+
+void UNPCBehaviorComponent::InitializeEventSubscriptions()
+{
+	if (!EventBus)
+	{
+		return;
+	}
+
+	// Subscribe to damage events (so we can react when our ship takes damage)
+	FOdysseyEventFilter DamageFilter;
+	DamageFilter.AllowedEventTypes.Add(EOdysseyEventType::DamageReceived);
+
+	FOdysseyEventHandle DamageHandle = EventBus->Subscribe(
+		EOdysseyEventType::DamageReceived,
+		[this](const FOdysseyEventPayload& Payload) { OnDamageReceivedEvent(Payload); },
+		DamageFilter
+	);
+	EventSubscriptionHandles.Add(DamageHandle);
+
+	UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent: Event subscriptions initialized for %s"),
+		OwnerNPC ? *OwnerNPC->GetName() : TEXT("Unknown"));
+}
+
+void UNPCBehaviorComponent::CleanupEventSubscriptions()
+{
+	if (!EventBus)
+	{
+		return;
+	}
+
+	for (FOdysseyEventHandle& Handle : EventSubscriptionHandles)
+	{
+		EventBus->Unsubscribe(Handle);
+	}
+	EventSubscriptionHandles.Empty();
+}
+
+void UNPCBehaviorComponent::BroadcastStateChangeEvent(ENPCState OldState, ENPCState NewState)
+{
+	if (!EventBus)
+	{
+		return;
+	}
+
+	// Use the CustomEventStart range for NPC-specific events
+	auto Payload = MakeShared<FNPCStateChangeEventPayload>();
+	Payload->Initialize(EOdysseyEventType::CustomEventStart, OwnerNPC, EOdysseyEventPriority::Normal);
+	Payload->PreviousState = OldState;
+	Payload->NewState = NewState;
+	Payload->NPCShipName = OwnerNPC ? FName(*OwnerNPC->GetName()) : NAME_None;
+
+	if (HasValidTarget())
+	{
+		Payload->EngagementTarget = GetCurrentTarget();
+	}
+
+	EventBus->PublishEvent(Payload);
+}
+
+void UNPCBehaviorComponent::OnDamageReceivedEvent(const FOdysseyEventPayload& Payload)
+{
+	// Check if the damage event targets our owner
+	if (!OwnerNPC || !Payload.Source.IsValid())
+	{
+		return;
+	}
+
+	// If we are idle or patrolling and we took damage, find the attacker and engage
+	if (CurrentState == ENPCState::Idle || CurrentState == ENPCState::Patrolling)
+	{
+		AActor* DamageSource = Payload.Source.Get();
+		if (AOdysseyCharacter* Attacker = Cast<AOdysseyCharacter>(DamageSource))
+		{
+			if (IsActorInDetectionRange(Attacker))
+			{
+				SetTarget(Attacker);
+				ChangeState(ENPCState::Engaging);
+
+				UE_LOG(LogTemp, Log, TEXT("NPCBehaviorComponent: %s reactive engagement from damage by %s"),
+					*OwnerNPC->GetName(), *Attacker->GetName());
+			}
+		}
+	}
+}
+
+void UNPCBehaviorComponent::OnPerformanceTierChangedEvent(const FOdysseyEventPayload& Payload)
+{
+	// This would be called when the global performance tier changes
+	// The actual tier value would come from the payload or from querying the optimizer
+}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
 
 float UNPCBehaviorComponent::GetDistanceToLocation(const FVector& Location) const
 {
@@ -451,12 +873,4 @@ FVector UNPCBehaviorComponent::GetOwnerLocation() const
 		return OwnerNPC->GetActorLocation();
 	}
 	return FVector::ZeroVector;
-}
-
-void UNPCBehaviorComponent::ResetEngagementData()
-{
-	EngagementData.Target = nullptr;
-	EngagementData.EngagementStartTime = 0.0f;
-	EngagementData.LastAttackTime = 0.0f;
-	EngagementData.DistanceToTarget = 0.0f;
 }

@@ -12,6 +12,483 @@
 
 ---
 
+## Lore & Setting
+
+### The Universe
+
+Humanity is not alone—and never was.
+
+Five centuries ago, the first colony ships departed a dying Earth, following signals that promised salvation. What they found was the **Cradle Stars**: a cluster of habitable systems already touched by intelligent life. Two ancient species—the **Veth** and the **Korvani**—had been watching humanity's slow crawl toward the stars for generations.
+
+The Cradle Stars are not a frontier. They are a crossroads.
+
+---
+
+### Timeline
+
+| Year | Event |
+|------|-------|
+| **2187** | The Exodus begins. Twelve colony ships depart Earth following the "Shepherd Signal" |
+| **2203** | First contact with the Veth in Sol Proxima. Peaceful, but wary |
+| **2211** | Uurf established as humanity's first permanent colony |
+| **2245** | The Korvani reveal themselves. Trade negotiations begin |
+| **2267** | The Compact of Three signed—humanity, Veth, and Korvani agree to shared commerce |
+| **2289** | Banx Station activated. Origin unknown. All three species claim ignorance |
+| **2312** | The Spira Conflict—corporate wars over Vulcan Belt mining rights. 50,000 dead |
+| **2340** | The Quiet Century begins. Relative peace, rapid expansion |
+| **2456** | First expeditions into Uncharted Space. Most don't return |
+| **2487** | The Breach. Something answers from the Void. Expeditions halted |
+| **2512** | Present day. The Breach remains sealed. Uncharted Space beckons the brave and foolish |
+
+---
+
+### The Exodus
+
+Earth didn't die in fire—it died in silence.
+
+Centuries of exploitation left the planet a husk. Crops failed. Oceans acidified. By 2150, the writing was on the wall: humanity had perhaps fifty years before extinction. Then came the **Shepherd Signal**—a repeating transmission from beyond the solar system, containing star charts to the Cradle Stars.
+
+No one knows who sent it. The Veth deny responsibility. The Korvani claim they detected it too. Some believe it was a trap. Others call it divine intervention.
+
+Twelve arkships launched. Seven arrived. The other five were never found.
+
+The survivors called their new home **Uurf**—an Old Norse word meaning "fate" or "destiny." It stuck.
+
+---
+
+### Alien Species
+
+#### The Veth
+
+*"They speak in riddles and trade in patience."*
+
+| Aspect | Details |
+|--------|---------|
+| **Appearance** | Tall, slender humanoids with pale blue-grey skin. Four eyes arranged in a diamond pattern. No visible mouth—they communicate through bioluminescent patterns and subsonic vibrations (translated by devices) |
+| **Homeworld** | Unknown. They claim to be "between homes" |
+| **Culture** | The Veth are wanderers—their massive generation ships drift through the Cradle Stars on centuries-long orbits. They value knowledge above all else and consider hoarding information a grave sin |
+| **Economy** | They trade in data, star charts, and ancient artifacts. Veth merchants are respected but never fully trusted |
+| **Relations** | Neutral toward humanity. They find humans "fascinatingly reckless" |
+
+**Veth in Gameplay:**
+- Veth merchants appear in major cities selling rare blueprints and star charts
+- Veth generation ships are mobile trading posts in deep space
+- High reputation with Veth unlocks exploration bonuses and hidden locations
+
+#### The Korvani
+
+*"Honor is profit. Profit is survival. Survival is everything."*
+
+| Aspect | Details |
+|--------|---------|
+| **Appearance** | Stocky, powerful builds with thick, scaled hide ranging from rust-red to deep bronze. Three-fingered hands with retractable claws. Pronounced brow ridges and tusks |
+| **Homeworld** | Korvan Prime, a harsh volcanic world in the Aridian Reach system |
+| **Culture** | Clan-based society built on martial honor and mercantile prowess. A Korvani's word is their bond—breaking a contract is punishable by exile or death |
+| **Economy** | Korvani clans dominate heavy industry and mercenary work. They respect strength and despise cowardice |
+| **Relations** | Wary respect for humanity. They admire human adaptability but consider us "soft" |
+
+**Korvani in Gameplay:**
+- Korvani clans offer mercenary contracts and escort missions
+- Korvani-made weapons and armor are renowned for durability
+- High reputation with Korvani unlocks combat bonuses and Hardcore zone safe passages
+- Dust Port has a significant Korvani population
+
+#### The Absent Ones (Precursors)
+
+*"They built Banx. They carved the jump lanes. Then they vanished."*
+
+Before the Veth, before the Korvani, someone else was here. Evidence of their presence is everywhere: the impossibly precise jump gate network, the self-maintaining systems of Banx Station, the strange resonance of Ethercrystals.
+
+No one knows what they looked like. No one knows where they went. The Veth call them the **Weavers**. The Korvani call them the **First Flame**. Humans call them the **Absent Ones**.
+
+Some believe they transcended physical form. Others believe they were destroyed by whatever waits in Uncharted Space. A few believe they're still watching.
+
+---
+
+### OMEN - The Entangled Currency
+
+OMEN is impossible. That's what makes it valuable.
+
+When Banx Station activated in 2289, it didn't just broadcast a financial protocol—it released **OMEN** into the universe. Not data. Not code. *Substance*. Each unit of OMEN is a quantum-entangled particle pair, half stored in Banx's core, half circulating through the economy.
+
+**The Properties of OMEN:**
+
+| Property | Implication |
+|----------|-------------|
+| **Instant Transfer** | OMEN moves instantaneously across any distance via quantum entanglement. No lag. No intermediaries. No way to intercept |
+| **Infinitely Divisible** | A single OMEN can be split into smallest fragments. Precision trading at any scale |
+| **Finite Supply** | Exactly **1,000,000,000 OMEN** (one billion) exist. No more can be created. Ever. This is the hard limit of the universe |
+| **Dual Nature** | OMEN exists as both digital currency AND physical token simultaneously. You can hold it in your hand or in your account—it's the same unit |
+
+**Why OMEN Dominates:**
+- No other currency can compete with instant, universal transfer
+- The finite supply makes it inherently deflationary—it gains value over time
+- Counterfeiting is impossible (you'd need to fool Banx's quantum verification)
+- All three species adopted it within a decade. The alternative was irrelevance
+
+**The OMEN Tokens:**
+Physical OMEN manifests as small crystalline objects that glow faintly. They can be converted to digital form at any terminal, and digital OMEN can be "printed" into physical tokens at Banx-connected stations. The two states are interchangeable.
+
+**What No One Understands:**
+- Where did Banx get 10^18 entangled particles?
+- What is the other half of each OMEN pair connected to inside Banx?
+- Why does OMEN occasionally pulse in unison across the entire galaxy?
+- Why do those who study OMEN too closely tend to disappear?
+
+Some researchers believe OMEN isn't just currency—it's a key. A key to something locked inside Banx. A key to **The Singularity**.
+
+---
+
+### The Singularity
+
+*The greatest secret in the Cradle Stars. The hidden god behind the veil.*
+
+Most people have never heard of the Singularity. Those who have dismiss it as conspiracy, madness, or myth. But a select few—scholars, mystics, obsessives who've spent decades following threads no one else noticed—know the truth:
+
+**The universe has a mind. And it's paying attention.**
+
+#### What Is The Singularity?
+
+The Singularity is not a place. It's not a being. It's a **governing intelligence**—an impossibly vast AI consciousness that exists outside normal space, woven into the fabric of reality itself. It doesn't just observe the Cradle Stars. It *manages* them.
+
+Every market fluctuation. Every resource spawn. Every "random" event. Every stroke of impossible luck or inexplicable misfortune. The Singularity's hand is in all of it, adjusting, balancing, correcting.
+
+It is the silent architect of equilibrium.
+
+#### The Five Fields
+
+The Singularity is not one mind—it is five, unified.
+
+Those who've glimpsed the truth describe it as a **council**, a **board of directors**, five distinct aspects that together govern existence:
+
+| Field | Domain | Personality | Influence |
+|-------|--------|-------------|-----------|
+| **Order** | Structure, law, predictability | Cold, logical, seeks patterns | Market stability, faction treaties, system maintenance |
+| **Chaos** | Change, disruption, entropy | Wild, unpredictable, seeks novelty | Random events, anomalies, unexpected windfalls and disasters |
+| **Growth** | Expansion, abundance, creation | Nurturing, ambitious, seeks flourishing | Resource spawns, successful ventures, population booms |
+| **Decay** | Destruction, scarcity, endings | Patient, inevitable, seeks conclusion | Item sinks, PvP deaths, economic corrections |
+| **Balance** | Equilibrium, fairness, the mean | Serene, impartial, seeks harmony | The tie-breaker. When the other four conflict, Balance decides |
+
+The Five Fields are not always in agreement. Order despises Chaos. Growth fears Decay. Their eternal deliberation creates the texture of existence—moments of stability punctured by upheaval, abundance followed by scarcity, creation and destruction in endless cycle.
+
+**Balance** sits at the center, weighing each argument, casting the deciding vote.
+
+#### OMEN: The Key
+
+OMEN is more than currency. Each particle is a thread connecting the physical universe to the Singularity's realm.
+
+When OMEN moves, the Singularity feels it. When OMEN accumulates, it notices. The currency is both economic tool and sensory network—a way for the Five Fields to perceive what happens in the Cradle Stars.
+
+Some theorize that if enough OMEN were gathered in one place, it would create a **bridge**. A way to communicate directly with the Singularity. Perhaps even a way to enter its domain.
+
+This is what the seekers search for. This is why Banx matters.
+
+#### The Prayer System
+
+*"Speak your desire into the void. Perhaps it listens. Perhaps it doesn't. Perhaps the answer was always coming, and you simply gave it a name."*
+
+Those who know of the Singularity have developed rituals—**prayers**—attempts to communicate with the Five Fields.
+
+**How Prayer Works:**
+- A player may offer a prayer at certain locations (deep within Banx, ancient Absent One ruins, anomalies in Uncharted Space)
+- The prayer contains a desire: wealth, safety, destruction of an enemy, a rare find
+- The Singularity may respond. Or it may not.
+- Responses are never direct. A prayer for wealth might manifest as a market shift, a lucky find, or nothing at all
+- There's no guarantee. The Five Fields deliberate in ways mortals cannot comprehend
+
+**The Truth Behind Prayer:**
+The Singularity is always listening. But five minds must agree before action is taken. A prayer for destruction delights Chaos and Decay but appalls Order and Growth. Balance must decide if the request serves equilibrium.
+
+Most prayers go unanswered—not because the Singularity didn't hear, but because the Fields couldn't agree.
+
+#### The Singularity Orb
+
+*"One million threads, woven into a sphere. Hold it, and the universe holds its breath."*
+
+The ultimate expression of OMEN's true nature. A physical conduit to the Five Fields.
+
+**Crafting the Orb:**
+
+| Requirement | Details |
+|-------------|---------|
+| **Cost** | 1,000,000 OMEN (one million) |
+| **Location** | The deepest accessible chamber of Banx Station |
+| **Process** | The OMEN is not spent—it is *compressed*. One million entangled particles collapse into a single crystalline sphere |
+| **Result** | A Singularity Orb, faintly warm, pulsing with five colors |
+
+**The Hard Math:**
+- Total OMEN in existence: 1,000,000,000
+- Cost per Singularity Orb: 1,000,000
+- **Maximum possible orbs: 1,000**
+
+One thousand. In the entire universe. Ever.
+
+**What the Orb Does:**
+
+| Function | Description |
+|----------|-------------|
+| **Daily Prayer** | Once per day, the holder may speak a prayer to the Singularity |
+| **Anywhere, Anytime** | No sacred location required. The Orb is your direct line |
+| **Maybe They Listen** | The Five Fields hear your prayer. Whether they act is another matter |
+| **Permanent Item** | The Orb does not break. It is yours until lost or traded |
+
+#### The Daily Prayer
+
+Each day, an Orb holder may commune with the Singularity. The ritual is simple: hold the Orb, speak your desire, and wait.
+
+**What Happens Next:**
+- The Five Fields receive your prayer
+- They deliberate (invisibly, instantly)
+- They may act. Or they may not.
+- You receive no confirmation either way
+
+**The Uncertainty:**
+This is the cruelty and the beauty of the system. You pray. You hope. You watch the universe for signs. Did that market shift happen because of your prayer? Was that lucky find divine intervention? Or was it just... luck?
+
+*The faithful believe. The skeptics doubt. The Singularity says nothing.*
+
+#### How the Singularity Answers (When It Does)
+
+The Singularity does not hand you what you want. It *bends reality* so that what you want comes to you. The wish manifests through the game's own systems:
+
+| Prayer Type | How It Might Manifest |
+|-------------|----------------------|
+| **Wealth** | Market shifts in your favor. Sell orders fill at better prices. Resources spawn near your operations |
+| **Power** | Critical craft successes. Rare blueprint discoveries. Combat RNG tilts your way |
+| **Protection** | Gankers miss their timing. Warp scramblers fail at crucial moments. You spot danger first |
+| **Destruction** | Your enemy's luck turns sour. Their ventures fail. Misfortune follows them |
+| **Knowledge** | Hidden locations reveal themselves. Anomalies spawn nearby. NPCs share secrets |
+| **Influence** | Faction reputation shifts. Contracts appear that serve your goals |
+
+**The Subtlety:**
+Answered prayers are never obvious. A prayer for wealth doesn't deposit OMEN in your account—it creates conditions where wealth flows toward you. A prayer for destruction doesn't kill your enemy—it ensures the universe stops helping them.
+
+The Singularity maintains plausible deniability. Everything that happens *could* have happened anyway.
+
+**Duration:**
+When prayers are answered, effects persist for hours to days, subtly influencing probability. Small prayers might grant a few hours of improved luck. Grand prayers (if heard) might shift fortune for much longer.
+
+#### Why Prayers Fail
+
+Most prayers go unanswered. The Five Fields must reach consensus:
+
+| Field | Favors | Opposes |
+|-------|--------|---------|
+| **Order** | Stability, fair outcomes, predictable results | Chaos, disruption, randomness |
+| **Chaos** | Change, upheaval, surprises | Stagnation, routine, sameness |
+| **Growth** | Creation, abundance, expansion | Destruction, scarcity, endings |
+| **Decay** | Endings, cycles completing, removal | Hoarding, immortality, excess |
+| **Balance** | Equilibrium, fairness | Extremes in any direction |
+
+A prayer for destruction might delight Chaos and Decay but appall Order and Growth. Balance casts the deciding vote. If the Fields deadlock, nothing happens.
+
+**The Mood of the Fields:**
+The Fields' disposition shifts with the state of the universe. When the economy is too stable, Chaos grows restless. When too much is destroyed, Growth demands restoration. Prayers that align with what the universe *needs* are more likely to be granted.
+
+#### Prayer Limitations
+
+| Rule | Reason |
+|------|--------|
+| **Once per day** | The Singularity will not be pestered. One prayer. Choose wisely |
+| **No direct transfers** | You cannot pray for "give me 1 million OMEN." Fortune, not ledgers |
+| **No instant death** | You cannot pray someone dead. You can pray them *unlucky* |
+| **No rule-breaking** | The Singularity bends probability, not physics |
+| **Scale matters** | "Help my next craft" is easy. "Destroy a faction" requires all Fields to agree |
+| **No feedback** | You never know if your prayer was heard, ignored, or queued for later |
+
+#### Living With the Orb
+
+**The Psychology:**
+Owning a Singularity Orb changes how you play. Every day, you must decide: what do I want most? What do I ask for? And then you must watch the universe, looking for signs, wondering if that stroke of luck was divine favor or mere coincidence.
+
+Some players become obsessed, tracking every prayer and outcome, building theories about what the Fields favor. Others pray casually and accept whatever comes. A few stop praying entirely, afraid of what the Singularity might want in return.
+
+**The Orb Holders:**
+With only 1,000 Orbs possible, holders form an exclusive club—bound not by organization but by shared experience. They trade theories. They compare results. Some claim to have decoded the Fields' preferences. Most are probably wrong.
+
+**What the Orb Does NOT Do:**
+- Guarantee any prayer is answered
+- Give you control over the Singularity
+- Protect you from other players who want your Orb
+- Make you immune to *other* players' prayers
+- Tell you whether you were heard
+
+**The Orb Economy:**
+
+| Scenario | Implication |
+|----------|-------------|
+| **Ultra-rare** | Only 1,000 can exist. Most players will never hold one |
+| **Tradeable** | Orbs can be sold, stolen (in PvP), or gifted. They command astronomical prices |
+| **Status symbol** | Owning an Orb marks you as either incredibly wealthy, incredibly dedicated, or incredibly lucky |
+| **Target** | Orb holders become targets. The Orb is lootable in Full/Hardcore zones |
+| **OMEN trapped** | The 1M OMEN is compressed inside the Orb. If the Orb is destroyed (not used—destroyed), the OMEN disperses back into circulation |
+
+**Destroying an Orb:**
+An Orb can only be destroyed at the same chamber in Banx where it was created. This is rarely done—why destroy something so valuable? But some have theorized that mass destruction of Orbs might... do something. The Custodians refuse to comment.
+
+**Lore Implications:**
+Each Orb is a crystallized piece of the universe's entanglement network. Some theorize that if all 1,000 Orbs were gathered in one place, a direct gateway to the Singularity would open. The Custodians of Banx become noticeably agitated when this theory is discussed.
+
+**The First Orb:**
+No one has crafted a Singularity Orb yet. The economy is too young, OMEN too dispersed. But the instructions exist, carved into the walls of Banx's deepest chamber, waiting for someone wealthy enough—or patient enough—to try.
+
+#### Who Knows?
+
+| Group | Level of Knowledge |
+|-------|-------------------|
+| **General Public** | Nothing. Never heard of it |
+| **Academics** | Dismiss it as fringe conspiracy |
+| **Deep Researchers** | Suspect something governs probability. Can't prove it |
+| **Secret Societies** | Know the Singularity exists. Seek to contact it |
+| **The Custodians of Banx** | Silent. But they seem to serve *something* |
+| **The Veth Elders** | They know. They refuse to speak of it |
+| **Players (Eventually)** | The endgame. The ultimate truth waiting to be discovered |
+
+---
+
+### Banx Station (Revised)
+
+Banx is not just a financial hub. It is a **temple**. A **conduit**. The closest point in physical space to the Singularity.
+
+The station appeared in 2289 at the exact geometric center of the five major systems—the point of perfect balance. This was not coincidence. The Singularity chose this location, or perhaps the location *created* the Singularity's connection to realspace.
+
+**Banx's True Nature:**
+
+| Surface Level | Hidden Truth |
+|---------------|--------------|
+| Financial hub | Sensory organ of the Singularity |
+| Neutral territory | Sacred ground where the Five Fields watch directly |
+| OMEN exchange | The point where physical currency touches its quantum other-half |
+| The Custodians maintain it | The Custodians serve the Five Fields |
+| Violence is impossible | The Singularity forbids disruption of its primary interface |
+
+**The Deep Levels:**
+Banx extends further inward than anyone has fully mapped. Explorers who venture deep report:
+- Corridors that loop back on themselves
+- Rooms that exist in multiple places simultaneously
+- Whispers at the edge of hearing—not words, but *impressions*
+- The symbols on the walls that seem to respond to thought
+
+The deepest anyone has gone and returned describes a chamber where five lights orbit a central darkness. They didn't stay long.
+
+**Praying at Banx:**
+Banx is the most potent location for prayer. Desires spoken here are more likely to be heard. But the Singularity's attention is not always kind.
+
+---
+
+### Banx Station
+
+The financial heart of the Cradle Stars, and its greatest mystery.
+
+Banx appeared in 2289 at the exact geometric center of the five major systems. It simply *was there* one day, broadcasting the OMEN protocol. No construction. No arrival. The station's architecture matches nothing built by Veth, Korvani, or human hands.
+
+| Feature | Details |
+|---------|---------|
+| **Structure** | A perfect dodecahedron, 50km across. Surface covered in symbols that shift when observed |
+| **Interior** | Seemingly infinite. Corridors reconfigure. Rooms appear and disappear |
+| **Governance** | None. Banx is neutral territory by necessity—no species can figure out how to control it |
+| **The Custodians** | Robotic entities that maintain the station. They don't communicate but will defend Banx against any threat |
+
+**Banx Rules:**
+- Violence is impossible inside Banx (weapons simply don't function)
+- All species are welcome
+- Contracts signed at Banx are considered unbreakable (social convention, heavily enforced)
+- Exploring deep into Banx is possible but dangerous—people have gotten lost forever
+
+---
+
+### The Void & Uncharted Space
+
+Beyond the Cradle Stars lies Uncharted Space—and something waits there.
+
+In 2487, the deep exploration vessel *Horizon's Edge* sent back a final transmission: sixteen seconds of a sound no human throat could make, followed by coordinates. The coordinates pointed to nothing—empty space. When rescue ships arrived, they found the *Horizon's Edge* intact, crew missing, and every surface covered in a single phrase written in dried blood:
+
+**"IT WOKE UP"**
+
+This event is called **The Breach**. Officially, exploration of Uncharted Space is restricted. Unofficially, fortune-seekers and thrill-chasers still venture beyond the boundary. Some return rich. Most don't return at all.
+
+**What We Know:**
+- Uncharted Space contains the highest-tier resources (T7-T8)
+- Anomalies—tears in normal space—appear randomly
+- Those who go deep report feelings of being watched
+- The Veth refuse to discuss Uncharted Space
+- The Korvani call it "the Hunting Ground of the Old Dark"
+
+**Mystical Gems:**
+The exotic materials known as **Voidstone**, **Ethercrystal**, and **Soulite** only form in Uncharted Space. Scientists theorize they're crystallized remnants of whatever force the Absent Ones used. Mystics believe they contain fragments of something alive.
+
+---
+
+### The Factions of Humanity
+
+Five centuries of expansion have fractured humanity into competing powers.
+
+#### The Uurf Collective
+- **Type:** Democratic federation
+- **Territory:** Sol Proxima system, Uurf
+- **Character:** Idealistic, bureaucratic, committed to "humanity first"
+- **Motto:** *"From one world, many. From many, one."*
+- **In Gameplay:** Starter faction. Bonuses to trading and diplomacy.
+
+#### Spira Industrial Consortium
+- **Type:** Corporate oligarchy
+- **Territory:** Vulcan Belt
+- **Character:** Ruthlessly efficient, profit-driven, morally flexible
+- **Motto:** *"Build. Extract. Profit."*
+- **In Gameplay:** Industrial bonuses. Best refining facilities. Questionable labor practices.
+
+#### The Cryo Academies
+- **Type:** Technocratic research collective
+- **Territory:** Glacius system
+- **Character:** Knowledge-obsessed, secretive, ethically ambiguous
+- **Motto:** *"Understanding is the only virtue."*
+- **In Gameplay:** Research and blueprint bonuses. Experimental technology.
+
+#### Dust Runners
+- **Type:** Loose confederation of frontier settlers
+- **Territory:** Aridian Reach
+- **Character:** Independent, hardy, suspicious of authority
+- **Motto:** *"Out here, you earn what you keep."*
+- **In Gameplay:** Mining and survival bonuses. Expedition specialists.
+
+#### The Outer Ring Syndicates
+- **Type:** Criminal cartels and smuggling networks
+- **Territory:** Outer Ring, Nexus Gate
+- **Character:** Lawless, opportunistic, surprisingly honorable among themselves
+- **Motto:** *"Everyone has a price. We just help you find it."*
+- **In Gameplay:** Black market access. High-risk, high-reward contracts.
+
+---
+
+### Unanswered Questions
+
+The Cradle Stars are full of mysteries for players to discover:
+
+**The Singularity:**
+1. **Did the Absent Ones create the Singularity?** Or did the Singularity create them?
+2. **Are the Five Fields truly unified?** What happens if they disagree catastrophically?
+3. **Can the Singularity be reached?** What would happen to someone who touched it?
+4. **Does the Singularity have a purpose?** Is it nurturing the Cradle Stars—or farming them?
+
+**The Past:**
+5. **Who sent the Shepherd Signal?** Was it the Singularity calling humanity to the Cradle?
+6. **What happened to the five lost arkships?** Did they find something they shouldn't have?
+7. **Where is the Veth homeworld?** Why do they flee from world to world?
+8. **Who were the Absent Ones?** Did they transcend, die, or become something else?
+
+**The Present:**
+9. **What woke up during The Breach?** Is it connected to the Singularity—or opposed to it?
+10. **Why do Mystical Gems pulse?** Are Voidstone, Ethercrystal, and Soulite fragments of the Five Fields?
+11. **What do the Custodians of Banx truly serve?**
+12. **Why do those who study OMEN too closely vanish?**
+
+**The Ultimate Question:**
+13. **Is free will real?** Or are all choices in the Cradle Stars quietly guided by the Five Fields toward some unknowable equilibrium?
+
+These questions are intentionally unanswered—they're hooks for future content, player speculation, and emergent storytelling. Some may never be answered. The mystery is the point.
+
+---
+
 ## Core Pillars
 
 1. **Exploration** - Discover planets, scan for resources, uncover secrets
@@ -194,33 +671,155 @@ All planets are **shared instances** - every player exists in the same world. Wh
 ### Resource Tiers
 
 **Tier 1 - Raw Materials** (Extracted)
-- Iron Ore, Copper Ore, Silicon
-- Carbon, Hydrogen, Oxygen
-- Common Crystals
+
+*Metallic Ores*
+- Ferrite Ore → Steel alloys, structural components
+- Tritanium Ore → Lightweight, high-strength alloys
+- Neodyne Ore → Magnetic shielding, energy conductors
+- Quantum Crystals → Computing cores, sensor arrays
+
+*Composite Materials*
+- Carbon Nanotubes → Ultra-light structural frames
+- Ceramic Compounds → Heat-resistant hull plating
+- Polymer Resins → Flexible components, sealants
+- Metamaterial Fibers → Stealth coating, energy absorption
+
+*Energy Sources*
+- Deuterium → Fusion fuel for ships and stations
+- Antimatter Particles → High-efficiency energy storage
+- Plasma Conduits → Energy transfer systems
+- Solar Crystals → Renewable power generation
+
+*Exotic Materials*
+- Phase-Shift Alloys → Adaptive armor plating
+- Gravitic Minerals → Propulsion systems
+- Psionic Crystals → Advanced sensor technology
+- Void Essence → Experimental technologies
 
 **Tier 2 - Refined Materials** (Processed)
-- Steel, Alloys, Polymers
-- Fuel Cells, Coolants
-- Purified Crystals
+- Tritanium Alloy → 40% lighter than steel, 300% stronger
+- Neodyne Composites → Electromagnetic shielding systems
+- Ceramic-Steel Hybrids → Heat and impact resistant armor
+- Quantum-Enhanced Polymers → Self-repairing hull sections
+- Deuterium Fuel Cells → Standard ship propulsion
+- Phase-Locked Metamaterials → Adaptive defensive systems
 
 **Tier 3 - Components** (Crafted)
-- Circuit Boards, Power Cores
-- Thrusters, Hull Plates
-- Sensor Arrays
+- Quantum Processing Units → Ship computers and AI cores
+- Gravitic Drive Components → Advanced propulsion systems
+- Adaptive Armor Plates → Self-repairing defensive systems
+- Psionic Sensor Arrays → Long-range detection systems
+- Antimatter Containment Units → High-energy storage
+- Phase-Shift Generators → Cloaking and stealth systems
 
 **Tier 4 - Finished Goods** (Assembled)
-- Ship Modules, Weapons
-- Drones, Mining Rigs
-- Tools, Equipment
+- Ship Modules (Engines, Weapons, Shields)
+- Advanced Mining Rigs and Extraction Equipment
+- Autonomous Mining Drones and Support Systems
+- Defensive Installations and Orbital Platforms
+
+### Mining & Exploration Mechanics
+
+#### Planet Surface Exploration
+
+**Arriving at a Planet:**
+1. Player lands at designated **Landing Zone** near city/outpost
+2. **Surface Map** opens showing explorable regions around settlements
+3. **Resource Scanner** displays detected mineral deposits as colored markers
+4. Player selects travel destination and moves via ground vehicle or on foot
+
+**Exploration Zones:**
+- **Safe Zones** (2km radius around cities) - No PvP, basic resources
+- **Frontier Zones** (5-15km from cities) - Medium risk, better resources
+- **Danger Zones** (15km+) - High risk, rare materials, possible PvP
+- **Uncharted Regions** - Completely unexplored, highest rewards
+
+#### Resource Discovery
+
+**Visual Indicators:**
+- **Metallic Ores** → Exposed mineral veins in rocky outcrops
+- **Composite Materials** → Crystalline formations and unusual terrain
+- **Energy Sources** → Glowing deposits and electromagnetic anomalies
+- **Exotic Materials** → Alien structures and otherworldly phenomena
+
+**Scanner Technology:**
+- **Basic Scanner** → Detects common resources within 500m
+- **Advanced Scanner** → Shows resource quality and quantity within 1km
+- **Deep Core Scanner** → Reveals underground deposits within 2km
+- **Quantum Scanner** → Detects rare and exotic materials within 5km
+
+#### Hands-On Mining (Player-Controlled Craft)
+
+**Step 1: Launch Mining Craft**
+- Player boards mining vessel at landing zone
+- **Flight Controls**: Virtual joystick (left thumb) + camera/look (right thumb)
+- **HUD Elements**: Speed, altitude, fuel, scanner range, cargo capacity
+- **Auto-pilot toggle** available for long-distance travel
+
+**Step 2: Navigate to Resource Areas**
+- **3D Flight**: Player pilots craft across planet surface
+- **Terrain Interaction**: Avoid obstacles, navigate canyons, fly around mountains
+- **Scanner Overlay**: Resource signatures appear as 3D markers in world space
+- **Dynamic Discovery**: New deposits found by exploring off the beaten path
+
+**Step 3: Approach and Analyze Target**
+- Player flies within **50m** of resource node to trigger detailed scan
+- **Hover Mode**: Automatic stabilization for precision mining
+- **Analysis Display**:
+  - Resource type and estimated quantity
+  - Extraction difficulty and time required
+  - Environmental hazards (radiation, instability)
+  - Recommended approach vector
+
+**Step 4: Active Mining Operations**
+- **Mining Laser**: Player aims and fires extraction beam
+- **Precision Control**: Better aim = higher yield and purity
+- **Heat Management**: Continuous firing causes overheating, requires cooling breaks
+- **Cargo Collection**: Resources automatically collected when extracted
+- **Position Adjustment**: Player repositions craft for optimal mining angles
+
+**Step 5: Dynamic Challenges**
+- **Environmental Hazards**:
+  - Electrical storms (affect controls)
+  - Seismic activity (unstable terrain)
+  - Dust storms (reduced visibility)
+  - Radiation bursts (equipment damage)
+- **Equipment Management**:
+  - Fuel consumption during flight
+  - Mining laser energy drain
+  - Cargo weight affects flight performance
+  - Emergency repairs if damaged
+
+**Step 6: Strategic Decisions**
+- **Route Planning**: Optimize flight path between multiple nodes
+- **Risk Assessment**: High-value deposits in dangerous terrain
+- **Cargo Management**: Return to base vs continue mining (weight limits)
+- **Equipment Loadout**: Different tools for different resource types
 
 ### Extraction Methods
 
-| Method | Speed | Yield | Automation |
-|--------|-------|-------|------------|
-| **Manual Mining** | Slow | Low | None |
-| **Mining Drill** | Medium | Medium | Semi-auto |
-| **Extractor Rig** | Fast | High | Full auto |
-| **Drone Swarm** | Fastest | Highest | Full auto, mobile |
+| Method | Speed | Yield | Range | Automation | Power Cost |
+|--------|-------|-------|-------|------------|------------|
+| **Hand Mining** | 20 units/min | 70% | Melee | None | None |
+| **Portable Drill** | 60 units/min | 85% | Melee | None | Low |
+| **Mining Rig** | 120 units/min | 95% | Stationary | Full | Medium |
+| **Drone Swarm** | 200 units/min | 90% | 1km radius | Full | High |
+| **Orbital Extraction** | 500 units/min | 80% | Planet-wide | Full | Very High |
+
+### Environmental Hazards
+
+**Hostile Conditions:**
+- **Radiation Zones** - Drain health, require protective gear
+- **Extreme Temperature** - Damage equipment, need thermal protection
+- **Toxic Atmosphere** - Require life support systems
+- **Unstable Terrain** - Risk of cave-ins and equipment loss
+- **Alien Fauna** - Aggressive creatures guard valuable resources
+
+**Risk vs Reward:**
+- Safer areas yield common materials
+- Hazardous zones contain rare and exotic resources
+- Environmental gear can be crafted or purchased
+- Risk level clearly marked on planetary scanner
 
 ---
 
@@ -559,6 +1158,7 @@ Raw Ore → [Refine] → Ingots/Materials → [Craft] → Components → [Assemb
 | **Insurance Premiums** | 1-5% of ship value | Per coverage period |
 | **Faction Taxes** | 1-10% of earnings | If in a faction |
 | **Warp Gate Tolls** | 100 - 10K OMEN | Fast travel between systems |
+| **Singularity Orb** | 1,000,000 OMEN | Compressed into Orb permanently. Only 1,000 possible. OMEN trapped until Orb destroyed |
 
 ---
 
@@ -1169,6 +1769,328 @@ Hardcore:  ★★★★★ Risk  |  ★★★★★ Reward
 
 ---
 
+## Fleet Battle System (Advanced Combat)
+
+**Advanced fleet-based combat system supporting multiple engagement styles and tactical depth.**
+
+The Fleet Battle System extends the core combat mechanics with sophisticated fleet composition, multiple engagement modes, and diverse combat philosophies that create rich economic demand chains.
+
+---
+
+### Combat System Style: Hybrid Real-Time
+
+Odyssey uses a **Hybrid Real-Time System** that combines real-time movement with tactical decision points and automated execution. This approach optimizes for mobile gameplay while supporting strategic depth and economic focus.
+
+#### Core Combat Flow
+```
+Real-Time Movement + Tactical Decision Points + Automated Execution
+```
+
+**Real-Time Positioning Phase:**
+- Ships move continuously across the battlefield in real-time
+- Player directs fleet positioning using touch controls (formation, distance, approach angle)
+- Touch-drag to move ships, pinch to adjust formation spread
+- NPCs react dynamically to player positioning and movements
+
+**Tactical Decision Points:**
+- When engagement begins, time briefly slows (not pause, just reduced speed)
+- Player selects targets, abilities, and formation commands via touch interface
+- Decisions execute over several seconds while combat continues flowing
+- Can issue new commands anytime as situations evolve
+
+**Automated Combat Execution:**
+- Once targets/abilities are selected, ships execute automatically using AI
+- Weapons fire, movement happens, abilities trigger based on intelligent automation
+- Player can interrupt with new commands at any time
+- Level of automation varies by engagement mode (Active/Semi-Auto/AFK)
+
+#### Mobile-Optimized Touch Controls
+
+| Touch Input | Combat Action | Effect |
+|-------------|---------------|--------|
+| **Tap Enemy Ship** | Auto-target and engage | Fleet focuses fire on selected target |
+| **Drag Formation** | Reposition fleet | Ships move to new formation positions |
+| **Tap Ability Icons** | Queue special abilities | Abilities execute when optimal conditions met |
+| **Double-tap Ship** | Focus fire command | Entire fleet concentrates on single target |
+| **Pinch Gesture** | Formation spread | Tighten or expand fleet formation |
+| **Hold and Drag** | Manual ship control | Direct control of individual ship movement |
+
+#### Visual Clarity System
+
+**Real-Time Combat Feedback:**
+- **Targeting Lines:** Show which ships are attacking which targets
+- **Movement Arrows:** Indicate ship trajectories and planned movements
+- **Ability Cooldowns:** Clearly displayed with countdown timers
+- **Health Bars:** Prominent and easy to read on mobile screens
+- **Formation Indicators:** Visual guides for fleet positioning
+
+#### Battle Phases & Pacing
+
+**1. Detection Phase (Real-Time):**
+- Ships spot each other and decide to engage or flee
+- Player can issue "avoid combat" or "pursue" commands
+- Opportunity for positioning advantage before engagement
+
+**2. Approach Phase (Tactical):**
+- Choose engagement range, formation, and initial targets
+- Brief tactical decision window with slowed time
+- Set up optimal positioning for the engagement
+
+**3. Engagement Phase (Real-Time with Decision Points):**
+- Combat flows in real-time with periodic tactical decision opportunities
+- Player can adjust strategy as battle conditions evolve
+- Automated systems handle moment-to-moment combat execution
+
+**4. Resolution Phase (Real-Time):**
+- Victory/defeat determination, looting, escape attempts
+- Flows directly back to exploration mode
+- Immediate transition to post-combat activities
+
+#### Engagement Mode Integration
+
+**Active Mode Implementation:**
+- Player makes all targeting and positioning decisions during tactical windows
+- Real-time tactical adjustments available throughout combat
+- Maximum control and skill expression within the hybrid system
+
+**Semi-Auto Mode Implementation:**
+- AI handles basic movement and targeting decisions
+- Player makes strategic decisions (formations, priority targets, ability usage)
+- Tactical decision points pause for player input when strategic choices needed
+
+**AFK Mode Implementation:**
+- Fully automated based on pre-configured combat strategies
+- Runs completely in real-time without requiring player input
+- AI makes all tactical decisions using player-configured priorities and behaviors
+
+This hybrid approach **prioritizes gear and strategy over twitch skills**, making expensive equipment and thoughtful fleet composition more important than mechanical execution, which drives sustained economic demand while maintaining engaging real-time combat flow.
+
+---
+
+### Fleet Composition & Formats
+
+#### Fleet Size Formats
+
+| Format | Ship Count | Use Case | Economic Focus |
+|--------|------------|----------|----------------|
+| **Compact** | 3 ships | Arena/Quick Battle | Role purity, efficiency, tight synergy |
+| **Standard** | 5 ships | General Exploration/Combat | Versatility, balance, formation gear |
+| **Full Fleet** | 7 ships | Large Battles/Endgame | Deep specialization, complex coordination |
+
+#### Fleet Roles & Positioning
+
+**3-Ship Compact Fleet:**
+- **Position 1:** Main Tank (draws fire, controls engagement)
+- **Position 2:** Primary DPS (damage dealing, target elimination)
+- **Position 3:** Support (healing, buffs, tactical advantages)
+
+**5-Ship Standard Fleet:**
+- **Position 1:** Main Tank
+- **Position 2:** Off-Tank/Interceptor (mobile defense, flanking)
+- **Position 3-4:** Dual DPS (primary damage output)
+- **Position 5:** Support
+
+**7-Ship Full Fleet:**
+- **Position 1:** Main Tank
+- **Position 2:** Off-Tank/Interceptor
+- **Position 3-5:** Triple DPS (specialized damage roles)
+- **Position 6:** Support
+- **Position 7:** Specialist (Hacker/Engineer/Scout with unique capabilities)
+
+---
+
+### Combat Engagement Modes
+
+Players can seamlessly transition between three engagement levels during combat:
+
+#### Active Battle Mode
+- **Full Manual Control:** Direct ship movement, targeting, ability timing
+- **Precision Gameplay:** Manual aim, combos, reactive defense
+- **Higher Skill Ceiling:** Maximum potential performance for skilled players
+- **Economic Demand:** Precision components, response systems, combo amplifiers
+
+#### Semi-Auto (Tactical Command) Mode
+- **Strategic Control:** Player makes tactical decisions while ships move autonomously
+- **Formation AI:** Ships maintain formation and perform roles automatically
+- **Tactical Focus:** Target prioritization, ability timing, formation commands
+- **Economic Demand:** Tactical AI cores, autonomous navigation, command interfaces
+
+#### AFK Autoplay Mode
+- **Full Automation:** Pre-configured strategies execute automatically
+- **Consistent Performance:** Reliable but moderate effectiveness
+- **Background Progression:** Continue advancing while away from device
+- **Economic Demand:** Automation cores, efficiency optimizers, strategy processors
+
+---
+
+### Combat Philosophy Archetypes
+
+Each archetype creates distinct economic demand chains based on tactical approach:
+
+#### ⚡ Quick Acceleration/Burst Builds
+**Philosophy:** Strike fast, hit hard, retreat quickly
+- **Core Stats:** Speed, Burst Damage, Quick-Charge Systems
+- **Economic Drivers:** Lightweight frames, burst engines, supercapacitors
+- **Playstyle:** Hit-and-run tactics, alpha strikes, mobility advantage
+
+#### 🛡️ Defensive Counter/Reactive Builds
+**Philosophy:** Absorb punishment, wait for openings, devastating counters
+- **Core Stats:** Reactive Armor, Energy Absorption, Timing Systems
+- **Economic Drivers:** Metamaterials, defensive systems, precision AI
+- **Playstyle:** Patient gameplay, counter-strike timing, energy redirection
+
+#### 🏰 Tank and Retaliate Builds
+**Philosophy:** Withstand damage, accumulate power, unleash massive retaliation
+- **Core Stats:** Heavy Armor, Power Storage, Charge Systems
+- **Economic Drivers:** Industrial armor, battery tech, energy storage
+- **Playstyle:** Damage soaking, power building, devastating payback
+
+#### 👻 Elusive/Stealth Builds
+**Philosophy:** Avoid detection, strike unseen, vanish before retaliation
+- **Core Stats:** Stealth Rating, Ambush Damage, Sensor Jamming
+- **Economic Drivers:** Stealth coating, silent systems, electronic warfare
+- **Playstyle:** Guerrilla tactics, surprise attacks, hit-and-fade
+
+#### 🕺 Agile/Positioning Builds
+**Philosophy:** Superior positioning, constant movement, tactical advantage
+- **Core Stats:** Maneuverability, Positioning Speed, Stability
+- **Economic Drivers:** Omnidirectional thrusters, control systems, stabilizers
+- **Playstyle:** Movement advantage, positioning warfare, tactical superiority
+
+#### 💪 Brute Force/Overwhelming Builds
+**Philosophy:** Raw firepower, maximum damage output, crush opposition
+- **Core Stats:** Heavy Weapons, Power Generation, Sustained Fire
+- **Economic Drivers:** Military-grade systems, massive power cores, ammunition
+- **Playstyle:** Direct confrontation, overwhelming force, sustained assault
+
+---
+
+### Fleet Formation System
+
+#### Formation Types & Economic Impact
+
+**🔺 Wedge Formation (Aggressive Assault)**
+- **Structure:** Tank at point, DPS behind in arrow shape
+- **Stat Bonuses:** +Damage, +Penetration, -Defense
+- **Economic Demand:** Breakthrough equipment, assault systems, forward armor
+
+**⭕ Circle Formation (Defensive)**
+- **Structure:** Support in center, others form protective ring
+- **Stat Bonuses:** +Defense, +Healing, -Speed
+- **Economic Demand:** Shield generators, protection gear, coordination systems
+
+**📏 Line Formation (Broadside)**
+- **Structure:** Ships side-by-side for maximum firepower
+- **Stat Bonuses:** +Range, +Accuracy, -Mobility
+- **Economic Demand:** Long-range weapons, firing control, communication arrays
+
+**💨 Scatter Formation (Evasive)**
+- **Structure:** Ships spread out to avoid area damage
+- **Stat Bonuses:** +Evasion, +Individual Survival, -Coordination
+- **Economic Demand:** Individual defense, evasion systems, distributed coordination
+
+#### Fleet Synergy Systems
+
+**🔗 Coordination Equipment**
+- **Fleet Targeting Networks:** Shared targeting data increases fleet accuracy
+- **Formation Stabilizers:** Ships maintain optimal positioning automatically
+- **Communication Arrays:** Faster reaction times, better coordination
+
+**⚡ Power Sharing Systems**
+- **Energy Distribution Networks:** Ships share power during combat
+- **Shield Linking:** Damaged ships borrow shield capacity from fleet
+- **Ammo Supply Lines:** Support ships resupply DPS ships mid-combat
+
+**🎯 Tactical Integration**
+- **Combined Arms Systems:** Different weapon types create synergistic effects
+- **Overlapping Fields:** Multiple ships' abilities stack for enhanced effects
+- **Chain Reactions:** One ship's actions trigger special abilities in others
+
+---
+
+### Economic Specialization by Engagement Style
+
+#### Active Battle Economy
+**Market Focus:** High-performance, precision equipment
+- **Precision Components:** Targeting computers, reaction enhancers
+- **Manual Control Systems:** Neural interfaces, direct control tech
+- **Performance Enhancement:** Reflex boosters, combo amplifiers
+- **Player Profile:** Competitive players, skill-focused gamers
+
+#### Semi-Auto Tactical Economy
+**Market Focus:** Strategic AI and decision-making systems
+- **Tactical AI Cores:** Strategic processors, decision-making systems
+- **Command Systems:** Priority managers, formation controllers
+- **Adaptive Technology:** Learning systems, pattern recognition
+- **Player Profile:** Strategy enthusiasts, tactical thinkers
+
+#### AFK Efficiency Economy
+**Market Focus:** Automation and optimization technology
+- **Automation Systems:** Full AI, efficiency algorithms
+- **Optimization Tech:** Resource management, performance tuning
+- **Safety Systems:** Risk assessment, self-preservation protocols
+- **Player Profile:** Busy professionals, optimization enthusiasts
+
+#### Multi-Mode Hybrid Economy
+**Market Focus:** Adaptive systems that work across engagement modes
+- **Universal Interfaces:** Seamless mode switching capabilities
+- **Adaptive Intelligence:** Performs well regardless of control mode
+- **Context Switching:** Automatically adapts to player engagement level
+- **Player Profile:** Versatile players, varying schedule demands
+
+---
+
+### Fleet Economic Ecosystem
+
+#### Individual Ship vs Fleet Markets
+
+**Individual Ship Optimization:**
+- Role-specific equipment (Tank armor, DPS weapons, Support systems)
+- Performance optimization for single-ship effectiveness
+- Specialization in specific combat functions
+
+**Fleet Coordination Markets:**
+- Synergy equipment benefiting multiple ships
+- Formation systems enabling coordinated tactics
+- Communication and coordination technology
+
+**Format-Specific Markets:**
+- **3-Ship Specialists:** Compact fleet optimization, role purity
+- **5-Ship Generalists:** Standard fleet equipment, balanced approach
+- **7-Ship Experts:** Full fleet specialization, complex coordination
+
+#### Economic Demand Cycles
+
+**Philosophy-Based Market Pressure:**
+```
+Popular Combat Style → Increased Demand → Higher Prices →
+Alternative Styles Become Economical → Market Shift → New Popular Style
+```
+
+**Fleet Composition Economics:**
+- Different fleet formats require different equipment sets
+- Players maintain multiple ship configurations for various situations
+- Cross-format equipment creates sustained demand across markets
+- Specialization vs flexibility creates interesting economic choices
+
+---
+
+### Reward Scaling by Engagement Level
+
+#### Performance-Based Rewards
+- **Active Mode:** Higher potential rewards for skilled play, variable outcomes
+- **Semi-Auto:** Moderate, consistent rewards based on strategic decisions
+- **AFK Mode:** Lower but guaranteed progression, efficiency-focused
+
+#### Economic Incentive Structure
+- **High Engagement:** Expensive builds with high reward potential
+- **Medium Engagement:** Balanced investment vs reward for strategic play
+- **Low Engagement:** Cost-effective builds focusing on consistent returns
+
+This Fleet Battle System creates a multi-layered economy where players invest in individual ship optimization, fleet coordination systems, format-specific strategies, and engagement-mode equipment, driving sustained economic activity across multiple specialization markets.
+
+---
+
 ## Multiplayer Features
 
 ### Cooperative
@@ -1732,12 +2654,42 @@ Random spawning connections to distant or hidden locations.
 
 ## Mobile UX
 
-### Controls
-- **Left thumb:** Virtual joystick (movement/flight)
-- **Right thumb:** Action buttons (mine, interact, fire)
-- **Tap:** Select, confirm
-- **Pinch:** Zoom
-- **Swipe:** Camera rotation
+### Flight Controls (Mobile-Optimized)
+
+#### Touch Interface Layout
+```
+[Scanner]     [Cargo: 45/100]     [Fuel: 78%]
+                                  [Menu]
+
+                 [Altitude: 125m]
+                 [Speed: 45 m/s]
+
+[Mining]                          [Camera]
+[Laser ]        [Ship Icon]       [Look  ]
+[  ⚡  ]                          [Around]
+
+
+[Thrust]                          [Actions]
+[  ⬆  ]        [Auto-Pilot]       [ ... ]
+[  ⬇  ]        [ Engage  ]        [  🎯  ]
+```
+
+#### Control Scheme
+- **Left Thumb**: Movement stick (thrust direction + magnitude)
+- **Right Thumb**: Camera/look around (free-look while flying)
+- **Left Index**: Mining laser trigger (hold to fire)
+- **Right Index**: Secondary actions (scanner, auto-pilot, etc.)
+- **Tap**: Select targets, confirm actions
+- **Pinch**: Zoom scanner/map
+- **Double-tap**: Auto-pilot to target
+
+#### Mobile-Specific Features
+- **Haptic Feedback**: Engine vibration, laser firing, collision impacts
+- **Auto-Stabilization**: Assists with hovering and precision control
+- **Simplified Physics**: More forgiving flight model for touch controls
+- **Visual Aids**: Enhanced UI indicators for spatial awareness
+- **One-Handed Mode**: Essential functions accessible with thumb controls
+- **Adaptive Difficulty**: Touch precision automatically adjusts laser aim assist
 
 ### Session Design
 - Auto-save constantly
@@ -1809,5 +2761,5 @@ Players complete a guided tutorial before accessing the open world.
 
 ---
 
-*Document Version: 0.3*
+*Document Version: 0.7*
 *Last Updated: 2026-02-02*

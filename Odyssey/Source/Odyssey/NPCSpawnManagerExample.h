@@ -6,8 +6,8 @@
 #include "NPCSpawnManagerExample.generated.h"
 
 /**
- * Example class showing how to set up and use the NPC Spawn Manager
- * This demonstrates the mobile-optimized NPC management system
+ * Example class demonstrating setup and runtime control of the NPC Spawn Manager.
+ * Place in a level alongside an ANPCSpawnManager.
  */
 UCLASS(BlueprintType, Blueprintable)
 class ODYSSEY_API ANPCSpawnManagerExample : public AActor
@@ -18,11 +18,9 @@ public:
 	ANPCSpawnManagerExample();
 
 protected:
-	// Reference to the NPC Spawn Manager
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Management")
 	ANPCSpawnManager* NPCSpawnManager;
 
-	// Example NPC class to spawn
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "NPC Setup")
 	TSubclassOf<AOdysseyCharacter> ExampleNPCClass;
 
@@ -30,7 +28,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// Setup functions for demonstration
 	UFUNCTION(BlueprintCallable, Category = "NPC Setup")
 	void SetupExampleNPCs();
 

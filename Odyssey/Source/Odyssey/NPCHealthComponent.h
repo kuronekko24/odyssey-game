@@ -1,6 +1,7 @@
 // NPCHealthComponent.h
-// Health management component for NPC ships with event integration
-// Handles health tracking, regeneration, and visual feedback for ship combat
+// Component-based health tracking with event integration for NPC ships
+// Supports shields, damage resistances, regeneration, and visual health feedback
+// Phase 1: Health & Damage Foundation
 
 #pragma once
 
@@ -10,22 +11,46 @@
 #include "NPCHealthComponent.generated.h"
 
 class UOdysseyEventBus;
+class UWidgetComponent;
+
+// ============================================================================
+// Enumerations
+// ============================================================================
 
 /**
- * Health state for different behaviors and visual feedback
+ * Health state tiers for behavior and visual feedback
+ * Thresholds are based on combined health+shield percentage
  */
 UENUM(BlueprintType)
 enum class EHealthState : uint8
 {
-	Healthy = 0,		// 100% to 75% health
-	Damaged = 1,		// 74% to 50% health
-	Critical = 2,		// 49% to 25% health
-	Dying = 3,			// 24% to 1% health
-	Dead = 4			// 0% health
+	Healthy   = 0,  // 75-100%
+	Damaged   = 1,  // 50-74%
+	Critical  = 2,  // 25-49%
+	Dying     = 3,  // 1-24%
+	Dead      = 4   // 0%
 };
 
 /**
- * Health event data for broadcasting health changes
+ * Damage type categories for resistance calculations
+ */
+UENUM(BlueprintType)
+enum class EDamageCategory : uint8
+{
+	Kinetic   = 0,  // Physical projectile damage
+	Energy    = 1,  // Laser / energy weapon damage
+	Plasma    = 2,  // Plasma weapon damage
+	Explosive = 3,  // Area-of-effect explosive damage
+	Collision = 4,  // Environmental / ram damage
+	True      = 5   // Bypasses all resistances
+};
+
+// ============================================================================
+// Event Payload Structures
+// ============================================================================
+
+/**
+ * Payload broadcast when health or shields change
  */
 USTRUCT(BlueprintType)
 struct ODYSSEY_API FHealthEventPayload : public FOdysseyEventPayload
@@ -42,7 +67,19 @@ struct ODYSSEY_API FHealthEventPayload : public FOdysseyEventPayload
 	float MaxHealth;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
+	float PreviousShields;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
+	float CurrentShields;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
+	float MaxShields;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
 	float DamageAmount;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
+	float ShieldDamageAbsorbed;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
 	EHealthState PreviousState;
@@ -59,41 +96,107 @@ struct ODYSSEY_API FHealthEventPayload : public FOdysseyEventPayload
 	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
 	bool bWasKillingBlow;
 
+	UPROPERTY(BlueprintReadOnly, Category = "Health Event")
+	bool bWasCritical;
+
 	FHealthEventPayload()
 		: PreviousHealth(0.0f)
 		, CurrentHealth(0.0f)
 		, MaxHealth(100.0f)
+		, PreviousShields(0.0f)
+		, CurrentShields(0.0f)
+		, MaxShields(0.0f)
 		, DamageAmount(0.0f)
+		, ShieldDamageAbsorbed(0.0f)
 		, PreviousState(EHealthState::Healthy)
 		, CurrentState(EHealthState::Healthy)
 		, DamageType(NAME_None)
 		, bWasKillingBlow(false)
+		, bWasCritical(false)
 	{
 	}
 
+	/** Get combined health + shield percentage (0.0 to 1.0) */
+	float GetEffectiveHealthPercentage() const
+	{
+		float MaxEffective = MaxHealth + MaxShields;
+		return MaxEffective > 0.0f ? (CurrentHealth + CurrentShields) / MaxEffective : 0.0f;
+	}
+
+	/** Get hull health percentage only (0.0 to 1.0) */
 	float GetHealthPercentage() const
 	{
 		return MaxHealth > 0.0f ? CurrentHealth / MaxHealth : 0.0f;
 	}
+
+	/** Get shield percentage only (0.0 to 1.0) */
+	float GetShieldPercentage() const
+	{
+		return MaxShields > 0.0f ? CurrentShields / MaxShields : 0.0f;
+	}
 };
 
 /**
- * Delegate declarations for Blueprint and C++ integration
+ * Pending damage-over-time effect
  */
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthChangedDelegate, const FHealthEventPayload&, HealthData);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHealthStateChangedDelegate, EHealthState, NewState);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActorDiedDelegate, AActor*, DiedActor);
+USTRUCT(BlueprintType)
+struct ODYSSEY_API FDamageOverTimeEffect
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly, Category = "DOT")
+	float DamagePerTick;
+
+	UPROPERTY(BlueprintReadOnly, Category = "DOT")
+	float TickInterval;
+
+	UPROPERTY(BlueprintReadOnly, Category = "DOT")
+	float RemainingDuration;
+
+	UPROPERTY(BlueprintReadOnly, Category = "DOT")
+	FName DamageType;
+
+	UPROPERTY(BlueprintReadOnly, Category = "DOT")
+	TWeakObjectPtr<AActor> Source;
+
+	/** Internal: time accumulator for tick scheduling */
+	float TickAccumulator;
+
+	FDamageOverTimeEffect()
+		: DamagePerTick(0.0f)
+		, TickInterval(1.0f)
+		, RemainingDuration(0.0f)
+		, DamageType(NAME_None)
+		, TickAccumulator(0.0f)
+	{
+	}
+};
+
+// ============================================================================
+// Delegate Declarations
+// ============================================================================
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, const FHealthEventPayload&, HealthData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthStateChanged, EHealthState, NewState);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnActorDied, AActor*, DiedActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldBroken, AActor*, Owner, AActor*, DamageSource);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnShieldRestored, AActor*, Owner, float, ShieldAmount);
+
+// ============================================================================
+// UNPCHealthComponent
+// ============================================================================
 
 /**
- * Health component for NPC ships in the Odyssey combat system
- * 
+ * Health component for NPC ships in the Odyssey combat system.
+ *
  * Features:
- * - Event-driven damage processing with integration to OdysseyEventBus
- * - Health state management for visual feedback
- * - Optional health regeneration with configurable rates
- * - Mobile-optimized with minimal allocations during combat
- * - Blueprint-friendly interface for designers
- * - Support for different damage types and resistances
+ * - Dual-layer defense: shields absorb damage before hull health
+ * - Per-type damage resistances (Kinetic, Energy, Plasma, etc.)
+ * - Configurable health and shield regeneration with combat-awareness
+ * - Damage-over-time effect tracking
+ * - Event-driven via OdysseyEventBus and local delegates
+ * - Mobile-optimized: reduced tick rate, minimal allocations
+ * - Visual health bar support via optional WidgetComponent
  */
 UCLASS(ClassGroup=(Odyssey), BlueprintType, Blueprintable, meta=(BlueprintSpawnableComponent))
 class ODYSSEY_API UNPCHealthComponent : public UActorComponent
@@ -115,17 +218,28 @@ public:
 	// ============================================================================
 
 	/**
-	 * Apply damage to this actor
-	 * @param DamageAmount Amount of damage to apply
+	 * Apply damage to this actor. Shields absorb damage first.
+	 * @param DamageAmount Raw damage before resistances
 	 * @param DamageSource Actor that caused the damage
-	 * @param DamageType Type identifier for the damage
-	 * @return Actual damage applied (after resistances, etc.)
+	 * @param DamageType Damage type name for resistance lookup
+	 * @return Actual damage applied to hull (after shields and resistances)
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	float TakeDamage(float DamageAmount, AActor* DamageSource = nullptr, FName DamageType = NAME_None);
 
 	/**
-	 * Heal this actor
+	 * Apply damage with critical hit flag
+	 * @param DamageAmount Raw damage before resistances
+	 * @param DamageSource Actor that caused the damage
+	 * @param DamageType Damage type name for resistance lookup
+	 * @param bIsCritical Whether this was a critical hit
+	 * @return Actual damage applied to hull
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	float TakeDamageEx(float DamageAmount, AActor* DamageSource, FName DamageType, bool bIsCritical);
+
+	/**
+	 * Heal this actor's hull health
 	 * @param HealAmount Amount to heal
 	 * @param HealSource Actor providing the healing (optional)
 	 * @return Actual health restored
@@ -134,278 +248,360 @@ public:
 	float Heal(float HealAmount, AActor* HealSource = nullptr);
 
 	/**
-	 * Set health to a specific value
-	 * @param NewHealth New health value (will be clamped to 0-MaxHealth)
+	 * Restore shield points
+	 * @param ShieldAmount Amount of shields to restore
+	 * @param Source Actor providing the restore (optional)
+	 * @return Actual shields restored
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	float RestoreShields(float ShieldAmount, AActor* Source = nullptr);
+
+	/**
+	 * Set health to a specific value (clamped to 0..MaxHealth)
+	 * @param NewHealth New health value
 	 * @param bBroadcastEvent Whether to broadcast health change event
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void SetHealth(float NewHealth, bool bBroadcastEvent = true);
 
 	/**
-	 * Set maximum health and optionally adjust current health proportionally
-	 * @param NewMaxHealth New maximum health value
-	 * @param bMaintainHealthPercentage If true, current health % stays the same
+	 * Set shields to a specific value (clamped to 0..MaxShields)
+	 * @param NewShields New shield value
+	 * @param bBroadcastEvent Whether to broadcast change event
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void SetShields(float NewShields, bool bBroadcastEvent = true);
+
+	/**
+	 * Set maximum health, optionally preserving health percentage
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void SetMaxHealth(float NewMaxHealth, bool bMaintainHealthPercentage = false);
 
 	/**
+	 * Set maximum shields, optionally preserving shield percentage
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	void SetMaxShields(float NewMaxShields, bool bMaintainShieldPercentage = false);
+
+	/**
 	 * Kill this actor immediately
-	 * @param KillerActor Actor responsible for the kill (optional)
 	 */
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void Kill(AActor* KillerActor = nullptr);
 
 	// ============================================================================
-	// Health State and Queries
+	// Damage-Over-Time
 	// ============================================================================
 
 	/**
-	 * Get current health value
+	 * Apply a damage-over-time effect
+	 * @param DamagePerTick Damage each tick
+	 * @param TickInterval Seconds between ticks
+	 * @param Duration Total effect duration
+	 * @param DamageType Type name for resistance lookup
+	 * @param Source Actor responsible
 	 */
+	UFUNCTION(BlueprintCallable, Category = "Health|DOT")
+	void ApplyDamageOverTime(float DamagePerTick, float TickInterval, float Duration, FName DamageType = NAME_None, AActor* Source = nullptr);
+
+	/**
+	 * Remove all damage-over-time effects
+	 */
+	UFUNCTION(BlueprintCallable, Category = "Health|DOT")
+	void ClearAllDamageOverTime();
+
+	/**
+	 * Get number of active DOT effects
+	 */
+	UFUNCTION(BlueprintPure, Category = "Health|DOT")
+	int32 GetActiveDOTCount() const { return ActiveDOTEffects.Num(); }
+
+	// ============================================================================
+	// Health Queries
+	// ============================================================================
+
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetCurrentHealth() const { return CurrentHealth; }
 
-	/**
-	 * Get maximum health value
-	 */
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetMaxHealth() const { return MaxHealth; }
 
-	/**
-	 * Get health as percentage (0.0 to 1.0)
-	 */
 	UFUNCTION(BlueprintPure, Category = "Health")
 	float GetHealthPercentage() const;
 
-	/**
-	 * Get current health state
-	 */
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetCurrentShields() const { return CurrentShields; }
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetMaxShields() const { return MaxShields; }
+
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetShieldPercentage() const;
+
+	/** Combined health+shield percentage for overall survivability */
+	UFUNCTION(BlueprintPure, Category = "Health")
+	float GetEffectiveHealthPercentage() const;
+
 	UFUNCTION(BlueprintPure, Category = "Health")
 	EHealthState GetHealthState() const { return CurrentHealthState; }
 
-	/**
-	 * Check if actor is dead
-	 */
 	UFUNCTION(BlueprintPure, Category = "Health")
 	bool IsDead() const { return CurrentHealthState == EHealthState::Dead; }
 
-	/**
-	 * Check if actor is at full health
-	 */
 	UFUNCTION(BlueprintPure, Category = "Health")
-	bool IsAtFullHealth() const { return FMath::IsNearlyEqual(CurrentHealth, MaxHealth, 0.1f); }
+	bool IsAtFullHealth() const;
 
-	/**
-	 * Check if actor can be healed (not dead and not at full health)
-	 */
+	UFUNCTION(BlueprintPure, Category = "Health")
+	bool HasShields() const { return MaxShields > 0.0f && CurrentShields > 0.0f; }
+
 	UFUNCTION(BlueprintPure, Category = "Health")
 	bool CanBeHealed() const { return !IsDead() && !IsAtFullHealth(); }
 
-	// ============================================================================
-	// Configuration
-	// ============================================================================
+	UFUNCTION(BlueprintPure, Category = "Health")
+	bool IsInCombat() const;
 
-	/**
-	 * Enable or disable health regeneration
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetHealthRegenEnabled(bool bEnabled);
-
-	/**
-	 * Set health regeneration rate (health per second)
-	 */
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	void SetHealthRegenRate(float RegenPerSecond);
+	// ============================================================================
+	// Resistance Configuration
+	// ============================================================================
 
 	/**
 	 * Set damage resistance for a specific damage type
-	 * @param DamageType Type of damage
+	 * @param DamageType Type of damage (use FName like "Kinetic", "Energy", etc.)
 	 * @param ResistancePercentage 0.0 = no resistance, 1.0 = complete immunity
 	 */
-	UFUNCTION(BlueprintCallable, Category = "Health")
+	UFUNCTION(BlueprintCallable, Category = "Health|Resistances")
 	void SetDamageResistance(FName DamageType, float ResistancePercentage);
 
-	/**
-	 * Get damage resistance for a specific damage type
-	 */
-	UFUNCTION(BlueprintPure, Category = "Health")
+	UFUNCTION(BlueprintPure, Category = "Health|Resistances")
 	float GetDamageResistance(FName DamageType) const;
+
+	/** Set a flat damage reduction amount (applied after resistance percentage) */
+	UFUNCTION(BlueprintCallable, Category = "Health|Resistances")
+	void SetFlatDamageReduction(float ReductionAmount);
+
+	UFUNCTION(BlueprintPure, Category = "Health|Resistances")
+	float GetFlatDamageReduction() const { return FlatDamageReduction; }
+
+	// ============================================================================
+	// Regeneration Configuration
+	// ============================================================================
+
+	UFUNCTION(BlueprintCallable, Category = "Health|Regeneration")
+	void SetHealthRegenEnabled(bool bEnabled);
+
+	UFUNCTION(BlueprintCallable, Category = "Health|Regeneration")
+	void SetHealthRegenRate(float RegenPerSecond);
+
+	UFUNCTION(BlueprintCallable, Category = "Health|Regeneration")
+	void SetShieldRegenEnabled(bool bEnabled);
+
+	UFUNCTION(BlueprintCallable, Category = "Health|Regeneration")
+	void SetShieldRegenRate(float RegenPerSecond);
+
+	// ============================================================================
+	// Visual Health Bar
+	// ============================================================================
+
+	/**
+	 * Get the health bar color based on current state
+	 * @return Interpolated color from green (healthy) to red (dying)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Health|Visual")
+	FLinearColor GetHealthBarColor() const;
+
+	/**
+	 * Get the shield bar color
+	 */
+	UFUNCTION(BlueprintPure, Category = "Health|Visual")
+	FLinearColor GetShieldBarColor() const;
+
+	/**
+	 * Whether the health bar should be visible (damaged or recently damaged)
+	 */
+	UFUNCTION(BlueprintPure, Category = "Health|Visual")
+	bool ShouldShowHealthBar() const;
 
 	// ============================================================================
 	// Events and Delegates
 	// ============================================================================
 
-	/**
-	 * Called when health changes (damage or healing)
-	 */
+	/** Called when health or shields change */
 	UPROPERTY(BlueprintAssignable, Category = "Health|Events")
-	FHealthChangedDelegate OnHealthChanged;
+	FOnHealthChanged OnHealthChanged;
 
-	/**
-	 * Called when health state changes (e.g., Healthy to Damaged)
-	 */
+	/** Called when health state tier changes */
 	UPROPERTY(BlueprintAssignable, Category = "Health|Events")
-	FHealthStateChangedDelegate OnHealthStateChanged;
+	FOnHealthStateChanged OnHealthStateChanged;
 
-	/**
-	 * Called when actor dies
-	 */
+	/** Called when actor dies */
 	UPROPERTY(BlueprintAssignable, Category = "Health|Events")
-	FActorDiedDelegate OnActorDied;
+	FOnActorDied OnActorDied;
+
+	/** Called when shields are fully depleted by damage */
+	UPROPERTY(BlueprintAssignable, Category = "Health|Events")
+	FOnShieldBroken OnShieldBroken;
+
+	/** Called when shields finish regenerating to full */
+	UPROPERTY(BlueprintAssignable, Category = "Health|Events")
+	FOnShieldRestored OnShieldRestored;
 
 protected:
 	// ============================================================================
-	// Configuration Properties
+	// Configuration Properties (Editable in Details Panel)
 	// ============================================================================
 
-	/**
-	 * Maximum health value
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (ClampMin = "1.0"))
+	/** Maximum hull health */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Hull", meta = (ClampMin = "1.0"))
 	float MaxHealth;
 
-	/**
-	 * Starting health as percentage of MaxHealth (0.0 to 1.0)
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	/** Starting health as percentage of MaxHealth */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Hull", meta = (ClampMin = "0.0", ClampMax = "1.0"))
 	float StartingHealthPercentage;
 
-	/**
-	 * Whether health can regenerate over time
-	 */
+	/** Maximum shield capacity (0 = no shields) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Shields", meta = (ClampMin = "0.0"))
+	float MaxShields;
+
+	/** Starting shields as percentage of MaxShields */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Shields", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float StartingShieldPercentage;
+
+	/** Percentage of excess shield damage that bleeds through to hull (0.0 = none, 1.0 = all) */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Shields", meta = (ClampMin = "0.0", ClampMax = "1.0"))
+	float ShieldBleedThroughRatio;
+
+	// --- Health Regeneration ---
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Regeneration")
 	bool bHealthRegenEnabled;
 
-	/**
-	 * Health regeneration rate (health points per second)
-	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Regeneration", meta = (ClampMin = "0.0"))
 	float HealthRegenRate;
 
-	/**
-	 * Delay before health regeneration starts after taking damage (seconds)
-	 */
+	/** Delay in seconds after taking damage before health regen starts */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Regeneration", meta = (ClampMin = "0.0"))
 	float HealthRegenDelay;
 
-	/**
-	 * Whether regeneration only works when not in combat
-	 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Regeneration")
 	bool bOnlyRegenOutOfCombat;
 
-	/**
-	 * Time to consider actor "out of combat" after last damage (seconds)
-	 */
+	/** Seconds since last damage to be considered "out of combat" */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Regeneration", meta = (ClampMin = "0.0"))
 	float OutOfCombatTime;
 
-	/**
-	 * Damage resistances by type (0.0 = no resistance, 1.0 = immunity)
-	 */
+	// --- Shield Regeneration ---
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Shields")
+	bool bShieldRegenEnabled;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Shields", meta = (ClampMin = "0.0"))
+	float ShieldRegenRate;
+
+	/** Delay after shield damage before regen starts */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Shields", meta = (ClampMin = "0.0"))
+	float ShieldRegenDelay;
+
+	// --- Resistances ---
+
+	/** Damage resistances by type name: 0.0 = no resistance, 1.0 = immunity */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Resistances")
 	TMap<FName, float> DamageResistances;
 
-	/**
-	 * Whether to broadcast health events to the global event bus
-	 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Events")
-	bool bBroadcastHealthEvents;
+	/** Flat damage reduction applied after percentage resistance */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Resistances", meta = (ClampMin = "0.0"))
+	float FlatDamageReduction;
 
-	/**
-	 * Whether this actor can die (if false, health will be clamped to 1)
-	 */
+	// --- Death & Events ---
+
+	/** Whether this actor can actually die (if false, health clamps to 1) */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	bool bCanDie;
+
+	/** Whether to publish health events to the global OdysseyEventBus */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Events")
+	bool bBroadcastToEventBus;
+
+	// --- Visual ---
+
+	/** How long the health bar stays visible after last damage */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Visual", meta = (ClampMin = "0.0"))
+	float HealthBarVisibilityDuration;
+
+	/** Whether to only show the health bar when damaged */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health|Visual")
+	bool bOnlyShowHealthBarWhenDamaged;
 
 	// ============================================================================
 	// Runtime State
 	// ============================================================================
 
-	/**
-	 * Current health value
-	 */
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	float CurrentHealth;
 
-	/**
-	 * Current health state
-	 */
+	UPROPERTY(BlueprintReadOnly, Category = "Health")
+	float CurrentShields;
+
 	UPROPERTY(BlueprintReadOnly, Category = "Health")
 	EHealthState CurrentHealthState;
 
-	/**
-	 * Time since last damage received (for regen delay and out-of-combat logic)
-	 */
+	/** Seconds since hull was last damaged */
 	float TimeSinceLastDamage;
 
-	/**
-	 * Whether health regeneration is currently active
-	 */
-	bool bIsRegenerating;
+	/** Seconds since shields were last damaged */
+	float TimeSinceLastShieldDamage;
 
-	/**
-	 * Reference to the global event bus for broadcasting events
-	 */
+	/** Whether health is currently regenerating */
+	bool bIsHealthRegenerating;
+
+	/** Whether shields are currently regenerating */
+	bool bIsShieldRegenerating;
+
+	/** Whether shields were full before last damage */
+	bool bShieldsWereFull;
+
+	/** Active damage-over-time effects */
+	UPROPERTY()
+	TArray<FDamageOverTimeEffect> ActiveDOTEffects;
+
+	/** Reference to the global event bus */
 	UPROPERTY()
 	UOdysseyEventBus* EventBus;
+
+	/** Event subscription handle for incoming damage events */
+	FOdysseyEventHandle DamageSubscriptionHandle;
 
 	// ============================================================================
 	// Internal Methods
 	// ============================================================================
 
-	/**
-	 * Update health state based on current health percentage
-	 */
-	void UpdateHealthState();
-
-	/**
-	 * Calculate actual damage after applying resistances
-	 */
+	/** Calculate post-resistance, post-reduction damage */
 	float CalculateActualDamage(float BaseDamage, FName DamageType) const;
 
-	/**
-	 * Broadcast health change event
-	 */
-	void BroadcastHealthChangeEvent(float PreviouHealth, float DamageAmount, AActor* Source, FName DamageType, EHealthState PreviousState);
+	/** Route damage through shields first, then hull. Returns hull damage dealt. */
+	float ApplyDamageToShieldsAndHealth(float ProcessedDamage, AActor* Source, FName DamageType, bool bIsCritical);
 
-	/**
-	 * Handle actor death
-	 */
+	/** Update health state tier based on effective health percentage */
+	void UpdateHealthState();
+
+	/** Broadcast FHealthEventPayload to delegates and event bus */
+	void BroadcastHealthChangeEvent(float PrevHealth, float PrevShields, float DamageAmount, float ShieldAbsorbed, AActor* Source, FName DamageType, EHealthState PrevState, bool bIsCritical);
+
+	/** Handle death logic */
 	void HandleDeath(AActor* KillerActor);
 
-	/**
-	 * Process health regeneration
-	 */
+	/** Process health regeneration per tick */
 	void ProcessHealthRegeneration(float DeltaTime);
 
-	/**
-	 * Check if actor is currently in combat
-	 */
-	bool IsInCombat() const;
+	/** Process shield regeneration per tick */
+	void ProcessShieldRegeneration(float DeltaTime);
 
-	// ============================================================================
-	// Event Bus Integration
-	// ============================================================================
+	/** Process active DOT effects per tick */
+	void ProcessDamageOverTime(float DeltaTime);
 
-	/**
-	 * Initialize event bus subscriptions
-	 */
+	// --- Event Bus Integration ---
+
 	void InitializeEventBusSubscriptions();
-
-	/**
-	 * Clean up event bus subscriptions
-	 */
 	void CleanupEventBusSubscriptions();
-
-	/**
-	 * Handle incoming damage events from the event bus
-	 */
-	void OnDamageReceived(const FOdysseyEventPayload& Payload);
-
-	/**
-	 * Event subscription handle for cleanup
-	 */
-	FOdysseyEventHandle DamageSubscriptionHandle;
+	void OnDamageEventReceived(const FOdysseyEventPayload& Payload);
 };

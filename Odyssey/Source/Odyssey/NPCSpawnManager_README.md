@@ -1,222 +1,190 @@
-# NPC Spawning & Performance System
+# NPC Spawning & Performance System (Phase 4 - Task #12)
 
 ## Overview
 
-The NPC Spawning & Performance System provides mobile-optimized NPC management for Odyssey with object pooling, performance-based scaling, and patrol route functionality.
+Mobile-optimized NPC lifecycle manager for Odyssey with zero-allocation object pooling,
+grid-based spatial partitioning, distance-based behavior LOD, and performance tier scaling.
+Designed to maintain 60fps across all mobile device tiers.
+
+## Architecture
+
+```
+ANPCSpawnManager
+├── Object Pool (TArray<FNPCPoolEntry>)
+│   ├── Pre-spawned ANPCShip actors (zero runtime allocation)
+│   └── Pool entries track state, LOD, spatial grid coords
+├── Spatial Grid (FNPCSpatialGrid)
+│   ├── Hash-map based O(1) cell lookup
+│   └── Radius queries for distance-based culling
+├── Performance Tier Integration (UOdysseyMobileOptimizer)
+│   ├── High:   12 NPCs, 5000u culling, full LOD to 1500u
+│   ├── Medium:  8 NPCs, 3500u culling, full LOD to 1000u
+│   └── Low:     4 NPCs, 2500u culling, no patrol, tight LOD
+├── Behavior LOD System
+│   ├── Full:    every-frame tick, full AI, collision
+│   ├── Reduced: 10Hz tick, simplified patrol, collision
+│   ├── Minimal: visible only, no tick, no collision
+│   └── Dormant: hidden, no tick, no collision
+└── Patrol Route System
+    ├── Waypoint navigation with wait times
+    ├── Shared route registry (FName-keyed)
+    └── Staggered batch updates per frame
+```
 
 ## Key Features
 
-### 1. Object Pooling
-- Pre-allocated NPC pool to eliminate runtime allocation
-- Configurable pool size (default: 12 initial, 20 maximum)
-- Automatic pool expansion when needed
-- Efficient reuse of NPC actors
+### 1. Zero-Allocation Object Pool
+- Pool actors are pre-spawned in `BeginPlay()` at a hidden location
+- `GetPooledNPC()` returns a pre-allocated actor - no `SpawnActor` at runtime
+- `ReturnNPCToPool()` hides and repositions the actor without destroying it
+- Pool expands on demand up to `MaxPoolSize`, with immediate pre-spawn for new slots
+- Eliminates GC pressure and allocation stalls during gameplay
 
 ### 2. Performance Tier Integration
-- **High Performance**: Up to 12 NPCs, 4000 unit culling distance
-- **Medium Performance**: Up to 8 NPCs, 3000 unit culling distance  
-- **Low Performance**: Up to 4 NPCs, 2000 unit culling distance, no patrolling
+Automatically detects tier from `UOdysseyMobileOptimizer` and applies limits:
 
-### 3. Distance-Based Culling
-- NPCs activate/deactivate based on player proximity
-- Configurable culling distances per performance tier
-- Essential NPCs always remain active
-- Smooth transitions to maintain performance
+| Setting             | High   | Medium | Low    |
+|---------------------|--------|--------|--------|
+| Max NPCs            | 12     | 8      | 4      |
+| Update Frequency    | 0.05s  | 0.1s   | 0.2s   |
+| Culling Distance    | 5000u  | 3500u  | 2500u  |
+| Patrolling          | Yes    | Yes    | No     |
+| Full LOD Distance   | 1500u  | 1000u  | 600u   |
+| Reduced LOD Distance| 3000u  | 2000u  | 1200u  |
+| Patrol Batch Size   | 6      | 4      | 2      |
 
-### 4. Waypoint Patrol System
-- Define patrol routes with multiple waypoints
-- Configurable wait times at each waypoint
-- Looping and non-looping routes supported
-- Performance-aware patrol updates
+Tier changes trigger `OptimizeNPCCount()` which deactivates farthest-first or
+activates closest-first to reach the new target.
 
-### 5. Priority System
-- NPCs spawn in priority order on limited devices
-- Essential NPCs always spawn regardless of performance
-- Automatic optimization based on current performance tier
+### 3. Distance-Based Behavior LOD
+Four tiers of NPC behavior complexity driven by distance to the player:
+
+- **Full** (< FullLODDistance): Every-frame tick, full AI behavior, collision enabled.
+  NPC behavior component runs at full update rate.
+- **Reduced** (< ReducedLODDistance): 10Hz actor tick, 5Hz behavior component tick,
+  simplified patrol (skip every other stagger update), collision enabled.
+- **Minimal** (< MinimalLODDistance): Actor visible but tick and collision disabled.
+  Visual presence only. Cheapest "alive" state.
+- **Dormant** (beyond MinimalLODDistance): Hidden, no tick, no collision. Effectively
+  free. Used for culled NPCs that remain in the pool for reactivation.
+
+LOD transitions happen during the staggered distance check pass.
+
+### 4. Spatial Partitioning
+Grid-based spatial hash for efficient neighbour queries:
+
+- Configurable cell size (default 1000 units)
+- `QueryRadius()` touches only cells overlapping the search area
+- NPC grid positions updated during staggered distance checks
+- Full grid rebuild every 5 seconds to catch accumulated drift
+- Used by `ActivateNearbyNPCs()` to avoid iterating the full pool
+
+### 5. Staggered Update Scheduling
+CPU cost is spread across multiple frames:
+
+- **Distance checks**: Process 1/3 of the pool per check interval
+- **Patrol updates**: Process `PatrolBatchSize` NPCs per patrol interval
+- **Spatial grid rebuild**: Full rebuild every 5 seconds
+- **Pool validation**: Every 5 seconds, detect destroyed actors and fix count drift
+
+### 6. Patrol Route System
+- Waypoint-based navigation with configurable wait times per point
+- Looping and non-looping routes
+- Shared route registry (`FName` keyed) for memory-efficient route reuse
+- Patrol disabled automatically on Low performance tier
+- Reduced LOD NPCs get half-rate patrol updates
+
+### 7. Priority & Essential NPC System
+- `Priority` field (higher = spawns first on constrained devices)
+- `bEssential` flag: NPC always active regardless of tier limits or distance
+- `OptimizeNPCCount()` deactivates non-essential farthest-first, reactivates closest-first
 
 ## Core Classes
 
-### ANPCSpawnManager
-Main manager class responsible for NPC lifecycle, performance optimization, and patrol management.
+### ANPCSpawnManager (AActor)
+Main lifecycle manager. Place one in the level.
 
-**Key Properties:**
-- `NPCSpawnData`: Array of NPC spawn configurations
-- `NPCPool`: Object pool for NPC instances
-- `CurrentPerformanceTier`: Current performance level from mobile optimizer
-- `ActiveNPCCount`: Number of currently active NPCs
+**Configuration:**
+- `NPCSpawnData`: Array of `FNPCSpawnData` spawn definitions
+- `DefaultNPCShipClass`: Class for pre-spawned pool actors
+- `High/Medium/LowPerformanceLimits`: Per-tier settings
+- `MaxPoolSize` / `InitialPoolSize`: Pool sizing
+- `bPreSpawnPoolActors`: Enable zero-allocation mode (default true)
+- `SpatialGridCellSize`: Grid cell size in units
 
 **Key Methods:**
-- `InitializeNPCSystem()`: Initialize the entire NPC system
-- `SpawnNPC(int32 SpawnDataIndex)`: Spawn an NPC from pool
-- `OptimizeNPCCount()`: Adjust active NPC count based on performance
-- `UpdateNPCPatrols()`: Update patrol movement for active NPCs
+- `InitializeNPCSystem()` / `ShutdownNPCSystem()`: Full lifecycle
+- `SpawnNPC(int32)` / `DespawnNPC(int32)`: Slot-level control
+- `OptimizeNPCCount()`: Auto-adjust to current tier
+- `GetNPCsInRadius(FVector, float)`: Spatial query
+- `RegisterPatrolRoute(FPatrolRoute)`: Shared route registration
+- `LogNPCSystemState()`: Console diagnostics
 
-### FNPCSpawnData
-Defines spawn configuration for individual NPCs.
+### FNPCPoolEntry
+Per-NPC runtime state. Packed for cache-friendly iteration.
 
-**Properties:**
-- `NPCClass`: The NPC class to spawn
-- `SpawnLocation/SpawnRotation`: Initial spawn transform
-- `PatrolRoute`: Waypoint-based movement pattern
-- `Priority`: Spawn priority (higher = spawns first)
-- `bEssential`: Always spawn regardless of performance
+Fields: actor pointer, pool/active flags, spawn data index, patrol state,
+cached distance, behavior LOD, spatial grid cell coordinates.
 
-### FPatrolRoute
-Defines waypoint-based movement patterns.
+### FNPCSpatialGrid
+Lightweight hash-map spatial grid. Not a USTRUCT (no reflection overhead).
 
-**Properties:**
-- `Waypoints`: Array of FWaypoint positions
-- `bLooping`: Whether route repeats infinitely
-- `MovementSpeed`: Units per second movement speed
-- `ActivationDistance`: Distance at which patrol becomes active
-
-### FWaypoint
-Individual waypoint in a patrol route.
-
-**Properties:**
-- `Location`: World position of waypoint
-- `WaitTime`: Seconds to wait at this waypoint
-- `bCanInteract`: Whether NPCs can be interacted with here
-
-## Performance Integration
-
-The system integrates with `UOdysseyMobileOptimizer` to automatically adjust NPC counts and behavior based on device performance:
-
-### Performance Limits per Tier:
-```cpp
-// High Performance (Desktop/High-end mobile)
-MaxNPCs = 12
-UpdateFrequency = 0.05f
-CullingDistance = 4000.0f
-bEnablePatrolling = true
-
-// Medium Performance (Standard mobile)
-MaxNPCs = 8
-UpdateFrequency = 0.1f
-CullingDistance = 3000.0f
-bEnablePatrolling = true
-
-// Low Performance (Low-end mobile)
-MaxNPCs = 4
-UpdateFrequency = 0.2f
-CullingDistance = 2000.0f
-bEnablePatrolling = false
-```
+### ENPCBehaviorLOD
+`Full`, `Reduced`, `Minimal`, `Dormant` - drives tick rate and visibility.
 
 ## Usage Example
 
-### Basic Setup
 ```cpp
-// Create NPC Spawn Manager
-ANPCSpawnManager* SpawnManager = GetWorld()->SpawnActor<ANPCSpawnManager>();
+// Create spawn manager (or place in level via editor)
+ANPCSpawnManager* Manager = GetWorld()->SpawnActor<ANPCSpawnManager>();
 
-// Configure spawn data
-FNPCSpawnData NPCData;
-NPCData.NPCClass = AOdysseyCharacter::StaticClass();
-NPCData.SpawnLocation = FVector(0, 0, 0);
-NPCData.Priority = 50;
-NPCData.bEssential = true;
+// Configure default ship class for pre-spawning
+Manager->DefaultNPCShipClass = ANPCShip::StaticClass();
+
+// Define spawn data
+FNPCSpawnData PirateSpawn;
+PirateSpawn.NPCClass = APirateShip::StaticClass();
+PirateSpawn.SpawnLocation = FVector(1000, 2000, 0);
+PirateSpawn.Priority = 50;
+PirateSpawn.bEssential = false;
 
 // Create patrol route
-FPatrolRoute Route;
-Route.Waypoints.Add(FWaypoint(FVector(0, 0, 0), 2.0f, true));
-Route.Waypoints.Add(FWaypoint(FVector(500, 0, 0), 1.0f, false));
-Route.Waypoints.Add(FWaypoint(FVector(500, 500, 0), 2.0f, true));
-Route.bLooping = true;
-Route.MovementSpeed = 200.0f;
+FPatrolRoute PirateRoute;
+PirateRoute.RouteId = FName("PirateRoute_01");
+PirateRoute.Waypoints.Add(FWaypoint(FVector(1000, 2000, 0), 2.0f));
+PirateRoute.Waypoints.Add(FWaypoint(FVector(3000, 2000, 0), 1.0f));
+PirateRoute.Waypoints.Add(FWaypoint(FVector(3000, 4000, 0), 2.0f));
+PirateRoute.bLooping = true;
+PirateRoute.MovementSpeed = 400.0f;
+PirateSpawn.PatrolRoute = PirateRoute;
 
-NPCData.PatrolRoute = Route;
-
-// Add to spawn manager
-SpawnManager->NPCSpawnData.Add(NPCData);
-
-// Initialize system
-SpawnManager->InitializeNPCSystem();
+Manager->NPCSpawnData.Add(PirateSpawn);
+Manager->InitializeNPCSystem();
 ```
-
-### Runtime Management
-```cpp
-// Check current state
-int32 ActiveCount = SpawnManager->GetActiveNPCCount();
-int32 MaxAllowed = SpawnManager->GetMaxNPCsForCurrentTier();
-
-// Force optimization
-SpawnManager->OptimizeNPCCount();
-
-// Get all active NPCs
-TArray<AOdysseyCharacter*> ActiveNPCs = SpawnManager->GetActiveNPCs();
-
-// Debug information
-SpawnManager->LogNPCSystemState();
-SpawnManager->DebugDrawPatrolRoutes();
-```
-
-## Architecture Details
-
-### Object Pool Management
-- Pool entries track usage, activation state, and patrol progress
-- Actors are hidden/shown rather than destroyed/created
-- Pool automatically expands up to maximum size when needed
-- Validation system ensures pool integrity
-
-### Distance-Based Optimization
-- Staggered distance checks every 2 seconds
-- NPCs beyond culling distance are deactivated
-- Priority system ensures important NPCs stay active
-- Smooth activation/deactivation prevents performance spikes
-
-### Patrol System
-- Staggered updates to process subset of NPCs per frame
-- State machine tracks movement and waiting phases
-- Performance-aware update frequencies
-- Automatic route validation and waypoint progression
-
-### Performance Monitoring
-- Integrates with mobile optimizer for tier changes
-- Automatic NPC count adjustment on performance changes
-- Essential NPCs protected from optimization
-- Configurable limits per performance tier
-
-## Best Practices
-
-1. **Priority Assignment**: Use higher priorities for gameplay-critical NPCs
-2. **Essential Flag**: Mark story-important NPCs as essential
-3. **Patrol Routes**: Keep routes within reasonable distances for performance
-4. **Pool Sizing**: Set initial pool size to expected concurrent NPC count
-5. **Update Frequencies**: Balance responsiveness with performance impact
 
 ## Debugging
 
-### Debug Functions
-- `DebugDrawPatrolRoutes()`: Visualize waypoint paths
-- `DebugDrawNPCStates()`: Show NPC activation status
-- `LogNPCSystemState()`: Print comprehensive system stats
+```cpp
+Manager->DebugDrawPatrolRoutes();     // Yellow spheres + green lines
+Manager->DebugDrawNPCStates();        // Color-coded LOD indicators
+Manager->DebugDrawSpatialGrid();      // Grid cells with occupancy counts
+Manager->LogNPCSystemState();         // Full console dump with LOD distribution
+```
 
-### Console Commands
-The system logs important events to help with debugging:
-- NPC spawn/despawn events
-- Performance tier changes
-- Pool management operations
-- Patrol state transitions
+## Performance Budget
 
-## Integration Notes
+Target: < 0.5ms per frame for NPC management on mobile.
 
-### Dependencies
-- Requires `UOdysseyMobileOptimizer` for performance integration
-- Uses `AOdysseyCharacter` as base NPC class
-- Integrates with Unreal's standard Actor/Component system
+- Staggered distance checks: ~0.05ms per batch (1/3 pool)
+- Staggered patrol updates: ~0.02ms per batch (4-6 NPCs)
+- Spatial grid queries: ~0.01ms per radius query
+- Pool validation: ~0.01ms every 5 seconds
+- LOD transitions: ~0.005ms per transition (set flags only)
 
-### Mobile Optimization
-- Designed specifically for mobile performance constraints
-- Automatic scaling based on device capabilities
-- Minimal memory allocation during gameplay
-- Efficient update patterns to maintain frame rate
+## Integration Points
 
-## Future Enhancements
-
-Potential areas for expansion:
-- AI behavior trees integration
-- Dynamic spawn point generation
-- NPC interaction system integration
-- Save/load support for NPC states
-- Network replication for multiplayer
+- `UOdysseyMobileOptimizer`: Performance tier detection and change notifications
+- `ANPCShip`: Pre-spawned pool actors, behavior component LOD configuration
+- `UNPCBehaviorComponent`: Tick interval scaling for Reduced LOD
+- `UNPCHealthComponent`: Unaffected by LOD (event-driven, low overhead)
+- `UOdysseyEventBus`: NPC lifecycle events broadcast on spawn/despawn
