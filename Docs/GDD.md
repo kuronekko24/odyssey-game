@@ -3853,6 +3853,15 @@ Screen 1:                          Screen 2:
 - Population indicator helps players pick active servers
 - Future: server transfer as paid service (with cooldown)
 
+**One Account, One Server — Strict Isolation:**
+- Each account is bound to exactly one server. Period
+- Players cannot create a second character on a different server with the same account
+- Creating a new account requires a different auth identity (different Apple ID / Google account / email)
+- Servers are completely isolated — no cross-server trade, chat, mail, or interaction of any kind
+- There is no cross-server travel, warp, or portal system. The universes do not connect
+- Server transfer moves EVERYTHING (character, ships, cargo, reputation, map, OMEN) and has a 6-month cooldown
+- This prevents: economy manipulation across servers, intelligence scouting on alt servers, resource arbitrage, and bypassing PvP consequences by fleeing to another server
+
 ---
 
 ### Step 4: Character Creation (30-60 seconds)
