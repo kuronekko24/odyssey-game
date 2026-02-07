@@ -656,13 +656,13 @@ All planets are **shared instances** - every player exists in the same world. Wh
 
 ### Planet Types
 
-| Type | Resources | Hazards | Notes |
-|------|-----------|---------|-------|
-| **Terrestrial** | Common ores, organics | Mild weather | Beginner-friendly |
-| **Volcanic** | Rare metals, crystals | Heat, eruptions | High risk/reward |
-| **Ice World** | Frozen gases, cryo-elements | Cold, storms | Specialized equipment needed |
-| **Gas Giant (Moons)** | Exotic gases, radioactives | Radiation, gravity | Advanced extraction |
-| **Barren/Asteroid** | Pure minerals, ancient tech | Low gravity, debris | Efficient but sparse |
+| Type | Resources | Hazards | Gravity | Notes |
+|------|-----------|---------|---------|-------|
+| **Terrestrial** | Common ores, organics | Mild weather | 1.0G (Standard) | Beginner-friendly |
+| **Volcanic** | Rare metals, crystals | Heat, eruptions | 1.2-1.8G (Heavy) | High risk/reward, hard to escape |
+| **Ice World** | Frozen gases, cryo-elements | Cold, storms | 0.6-1.0G (Light-Standard) | Specialized equipment needed |
+| **Gas Giant (Moons)** | Exotic gases, radioactives | Radiation, gravity | 0.2-2.5G (Varies wildly) | Advanced extraction |
+| **Barren/Asteroid** | Pure minerals, ancient tech | Low gravity, debris | 0.1-0.4G (Very Light) | Efficient escape, sparse deposits |
 
 ---
 
@@ -1034,13 +1034,13 @@ Ships are defined by their **hull**, which determines size, capacity, and equipm
 
 #### Hull Sizes
 
-| Size | Cargo Capacity | Equipment Slots | Base Speed | Example |
-|------|----------------|-----------------|------------|---------|
-| **XS (Extra Small)** | 50 units | 4 | Very Fast | Shuttle, Probe |
-| **S (Small)** | 200 units | 6 | Fast | Scout, Interceptor |
-| **M (Medium)** | 1,000 units | 8 | Medium | Freighter, Miner |
-| **L (Large)** | 5,000 units | 10 | Slow | Heavy Freighter, Cruiser |
-| **XL (Extra Large)** | 25,000 units | 12 | Very Slow | Capital, Carrier |
+| Size | Cargo Capacity | Max Lift (1.0G) | Equipment Slots | Base Speed | Example |
+|------|----------------|-----------------|-----------------|------------|---------|
+| **XS (Extra Small)** | 50 units | 2 tons | 4 | Very Fast | Shuttle, Probe |
+| **S (Small)** | 200 units | 8 tons | 6 | Fast | Scout, Interceptor |
+| **M (Medium)** | 1,000 units | 30 tons | 8 | Medium | Freighter, Miner |
+| **L (Large)** | 5,000 units | 120 tons | 10 | Slow | Heavy Freighter, Cruiser |
+| **XL (Extra Large)** | 25,000 units | 500 tons | 12 | Very Slow | Capital, Carrier |
 
 #### Hull Tiers (1-8)
 
@@ -1062,6 +1062,118 @@ Every hull has a tier that determines what equipment it can use.
 - A T3 hull CANNOT equip T4+ equipment
 - Higher tier = better base stats + higher equipment ceiling
 - Same size hull at higher tier is strictly better
+
+### Weight & Gravity System
+
+Every craft — ships and ground vehicles — has a **weight**. Every planet has a **gravity value (G)**. Together, these determine what a Nimbus can carry off-world.
+
+#### Core Rule
+
+A Nimbus can carry **any combination** of cargo, ground vehicles, or smaller craft as long as the total loaded weight stays under its **effective lift capacity** for that planet's gravity.
+
+```
+Effective Lift = Max Lift (1.0G) ÷ Planet Gravity
+
+Example: M-class Freighter (30 ton Max Lift)
+  On Terrestrial (1.0G):  30 ÷ 1.0 = 30 tons → can carry a Bore Rig (15t) + cargo
+  On Volcanic (1.5G):     30 ÷ 1.5 = 20 tons → Bore Rig (15t) barely fits, minimal cargo
+  On Asteroid (0.2G):     30 ÷ 0.2 = 150 tons → can carry almost anything
+  On Heavy Moon (2.5G):   30 ÷ 2.5 = 12 tons → no Bore Rig, light cargo only
+```
+
+#### Weight Budget
+
+Total weight is the sum of everything on board:
+
+| Component | Weight |
+|-----------|--------|
+| **Ship hull** | Does not count (it IS the ship) |
+| **Installed equipment** | 0.1-2 tons per module depending on tier |
+| **Cargo** | ~1 ton per 100 units of ore (varies by material) |
+| **Ground vehicles** | 1.5-45 tons (see vehicle table) |
+| **Carried spacecraft** | Hull weight of the carried craft |
+| **Fuel** | Negligible |
+
+#### Spacecraft Weights (When Carried)
+
+Ships can be transported inside larger ships if weight and cargo bay size allow.
+
+| Ship Size | Hull Weight |
+|-----------|------------|
+| **XS** | 3 tons |
+| **S** | 10 tons |
+| **M** | 40 tons |
+| **L** | 200 tons |
+| **XL** | Cannot be carried |
+
+**Carrying Rules:**
+- A ship can only carry craft **at least 2 sizes smaller** in its cargo bay
+- XL ships can carry up to M-class craft
+- L ships can carry up to S-class craft
+- M ships can carry XS craft only
+- S and XS ships cannot carry other spacecraft
+- Ground vehicles follow weight limits only (no size restriction beyond fitting)
+
+#### Gravity Effects on Gameplay
+
+| Gravity | Effect on Nimbus | Strategic Impact |
+|---------|-----------------|-----------------|
+| **Very Light (0.1-0.3G)** | Massive lift capacity, easy escape | Can haul everything in one trip. Deposits tend to be sparse though |
+| **Light (0.4-0.7G)** | Generous lift, comfortable operations | Ideal for mining runs with ground vehicles |
+| **Standard (0.8-1.2G)** | Normal operations, plan your loadout | Must choose: bring vehicles OR fill cargo |
+| **Heavy (1.3-1.8G)** | Reduced lift, tough takeoffs | Multiple trips required. Ground vehicles may need to stay planetside |
+| **Extreme (1.9-2.5G)** | Severely limited, escape is a challenge | Only light cargo gets off-world. Premium resources justify the effort |
+
+#### Overweight Consequences
+
+Players CAN attempt takeoff while overweight, but:
+
+| Overweight % | Effect |
+|--------------|--------|
+| 1-10% over | Sluggish ascent, 2x fuel consumption during escape |
+| 11-25% over | Very slow ascent, 3x fuel, engine overheat warning |
+| 26-50% over | Engines redline, 5x fuel, risk of engine malfunction and crash back to surface |
+| 51%+ over | Cannot achieve escape velocity, takeoff fails |
+
+**Crash Consequences:**
+- Failed escape attempt damages hull and engines (10-30% durability loss)
+- Cargo may spill on impact (lose 10-25% of loaded cargo randomly)
+- Ground vehicles in cargo bay take damage too
+- Player must repair before attempting again or jettison weight
+
+#### Player HUD — Weight Display
+
+When on a planet surface, the HUD shows:
+```
+[Weight Status]
+Total Load:    22.5 / 30.0 tons  ██████████████░░░░░░ 75%
+Gravity:       1.0G (Standard)
+Effective Lift: 30.0 tons
+Status:        ✓ CLEAR FOR TAKEOFF
+
+--- Breakdown ---
+Cargo:         12.0 tons (1,200 units ore)
+Bore Rig:      15.0 tons (stored in bay)
+Equipment:     0.5 tons
+```
+
+When overweight:
+```
+Total Load:    38.0 / 30.0 tons  ████████████████████ 127%
+Gravity:       1.0G (Standard)
+Effective Lift: 30.0 tons
+Status:        ⚠ OVERWEIGHT — Jettison 8.0 tons or risk engine failure
+```
+
+#### Strategic Implications
+
+This system creates meaningful decisions at every step:
+
+- **Planet Selection**: High-gravity worlds have the best resources but getting them off-world is the challenge
+- **Ship Choice**: Bring a bigger Nimbus for heavy-G planets, or make multiple trips with a smaller one
+- **Vehicle Deployment**: Dropping a Bore Rig on a heavy planet means it might stay there — plan accordingly
+- **Route Planning**: Mine on a low-G moon, refine on-site with a Crawler, then haul refined (lighter) materials to orbit
+- **Emergency Decisions**: Storm coming, cargo bay full, 15% overweight — do you jettison ore or risk the takeoff?
 
 ### Ship Classes
 
@@ -1171,14 +1283,14 @@ Players use their Nimbus to scout deposits from the air, then deploy ground vehi
 
 #### Vehicle Classes
 
-| Class | Type | Role | Cargo | Speed | Crew |
-|-------|------|------|-------|-------|------|
-| **Rover** | Wheeled | Light recon, personnel transport | 50 | Fast | 1 |
-| **Hauler** | Wheeled/Tracked | Bulk cargo transport between sites | 2,000 | Medium | 1 |
-| **Bore Rig** | Tracked | Deep core extraction, stationary mining | 500 | Very Slow | 1 |
-| **Crawler** | Tracked | Mobile refinery, processes ore on-site | 300 | Slow | 1 |
-| **Armored Transport** | Hover | Armed escort, PvP zone hauling | 800 | Medium | 1-2 |
-| **Mega Hauler** | Tracked | Massive cargo runs between outpost and landing zone | 10,000 | Very Slow | 1 |
+| Class | Type | Role | Cargo | Weight (Empty) | Speed | Crew |
+|-------|------|------|-------|----------------|-------|------|
+| **Rover** | Wheeled | Light recon, personnel transport | 50 | 1.5 tons | Fast | 1 |
+| **Hauler** | Wheeled/Tracked | Bulk cargo transport between sites | 2,000 | 8 tons | Medium | 1 |
+| **Bore Rig** | Tracked | Deep core extraction, stationary mining | 500 | 15 tons | Very Slow | 1 |
+| **Crawler** | Tracked | Mobile refinery, processes ore on-site | 300 | 20 tons | Slow | 1 |
+| **Armored Transport** | Hover | Armed escort, PvP zone hauling | 800 | 12 tons | Medium | 1-2 |
+| **Mega Hauler** | Tracked | Massive cargo runs between outpost and landing zone | 10,000 | 45 tons | Very Slow | 1 |
 
 #### Vehicle Controls (Mobile)
 
@@ -1235,19 +1347,23 @@ Ground vehicles follow the same T1-T8 tier system as ships.
 #### Ground vs Air Gameplay Loop
 
 ```
-1. Fly Nimbus over planet surface
-2. Scanner detects surface deposit → mine with laser from air (quick, light yield)
-3. Scanner detects DEEP deposit → cannot mine from air
-4. Land at nearest Vehicle Bay
-5. Deploy Bore Rig → drive to deep deposit → extract heavy resources
-6. Load Hauler → transport ore back to landing zone
-7. Load cargo onto Nimbus → fly to city to sell/craft
+1. Check planet gravity before committing (HUD shows G value in orbit)
+2. Fly Nimbus over planet surface
+3. Scanner detects surface deposit → mine with laser from air (quick, light yield)
+4. Scanner detects DEEP deposit → cannot mine from air
+5. Land at nearest Vehicle Bay
+6. Deploy Bore Rig → drive to deep deposit → extract heavy resources
+7. Load Hauler → transport ore back to landing zone
+8. Check weight budget — can you carry the Bore Rig back + cargo?
+9. If overweight: refine on-site with Crawler (lighter output), jettison low-value ore, or leave vehicle planetside
+10. Escape to orbit → fly to city to sell/craft
 ```
 
-**Deep deposits** are richer and contain rarer materials than surface deposits, but they require ground vehicles to access. This creates a natural progression:
-- **Early game**: Fly and mine from the air, surface deposits only
-- **Mid game**: Start using ground vehicles for deep extraction
-- **Late game**: Coordinated operations with multiple vehicles feeding materials to a Crawler for on-site refining
+**Deep deposits** are richer and contain rarer materials than surface deposits, but they require ground vehicles to access. **Gravity** adds a layer — the best deposits are on heavy worlds where getting materials (and vehicles) back to orbit is the real challenge.
+
+- **Early game**: Fly and mine from the air on low-G worlds, surface deposits only
+- **Mid game**: Deploy ground vehicles for deep extraction, learn to manage weight budgets
+- **Late game**: Coordinated operations on high-G worlds — Crawler refines on-site to reduce weight, multiple trips, or bring a larger Nimbus
 
 ---
 
