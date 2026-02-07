@@ -3722,6 +3722,260 @@ The initial splash screen shown at app launch displays:
 
 ---
 
+## First-Time User Flow
+
+The complete step-by-step experience from app install to gameplay. Designed to get players into the action as fast as possible — under 3 minutes from tap to flying.
+
+---
+
+### Step 1: App Launch → Splash Screen (5-10 seconds)
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│                                             │
+│              ✦  O D Y S S E Y  ✦           │
+│                                             │
+│         "The stars were never empty."       │
+│                                             │
+│                                             │
+│            ████████████░░░  78%             │
+│                                             │
+│          v0.1.0  |  Server: Online          │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- Logo with ambient particle effects loads while game assets download
+- Daily rotating tagline
+- Progress bar for initial asset loading
+- No interaction required — auto-transitions when ready
+
+---
+
+### Step 2: Login / Account Creation (15-30 seconds)
+
+First-time players see the authentication screen. Returning players auto-login silently and skip to Step 6.
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│              ✦  O D Y S S E Y  ✦           │
+│                                             │
+│                                             │
+│         ┌─────────────────────────┐         │
+│         │  ▣  Sign in with Apple  │         │
+│         └─────────────────────────┘         │
+│         ┌─────────────────────────┐         │
+│         │  ▲  Sign in with Google │         │
+│         └─────────────────────────┘         │
+│         ┌─────────────────────────┐         │
+│         │  ✉  Sign in with Email  │         │
+│         └─────────────────────────┘         │
+│                                             │
+│            Terms of Service | Privacy       │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+#### Authentication Methods
+
+| Method | Flow | Notes |
+|--------|------|-------|
+| **Apple Sign In** | Native iOS prompt → one tap → done | Required for iOS App Store. Supports "Hide My Email" |
+| **Google Sign In** | Google OAuth popup → select account → done | Primary method for Android. Works on iOS too |
+| **Email** | Enter email → receive 6-digit code → enter code → done | Passwordless magic link/code. No passwords to forget |
+
+**Auth Rules:**
+- No usernames or passwords at this stage — just authentication
+- Account linking: players can link multiple auth methods later in settings
+- Guest play is NOT supported — prevents throwaway grief accounts
+- Session tokens persist — players only log in once unless they log out or switch devices
+- Cross-platform: same account works on iOS, Android, and future PC
+
+#### Email Sign-In Flow
+
+```
+Screen 1:                          Screen 2:
+┌─────────────────────────┐       ┌─────────────────────────┐
+│                         │       │                         │
+│  Enter your email       │       │  Enter the code we      │
+│                         │       │  sent to j***@email.com │
+│  ┌───────────────────┐  │       │                         │
+│  │ player@email.com  │  │       │    ┌─┬─┬─┬─┬─┬─┐      │
+│  └───────────────────┘  │       │    │4│7│2│_│_│_│      │
+│                         │       │    └─┴─┴─┴─┴─┴─┘      │
+│  ┌───────────────────┐  │       │                         │
+│  │   Send Code  →    │  │       │  Code expires in 4:32   │
+│  └───────────────────┘  │       │                         │
+│                         │       │  [Resend Code]          │
+│  ← Back                │       │  ← Back                 │
+└─────────────────────────┘       └─────────────────────────┘
+```
+
+- 6-digit code sent via email
+- Code expires after 5 minutes
+- Resend available after 30 seconds
+- 5 failed attempts locks for 15 minutes
+- No password creation — ever. Passwordless only
+
+---
+
+### Step 3: Server Selection (5-10 seconds)
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│           Choose Your Region                │
+│                                             │
+│   ┌───────────────────────────────────┐     │
+│   │  ★ North America  [Recommended]  │     │
+│   │    Ping: 23ms  |  Pop: High      │     │
+│   └───────────────────────────────────┘     │
+│   ┌───────────────────────────────────┐     │
+│   │    Europe                         │     │
+│   │    Ping: 89ms  |  Pop: High      │     │
+│   └───────────────────────────────────┘     │
+│   ┌───────────────────────────────────┐     │
+│   │    Asia-Pacific                   │     │
+│   │    Ping: 142ms |  Pop: Medium    │     │
+│   └───────────────────────────────────┘     │
+│                                             │
+│   Server chosen is permanent. All players   │
+│   in a region share one universe.           │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- Auto-recommends lowest ping region
+- One server per region — everyone in that region plays in the same universe
+- Permanent choice (no server hopping — preserves economy integrity)
+- Population indicator helps players pick active servers
+- Future: server transfer as paid service (with cooldown)
+
+---
+
+### Step 4: Character Creation (30-60 seconds)
+
+Kept minimal to get players into the game fast. Cosmetic depth comes later through in-game unlocks.
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│           Who Are You, Pilot?               │
+│                                             │
+│          ┌─────────────────┐                │
+│          │                 │                │
+│          │   [Avatar]      │                │
+│          │   ◄  ●○○○  ►   │                │
+│          │                 │                │
+│          └─────────────────┘                │
+│                                             │
+│   Callsign:                                 │
+│   ┌───────────────────────────────────┐     │
+│   │ _                                 │     │
+│   └───────────────────────────────────┘     │
+│   3-16 characters, letters & numbers        │
+│                                             │
+│          ┌───────────────────┐              │
+│          │   Launch    →     │              │
+│          └───────────────────┘              │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+#### Callsign (Player Name)
+- 3-16 characters
+- Letters, numbers, hyphens, underscores
+- Unique per server (real-time availability check as you type)
+- Profanity filter
+- Cannot be changed for 30 days after creation (prevent grief-name swapping)
+- Displayed galaxy-wide on leaderboards, markets, discoveries, bounties
+
+#### Avatar Preset
+- **4 preset avatars** at launch (2 male, 2 female silhouettes)
+- Swipe to browse
+- These are simple portrait icons shown in chat, market listings, and profiles
+- Full customization unlocked later in-game at any city (hair, face, suit color, helmet, etc.)
+- NOT a blocker — players can skip and use default, customize whenever they want
+
+#### What We Skip
+- No class selection (classless progression — you ARE what you do)
+- No race selection (all players are human)
+- No stat allocation (stats come from equipment and skills)
+- No ship selection (everyone starts with the same damaged shuttle — the story demands it)
+- No lengthy backstory prompts
+
+---
+
+### Step 5: Intro Cinematic (45-60 seconds, skippable)
+
+A short cinematic that sets the tone and drops the player directly into Act 1.
+
+**Scene 1 (15s):** Black screen. Stars fade in. A calm voice narrates:
+> *"In 2187, humanity fled a dying Earth. Twelve ships carried our last hope toward a signal no one understood."*
+
+**Scene 2 (15s):** Camera pulls back to reveal the Cradle Stars — five star systems glittering. Ships moving between them.
+> *"Seven ships arrived. Five centuries later, we built a new home among alien neighbors and ancient ruins."*
+
+**Scene 3 (15s):** Camera zooms to a jump gate. A small, battered shuttle exits — sparks flying, hull cracked. Alarms blaring inside the cockpit.
+> *"You are the latest arrival. Your ship is damaged. Your past is unclear. But the stars have plans for those who survive."*
+
+**Scene 4 (transition):** Camera moves into the cockpit. The cinematic seamlessly transitions to gameplay — the HUD flickers on, emergency warnings flash, and the player has control.
+
+- **Skippable** after first playthrough (hold to skip prompt in corner)
+- First-time players cannot skip (it's only 45 seconds and sets up the story)
+- No separate loading screen between cinematic and gameplay — it's one continuous shot
+
+---
+
+### Step 6: Gameplay Begins → Act 1, Chapter 1.1
+
+The player is now in-game. They're sitting in a damaged shuttle drifting in Uurf orbit. From here, the Act 1 storyline takes over as the extended tutorial.
+
+**Immediate state:**
+- Ship is damaged — limited thrust, no weapons, no scanner
+- Emergency HUD shows basic prompts
+- Uurf is visible below — a blue-green planet
+- A distress beacon marker pulses on the HUD
+
+**First prompt:**
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│   ⚠ EMERGENCY                              │
+│   Hull integrity: 34%                       │
+│   Thrust: Limited                           │
+│                                             │
+│   Use LEFT STICK to steer toward the        │
+│   beacon signal.                            │
+│                          [Got it]           │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- One simple prompt, then the player is flying
+- No more popups — all further guidance comes from HUD markers and NPC voice lines
+- Kael's voice crackles over comms as you approach Uurf: *"Unidentified shuttle, you're coming in hot. I'll clear landing pad 7 — try not to miss."*
+
+---
+
+### Full Timeline Summary
+
+| Step | Screen | Duration | Returning Player |
+|------|--------|----------|------------------|
+| 1 | Splash screen + asset loading | 5-10s | Same |
+| 2 | Login (Apple/Google/Email) | 15-30s | Auto-skipped (saved session) |
+| 3 | Server selection | 5-10s | Auto-skipped (saved choice) |
+| 4 | Character creation | 30-60s | Auto-skipped |
+| 5 | Intro cinematic | 45-60s | Skippable |
+| 6 | Gameplay (Act 1.1) | ∞ | Resumes where they left off |
+
+**First-time total: ~2-3 minutes from app open to flying**
+**Returning player: ~10-15 seconds from app open to gameplay**
+
+---
+
 ## Technical Targets
 
 ### Performance
