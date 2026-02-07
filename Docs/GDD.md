@@ -3619,6 +3619,107 @@ The galaxy is scattered with hidden things waiting to be found. These are not qu
 - Quick resume from where you left off
 - All operations require active play
 
+### Loading Screens & Tips
+
+Loading screens display contextual tips that help players learn the game. Tips are selected based on the player's current progression, recent activity, and where they're headed.
+
+#### Tip Selection Logic
+
+| Priority | Condition | Example |
+|----------|-----------|---------|
+| **1st** | Mechanic the player hasn't used yet | "Try deploying a ground vehicle for deep deposits" |
+| **2nd** | Related to current destination/activity | Loading into a Mild zone → PvP awareness tip |
+| **3rd** | Related to recent death or failure | Died to overheating → "Mining lasers overheat with continuous use. Fire in bursts for longer operation" |
+| **4th** | Current storyline act hint | In Act 2 → gravity/weight tips |
+| **5th** | General tip from random pool | Lore facts, efficiency tricks, social features |
+
+#### Tip Categories
+
+**Piloting (shown to T1-T3 players frequently, T4+ occasionally)**
+- "Higher altitude reveals more terrain on your map, but surface deposits need low-altitude scanning."
+- "Auto-stabilization keeps your craft steady while mining. Toggle it off for sharper turns in combat."
+- "Your cargo weight affects flight handling. A full hold means slower turns and longer braking."
+- "Double-tap a destination to engage auto-pilot. Keep your eyes on the scanner while cruising."
+
+**Mining & Resources**
+- "Fire your mining laser in short bursts to manage heat. Overheating damages your equipment."
+- "Deep deposits can only be reached with ground vehicles. Look for the blue downward arrow on your scanner."
+- "Different planets have different resources. Check the system map for resource types before committing to a trip."
+- "Refining ore on-site with a Crawler reduces its weight — useful on high-gravity worlds."
+
+**Weight & Gravity**
+- "Check a planet's gravity before landing. Heavy worlds limit how much you can carry back to orbit."
+- "Overweight takeoff burns extra fuel and risks engine failure. Jettison low-value cargo if needed."
+- "Low-gravity asteroids let you haul massive loads — but deposits are sparser."
+- "Your weight HUD turns yellow at 80% capacity and red at 100%. Plan your loads carefully."
+
+**Crafting & Economy**
+- "Repair kits can only restore equipment to 80% durability. Visit a station for full repairs."
+- "Equipment that hits 0% durability is broken and must be repaired before use."
+- "Every item in the market is crafted by another player. Supply and demand set the price."
+- "Spira offers 25% reduced refining costs. Worth the trip for big processing jobs."
+
+**Combat & Survival**
+- "In Full PvP zones, destroyed ships drop cargo AND equipped modules. Don't fly what you can't afford to lose."
+- "Hostile creatures guard the best resource deposits. Clear the nest for uncontested mining access."
+- "Shields recharge over time, armor does not. Pick your defense based on your playstyle."
+- "Escape is always an option. Warp drives charge faster with higher-tier thrusters."
+
+**Exploration & Map**
+- "Fly low over unexplored terrain to reveal it on your map. The fog lifts permanently."
+- "The first player to discover a location gets their name permanently attached to it."
+- "Buy star charts from Veth merchants to reveal distant systems without visiting them."
+- "Fully mapping a planet grants +10% mining yield there permanently."
+
+**Social & Multiplayer**
+- "You can sell your map data to other players on the market. Explorers profit from knowledge."
+- "Guild members share exploration data automatically. Join a guild to fill your map faster."
+- "Player contracts let you hire escorts for dangerous zone runs. Sometimes it's cheaper than losing cargo."
+- "Place a bounty on a player who wronged you. At 100K+, they're visible system-wide."
+
+**Lore & World (unlocked progressively)**
+- "The Shepherd Signal led humanity to the Cradle Stars. No one knows who sent it... yet."
+- "Banx Station appeared in 2289 at the exact center of all five systems. Coincidence?"
+- "The Veth call the Precursors 'The Weavers.' The Korvani call them 'The First Flame.'"
+- "OMEN occasionally pulses in unison across the entire galaxy. Researchers who study this tend to disappear."
+- "Seven of twelve arkships arrived at the Cradle Stars. The other five were never found."
+
+#### Splash Screen
+
+The initial splash screen shown at app launch displays:
+- Game logo with ambient particle effects
+- Rotating lore tagline (changes daily):
+  - *"The stars were never empty."*
+  - *"Mine. Build. Trade. Survive."*
+  - *"One billion OMEN. One thousand Orbs. One truth."*
+  - *"The Breach is sealed. For now."*
+  - *"Three species. Five Fields. Infinite ambition."*
+- Version number and server status
+- Tip of the Day (one persistent tip per 24h cycle, shown below logo)
+
+#### Loading Screen Layout
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│          [Scene Art / Ship Render]          │
+│          (rotates per destination)          │
+│                                             │
+│                                             │
+│  ─────────────── ◆ ───────────────         │
+│                                             │
+│  TIP: Fire your mining laser in short      │
+│  bursts to manage heat. Overheating        │
+│  damages your equipment.                    │
+│                                             │
+│         ████████████░░░░  67%               │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- Scene art rotates based on destination (planet landscape, city skyline, space vista)
+- Progress bar shows actual loading progress
+- Tips fade-transition if loading takes long enough for a second tip
+
 ---
 
 ## Technical Targets
