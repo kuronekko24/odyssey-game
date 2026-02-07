@@ -3821,46 +3821,31 @@ Screen 1:                          Screen 2:
 
 ---
 
-### Step 3: Server Selection (5-10 seconds)
+### Step 3: Server Selection
 
-```
-┌─────────────────────────────────────────────┐
-│                                             │
-│           Choose Your Region                │
-│                                             │
-│   ┌───────────────────────────────────┐     │
-│   │  ★ North America  [Recommended]  │     │
-│   │    Ping: 23ms  |  Pop: High      │     │
-│   └───────────────────────────────────┘     │
-│   ┌───────────────────────────────────┐     │
-│   │    Europe                         │     │
-│   │    Ping: 89ms  |  Pop: High      │     │
-│   └───────────────────────────────────┘     │
-│   ┌───────────────────────────────────┐     │
-│   │    Asia-Pacific                   │     │
-│   │    Ping: 142ms |  Pop: Medium    │     │
-│   └───────────────────────────────────┘     │
-│                                             │
-│   Server chosen is permanent. All players   │
-│   in a region share one universe.           │
-│                                             │
-└─────────────────────────────────────────────┘
-```
+**There is no server selection.** There is one single open world and every player in the game shares it.
 
-- Auto-recommends lowest ping region
-- One server per region — everyone in that region plays in the same universe
-- Permanent choice (no server hopping — preserves economy integrity)
-- Population indicator helps players pick active servers
-- Future: server transfer as paid service (with cooldown)
+**Single Universe Design:**
+- One persistent world for ALL players globally
+- No shards, no instances, no region splits
+- Every player sees the same galaxy, the same markets, the same resources
+- What one player does affects everyone — mine a deposit, it's gone for others too
+- The economy is truly global — one market, one OMEN supply, one leaderboard
+- First discoveries, relics, world boss kills — they happen once, for everyone
 
-**One Account, One Server — Strict Isolation:**
-- Each account is bound to exactly one server. Period
-- Players cannot create a second character on a different server with the same account
-- Creating a new account requires a different auth identity (different Apple ID / Google account / email)
-- Servers are completely isolated — no cross-server trade, chat, mail, or interaction of any kind
-- There is no cross-server travel, warp, or portal system. The universes do not connect
-- Server transfer moves EVERYTHING (character, ships, cargo, reputation, map, OMEN) and has a 6-month cooldown
-- This prevents: economy manipulation across servers, intelligence scouting on alt servers, resource arbitrage, and bypassing PvP consequences by fleeing to another server
+**Why One World:**
+- A single economy is more meaningful — supply and demand are real
+- First discoveries actually matter — you're first in the ENTIRE game, not just your shard
+- Player reputation carries weight — everyone knows the top traders, explorers, pirates
+- Territory control and faction wars affect the whole galaxy
+- The 1,000 Singularity Orb cap only works with one shared economy
+
+**Technical Approach:**
+- Distributed server architecture with regional edge nodes for low latency
+- Players auto-connect to nearest edge node — no selection needed
+- Edge nodes sync to central authoritative server for economy, map state, and persistence
+- Spatial partitioning: areas with high player density dynamically allocate more server resources
+- If extreme population requires it in the future: overflow layering for crowded cities only (same world, temporary visual separation, all actions still affect the shared state)
 
 ---
 
@@ -3975,12 +3960,12 @@ The player is now in-game. They're sitting in a damaged shuttle drifting in Uurf
 |------|--------|----------|------------------|
 | 1 | Splash screen + asset loading | 5-10s | Same |
 | 2 | Login (Apple/Google/Email) | 15-30s | Auto-skipped (saved session) |
-| 3 | Server selection | 5-10s | Auto-skipped (saved choice) |
+| 3 | ~~Server selection~~ | N/A | N/A (single world) |
 | 4 | Character creation | 30-60s | Auto-skipped |
 | 5 | Intro cinematic | 45-60s | Skippable |
 | 6 | Gameplay (Act 1.1) | ∞ | Resumes where they left off |
 
-**First-time total: ~2-3 minutes from app open to flying**
+**First-time total: ~2 minutes from app open to flying**
 **Returning player: ~10-15 seconds from app open to gameplay**
 
 ---
