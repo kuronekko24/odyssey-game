@@ -1,4 +1,27 @@
-# Odyssey - Setup Guide
+# Odyssey - Developer Setup Guide
+
+## Quick Start (Existing Developer)
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/kuronekko24/odyssey-game.git
+cd odyssey-game
+
+# 2. Open in Unreal Engine
+open Odyssey/Odyssey.uproject
+
+# 3. Build C++ code (in UE5 Editor)
+# Build menu → Build Solution (or Ctrl+Shift+B / Cmd+Shift+B)
+
+# 4. Run tests (in UE5 Editor)
+# Tools → Session Frontend → Automation → Filter: "Odyssey" → Run All
+
+# 5. Play in Editor
+# Click Play button or Alt+P for desktop preview
+# For mobile preview: Play → Mobile Preview (ES3.1)
+```
+
+---
 
 ## Prerequisites
 
@@ -20,9 +43,61 @@
    - Download: https://developer.android.com/studio
    - Install Android SDK and NDK via SDK Manager
 
+5. **Git & Git LFS**
+   ```bash
+   brew install git git-lfs
+   git lfs install
+   ```
+
 ---
 
-## Step 1: Install Unreal Engine
+## Step 1: Clone & Set Up Repository
+
+```bash
+# Clone the repository
+git clone https://github.com/kuronekko24/odyssey-game.git
+cd odyssey-game
+
+# Verify project structure
+ls Odyssey/Odyssey.uproject    # UE5 project file
+ls Odyssey/Source/Odyssey/     # C++ source code
+ls Docs/                       # Design documentation
+```
+
+### Project Structure Overview
+```
+odyssey-game/
+├── Odyssey/
+│   ├── Odyssey.uproject           # Open this in UE5
+│   ├── Config/                    # Engine & platform settings
+│   ├── Source/Odyssey/            # All C++ game code
+│   │   ├── Economy/               #   Dynamic economy simulation
+│   │   ├── Procedural/            #   Planet generation
+│   │   ├── Crafting/              #   Crafting & automation
+│   │   ├── Social/                #   Guilds & reputation
+│   │   ├── Combat/                #   Touch targeting & combat
+│   │   ├── Tests/                 #   776 automation tests
+│   │   │   ├── Combat/            #     167 combat tests
+│   │   │   ├── Social/            #     156 social tests
+│   │   │   ├── Procedural/        #     159 procedural tests
+│   │   │   ├── Crafting/          #     148 crafting tests
+│   │   │   └── Economy/           #     146 economy tests
+│   │   ├── NPC*.h/cpp             #   NPC ship systems
+│   │   ├── Odyssey*.h/cpp         #   Core game systems
+│   │   └── Odyssey.Build.cs       #   Build configuration
+│   └── Content/                   # Blueprints, data, assets
+├── Docs/
+│   ├── GDD.md                     # Game Design Document
+│   ├── TDD.md                     # Technical Design Document
+│   ├── Storyline.md               # Narrative & lore
+│   ├── OMEN_Cosmic_Expansion.md   # OMEN consciousness system
+│   └── SETUP.md                   # This file
+└── README.md
+```
+
+---
+
+## Step 2: Install Unreal Engine
 
 1. Open Epic Games Launcher
 2. Navigate to **Unreal Engine** tab
@@ -201,6 +276,230 @@ git add .gitattributes
 2. In Editor: **Platforms → iOS → Launch**
 3. Wait for build and Xcode deployment
 4. Verify game runs on device
+
+---
+
+## Running a Local Instance
+
+### Option A: Play in Editor (Fastest)
+
+1. Open `Odyssey/Odyssey.uproject` in Unreal Engine 5.4+
+2. Wait for shaders to compile (first launch takes a few minutes)
+3. Click **Play** button (or press `Alt+P`)
+4. Game runs in the editor viewport with full debug capabilities
+
+### Option B: Mobile Preview in Editor
+
+1. In UE5 Editor toolbar: **Play → Mobile Preview (ES3.1)**
+2. Simulates mobile rendering pipeline on desktop
+3. Touch controls simulated with mouse clicks
+4. Good for testing mobile optimization without a device
+
+### Option C: Standalone Game Window
+
+1. In UE5 Editor: **Play → Standalone Game**
+2. Launches in a separate window at target resolution
+3. Better performance testing than in-editor play
+4. Close window to stop (or press `Esc`)
+
+### Option D: Package for Device
+
+**Android:**
+```bash
+# In UE5 Editor: Platforms → Android → Package Project
+# Or via command line:
+/path/to/UE5/Engine/Build/BatchFiles/RunUAT.sh BuildCookRun \
+  -project="$HOME/dev/Odyssey/Odyssey/Odyssey.uproject" \
+  -platform=Android -clientconfig=Development -cook -build -stage -pak -package
+```
+
+**iOS (Mac only):**
+```bash
+# In UE5 Editor: Platforms → iOS → Package Project
+# Requires Apple Developer account and provisioning profile
+```
+
+---
+
+## Building the C++ Code
+
+### From UE5 Editor
+1. Open `Odyssey.uproject`
+2. If prompted to rebuild, click **Yes**
+3. Manual rebuild: **Build → Build Solution** or `Ctrl+Shift+B` (Win) / `Cmd+Shift+B` (Mac)
+4. Check **Output Log** for compilation errors
+
+### From Command Line (Advanced)
+
+**Mac:**
+```bash
+# Generate Xcode project files
+/path/to/UE5/Engine/Build/BatchFiles/Mac/GenerateProjectFiles.sh \
+  "$HOME/dev/Odyssey/Odyssey/Odyssey.uproject" -game
+
+# Build via Xcode
+xcodebuild -project Odyssey.xcodeproj -scheme OdysseyEditor -configuration Development build
+```
+
+**Windows:**
+```bash
+# Generate Visual Studio project files
+"C:\Program Files\Epic Games\UE_5.4\Engine\Build\BatchFiles\GenerateProjectFiles.bat" ^
+  "C:\dev\Odyssey\Odyssey\Odyssey.uproject" -game
+
+# Build via MSBuild
+MSBuild.exe Odyssey.sln /t:Build /p:Configuration="Development Editor"
+```
+
+### Build Configurations
+
+| Config | Use Case | Performance | Debugging |
+|--------|----------|-------------|-----------|
+| **Development** | Day-to-day coding | Good | Full debug |
+| **DebugGame** | Deep debugging | Slow | Maximum info |
+| **Shipping** | Release builds | Maximum | None |
+
+---
+
+## Running the Test Suite
+
+### From UE5 Editor (Recommended)
+
+1. Open **Tools → Session Frontend** (or `Window → Developer Tools → Session Frontend`)
+2. Click the **Automation** tab
+3. In the test filter, type `Odyssey` to see all 776 tests
+4. Filter by system:
+   - `Odyssey.Combat` → 167 combat tests
+   - `Odyssey.Social` → 156 social tests
+   - `Odyssey.Economy` → 146 economy tests
+   - `Odyssey.Procedural` → 159 procedural tests
+   - `Odyssey.Crafting` → 148 crafting tests
+5. Check the tests you want to run and click **Start Tests**
+6. Results appear in the panel with pass/fail indicators
+
+### From Command Line (CI/Headless)
+
+```bash
+# Run all Odyssey tests headless
+/path/to/UE5/Engine/Binaries/Mac/UnrealEditor-Cmd \
+  "$HOME/dev/Odyssey/Odyssey/Odyssey.uproject" \
+  -ExecCmds="Automation RunTests Odyssey" \
+  -Unattended -NullRHI -NoSound -NoSplash \
+  -log -ReportOutputPath="$HOME/dev/Odyssey/TestResults"
+
+# Run specific system tests
+/path/to/UE5/Engine/Binaries/Mac/UnrealEditor-Cmd \
+  "$HOME/dev/Odyssey/Odyssey/Odyssey.uproject" \
+  -ExecCmds="Automation RunTests Odyssey.Combat" \
+  -Unattended -NullRHI -NoSound -NoSplash
+
+# Run with JUnit XML output (for CI integration)
+/path/to/UE5/Engine/Binaries/Mac/UnrealEditor-Cmd \
+  "$HOME/dev/Odyssey/Odyssey/Odyssey.uproject" \
+  -ExecCmds="Automation RunTests Odyssey; Quit" \
+  -Unattended -NullRHI -TestExit="Automation Test Queue Empty" \
+  -ReportExportPath="$HOME/dev/Odyssey/TestResults"
+```
+
+### Test Organization
+
+```
+Odyssey/Source/Odyssey/Tests/
+├── Combat/          # 9 files, 167 tests
+│   ├── NPCHealthComponentTests.cpp
+│   ├── OdysseyDamageProcessorTests.cpp
+│   ├── NPCShipTests.cpp
+│   ├── NPCBehaviorComponentTests.cpp
+│   ├── TouchTargetingSystemTests.cpp
+│   ├── AutoWeaponSystemTests.cpp
+│   ├── NPCSpawnManagerTests.cpp
+│   ├── CombatFeedbackSystemTests.cpp
+│   └── CombatIntegrationTests.cpp
+├── Social/          # 6 files, 156 tests
+│   ├── GuildManagerTests.cpp
+│   ├── ReputationSystemTests.cpp
+│   ├── ContractSystemTests.cpp
+│   ├── GuildEconomyTests.cpp
+│   ├── CooperativeProjectTests.cpp
+│   └── SocialIntegrationTests.cpp
+├── Economy/         # 8 files, 146 tests
+│   ├── MarketDataComponentTest.cpp
+│   ├── PriceFluctuationSystemTest.cpp
+│   ├── TradeRouteAnalyzerTest.cpp
+│   ├── EconomicEventSystemTest.cpp
+│   ├── EconomySaveSystemTest.cpp
+│   ├── EconomyRippleEffectTest.cpp
+│   ├── EconomyPerformanceTest.cpp
+│   └── EconomyIntegrationTest.cpp
+├── Procedural/      # 7 files, 159 tests
+│   ├── PlanetGenerationTests.cpp
+│   ├── ResourceDistributionTests.cpp
+│   ├── BiomeDefinitionTests.cpp
+│   ├── ExplorationRewardTests.cpp
+│   ├── PlanetaryEconomyTests.cpp
+│   ├── PerformanceTests.cpp
+│   └── ProceduralIntegrationTests.cpp
+└── Crafting/        # 7 files, 148 tests
+    ├── OdysseyRecipeSystemTests.cpp
+    ├── OdysseyCraftingManagerTests.cpp
+    ├── OdysseyQualityControlTests.cpp
+    ├── OdysseyAutomationNetworkTests.cpp
+    ├── OdysseyCraftingSkillTests.cpp
+    ├── OdysseyProductionChainPlannerTests.cpp
+    └── OdysseyCraftingIntegrationTests.cpp
+```
+
+---
+
+## Development Workflow
+
+### Daily Development Cycle
+
+```bash
+# 1. Pull latest changes
+cd ~/dev/Odyssey
+git pull
+
+# 2. Open project in UE5
+open Odyssey/Odyssey.uproject
+
+# 3. Make changes in C++ source or Blueprints
+
+# 4. Build and test
+# Build: Ctrl+Shift+B (Editor)
+# Test: Tools → Session Frontend → Automation → Run
+
+# 5. Commit and push after every feature
+git add .
+git commit -m "Brief description of changes"
+git push
+```
+
+### Adding New Systems
+
+1. Create `.h` and `.cpp` files in appropriate subdirectory under `Source/Odyssey/`
+2. Add corresponding test file in `Tests/<SystemName>/`
+3. Follow existing patterns (component-based, event-driven)
+4. Run full test suite before committing
+5. Update documentation if adding major features
+
+### Code Architecture Patterns
+
+**Component-Based Design:**
+- All gameplay systems are UActorComponents
+- Attach to actors for modular functionality
+- Communicate through UE5 delegates and the OdysseyEventBus
+
+**Event-Driven Architecture:**
+- Systems communicate through events, not direct references
+- Use OdysseyEventBus for cross-system communication
+- Keeps systems decoupled and testable
+
+**Mobile-First Optimization:**
+- Performance tier system (High/Medium/Low)
+- Object pooling for frequently spawned actors
+- Distance-based LOD for NPC behavior
+- Staggered updates to prevent frame spikes
 
 ---
 
