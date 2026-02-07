@@ -1151,6 +1151,104 @@ All equipment is player-crafted and has tiers (T1-T8).
 - Fleet size limited by Command skill
 - Ships in fleet consume fuel when traveling
 
+### Ground Vehicles
+
+Ground vehicles operate exclusively on planet surfaces. They cannot leave atmosphere or fly — they are wheeled/tracked/hover craft built for terrain traversal, heavy hauling, and specialized extraction that mining craft can't do efficiently.
+
+#### Why Ground Vehicles?
+
+```
+Mining Craft (Nimbus)              Ground Vehicles
+├── Flies, fast traversal          ├── Surface only, slower
+├── Light mining (laser)           ├── Heavy extraction (drills, rigs)
+├── Small-medium cargo             ├── Massive cargo capacity
+├── Fuel-hungry                    ├── Fuel-efficient
+├── Vulnerable in air              ├── Armored, durable
+└── Scout & extract                └── Haul & process
+```
+
+Players use their Nimbus to scout deposits from the air, then deploy ground vehicles for heavy-duty extraction and transport.
+
+#### Vehicle Classes
+
+| Class | Type | Role | Cargo | Speed | Crew |
+|-------|------|------|-------|-------|------|
+| **Rover** | Wheeled | Light recon, personnel transport | 50 | Fast | 1 |
+| **Hauler** | Wheeled/Tracked | Bulk cargo transport between sites | 2,000 | Medium | 1 |
+| **Bore Rig** | Tracked | Deep core extraction, stationary mining | 500 | Very Slow | 1 |
+| **Crawler** | Tracked | Mobile refinery, processes ore on-site | 300 | Slow | 1 |
+| **Armored Transport** | Hover | Armed escort, PvP zone hauling | 800 | Medium | 1-2 |
+| **Mega Hauler** | Tracked | Massive cargo runs between outpost and landing zone | 10,000 | Very Slow | 1 |
+
+#### Vehicle Controls (Mobile)
+
+Ground vehicles use the same dual-stick layout as mining craft, adapted for surface movement:
+
+- **Left Thumb**: Steering + throttle
+- **Right Thumb**: Camera/turret control
+- **Terrain Indicator**: Shows slope angle and surface type
+- **Traction Warning**: Alerts when losing grip on steep/icy terrain
+
+#### Ground Vehicle Mechanics
+
+**Terrain Interaction:**
+- Vehicles handle differently on rock, sand, ice, mud, and volcanic terrain
+- Steep slopes slow vehicles or cause sliding (tracked vehicles handle better)
+- Some terrain is impassable — players must find paths or switch to Nimbus
+- Weather affects traction (rain → mud, storms → reduced visibility)
+
+**Deployment:**
+- Ground vehicles are stored in a **Vehicle Bay** at landing zones or outposts
+- Players can own multiple vehicles, swap at any Vehicle Bay
+- Vehicles can be dropped from orbit by Nimbus (deploy from ship cargo, one-way)
+- Destroyed vehicles must be rebuilt or repaired at a Vehicle Bay
+
+**Fuel & Maintenance:**
+- Ground vehicles use **Ground Fuel Cells** (cheaper than ship fuel)
+- Fuel consumption based on weight, terrain difficulty, and speed
+- Equipment degrades same as ship equipment (uses the durability system)
+- Field repairs possible with standard repair kits
+
+#### Ground Vehicle Equipment
+
+| Slot | Equipment | Function |
+|------|-----------|----------|
+| **Drill** | Mining drill (Bore Rig only) | Deep core extraction — accesses deposits mining lasers can't reach |
+| **Processing Unit** | Mobile refinery (Crawler only) | Refine raw ore on-site, saves return trips |
+| **Cargo Module** | Expanded storage | Increase cargo capacity |
+| **Armor Plating** | Defensive hull | Protection from creatures and PvP |
+| **Turret** | Defensive weapon | Auto-targets hostile fauna, manual aim for PvP |
+| **Winch** | Recovery tool | Tow disabled vehicles, pull cargo pods |
+| **Terrain Scanner** | Ground-penetrating radar | Reveals underground deposits invisible to air scanners |
+
+#### Ground Vehicle Tiers
+
+Ground vehicles follow the same T1-T8 tier system as ships.
+
+| Tier | Materials | Availability | Notes |
+|------|-----------|-------------|-------|
+| T1-T2 | Common metals | Starter planets | Basic stats, common terrain only |
+| T3-T4 | Industrial alloys | Mid-game planets | Better traction, more cargo |
+| T5-T6 | Rare composites | Full PvP zones | Armored options, all-terrain |
+| T7-T8 | Exotic materials | Hardcore/Endgame | Maximum performance, self-repair capability |
+
+#### Ground vs Air Gameplay Loop
+
+```
+1. Fly Nimbus over planet surface
+2. Scanner detects surface deposit → mine with laser from air (quick, light yield)
+3. Scanner detects DEEP deposit → cannot mine from air
+4. Land at nearest Vehicle Bay
+5. Deploy Bore Rig → drive to deep deposit → extract heavy resources
+6. Load Hauler → transport ore back to landing zone
+7. Load cargo onto Nimbus → fly to city to sell/craft
+```
+
+**Deep deposits** are richer and contain rarer materials than surface deposits, but they require ground vehicles to access. This creates a natural progression:
+- **Early game**: Fly and mine from the air, surface deposits only
+- **Mid game**: Start using ground vehicles for deep extraction
+- **Late game**: Coordinated operations with multiple vehicles feeding materials to a Crawler for on-site refining
+
 ---
 
 ## Economy & Markets
