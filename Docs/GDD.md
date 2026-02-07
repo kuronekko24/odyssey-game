@@ -894,6 +894,112 @@ Raw Ore → [Refinery] → Refined Metal → [Fabricator] → Components → [As
 
 ---
 
+## Equipment Degradation & Repair
+
+All equipment wears down through use, damage, and environmental exposure. This system is a core material sink that keeps the crafting economy alive.
+
+### Durability System
+
+Every piece of equipment has a **Durability (DUR)** stat measured as a percentage.
+
+| Durability | Status | Effect |
+|------------|--------|--------|
+| 100-76% | **Pristine** | Full performance |
+| 75-51% | **Worn** | -5% efficiency |
+| 50-26% | **Damaged** | -15% efficiency, visual wear |
+| 25-11% | **Critical** | -30% efficiency, malfunction chance |
+| 10-1% | **Failing** | -50% efficiency, frequent malfunctions |
+| 0% | **Broken** | Non-functional, must be repaired before use |
+
+### What Causes Degradation
+
+| Source | Rate | Affected Equipment |
+|--------|------|--------------------|
+| **Normal Use** | Slow (0.1-0.5% per session) | Mining lasers, engines, scanners |
+| **Combat Damage** | Moderate (1-5% per engagement) | Shields, armor, weapons |
+| **Environmental Exposure** | Variable (0.5-3% per hazard) | Hull, life support, sensors |
+| **Overheating** | Fast (2-5% per overheat event) | Mining lasers, weapons |
+| **Overloading** | Fast (3-8% per overload) | Engines, shields, cargo systems |
+| **Crash/Collision** | Sudden (5-20% per impact) | Hull, thrusters, cargo |
+
+### Malfunction System
+
+Below 25% durability, equipment can malfunction during use:
+
+| Equipment | Malfunction Effect |
+|-----------|--------------------|
+| **Mining Laser** | Beam cuts out mid-extraction, loses partial yield |
+| **Engines** | Random thrust loss, speed drops temporarily |
+| **Shields** | Shield flickers, brief vulnerability windows |
+| **Weapons** | Misfires, reduced rate of fire |
+| **Scanners** | False readings, reduced range |
+| **Cargo Bay** | Containers leak, slow resource loss |
+
+### Repair Methods
+
+#### Field Repair (While Flying)
+- Uses **Repair Kits** (crafted consumable)
+- Restores 10-25% durability depending on kit tier
+- Takes 10-30 seconds (player must hover/stop)
+- Cannot repair above 80% durability
+- Limited by repair kit inventory
+
+| Kit Tier | Materials | Restores | Craftable At |
+|----------|-----------|----------|--------------|
+| T1 Basic | Ferrite + Polymer Resin | 10% | Portable Workbench |
+| T3 Standard | Tritanium Alloy + Ceramics | 15% | Fabricator |
+| T5 Advanced | Neodyne Composite + Quantum Polymer | 20% | Fabricator |
+| T7 Expert | Phase-Shift Alloy + Adaptive Plates | 25% | Assembly Bay |
+
+#### Station Repair (At Dock)
+- Full repair to 100% durability
+- Costs OMEN based on equipment tier and damage level
+- Instant for minor damage, time-gated for severe damage
+- Available at any city or outpost with repair facilities
+
+| Damage Level | Cost Multiplier | Repair Time |
+|--------------|-----------------|-------------|
+| Worn (75-51%) | 1x base cost | Instant |
+| Damaged (50-26%) | 3x base cost | 5 min |
+| Critical (25-11%) | 6x base cost | 15 min |
+| Failing/Broken (10-0%) | 10x base cost | 30 min |
+
+#### Player Repair (Crafting Skill)
+- Players with Maintenance skill can repair equipment anywhere
+- Uses raw materials instead of repair kits
+- Can repair to 100% at higher skill tiers
+- More cost-effective but requires inventory space for materials
+- Maintenance skill tree unlocks better repair efficiency
+
+### Permanent Degradation
+
+Repeated full repairs gradually lower an item's **Maximum Durability**.
+
+| Repairs from Broken | Max Durability Loss |
+|---------------------|---------------------|
+| 1st time | -2% max durability |
+| 2nd time | -3% max durability |
+| 3rd time | -5% max durability |
+| 4th+ time | -5% each |
+
+- Items that reach **50% max durability** are permanently **Worn** and cannot be fully restored
+- Items that reach **0% max durability** are **Destroyed** permanently
+- Higher-tier equipment degrades slower and has more repair cycles before destruction
+- This creates consistent demand for newly crafted replacements
+
+### Economy Impact
+
+```
+Equipment wears out → Players need repairs → Repair kits consume materials
+                                           → Station repairs consume OMEN
+          ↓
+Equipment eventually destroyed → Players need replacements → Crafters build new gear
+          ↓                                                → Miners gather materials
+Destroyed items exit economy → Prevents item inflation → Maintains crafting demand
+```
+
+---
+
 ## Automation & Drones
 
 ### Drone Types
@@ -1728,15 +1834,163 @@ Players can place bounties on enemies.
 
 ---
 
-### Threats (PvE Combat)
+### PvE Content & Threats
 
-| Threat | Location | Danger | Drops |
-|--------|----------|--------|-------|
-| **Pirates** | Trade routes, belts | Medium | Salvage, OMEN |
-| **Drones (hostile)** | Abandoned stations | Low-Medium | Components |
-| **Creatures** | Planet surfaces | Varies | Organics, rare mats |
-| **World Bosses** | Scheduled spawns | Very High | T6-T8 loot |
-| **Anomalies** | Random spawns | Extreme | Exotic materials |
+The galaxy is alive with threats beyond other players. PvE content provides consistent gameplay for all zones and feeds into the crafting/economy loop through unique drops.
+
+---
+
+#### NPC Pirates
+
+Organized criminal factions that patrol trade routes and mining areas. Each faction has distinct behavior, ship compositions, and territory.
+
+**Pirate Factions:**
+
+| Faction | Territory | Behavior | Ship Types | Signature Drops |
+|---------|-----------|----------|------------|-----------------|
+| **Rust Wolves** | Sol Proxima outer, Vulcan Belt | Aggressive, swarm tactics | XS-S frigates, fast interceptors | Salvaged components, stolen cargo |
+| **Void Syndicate** | Glacius, Outer Ring | Calculated, ambush predators | M cruisers, cloaked scouts | E-War modules, stealth tech |
+| **Korvani Exiles** | Aridian Reach, Uncharted | Honorable combat, strong ships | M-L warships, heavy armor | Korvani weapons, rare alloys |
+| **Ghosts of Spira** | Vulcan Belt, trade routes | Hit-and-run, cargo theft | S-M raiders, fast haulers | Industrial components, OMEN |
+
+**Pirate Behavior Patterns:**
+- **Patrol**: Move along set routes, engage players who enter detection range
+- **Ambush**: Wait at chokepoints (asteroid fields, canyon exits, gate approaches)
+- **Raid**: Timed attacks on mining operations and trade convoys
+- **Escalation**: Defeating pirates draws reinforcements (wave-based encounters)
+- **Retreat**: Damaged pirates attempt to flee, can be pursued for bonus loot
+
+**Pirate Difficulty Scaling:**
+
+| Zone | Pirate Tier | Fleet Size | Aggression |
+|------|-------------|------------|------------|
+| Friendly | None | - | - |
+| Mild | T1-T3 | 1-3 ships | Low (attack if provoked) |
+| Full | T3-T6 | 3-6 ships | Medium (attack on sight) |
+| Hardcore | T5-T8 | 5-12 ships | High (hunt actively) |
+
+---
+
+#### Hostile Fauna
+
+Planet surfaces host dangerous creatures that guard valuable resource deposits. Players encounter them while piloting mining craft.
+
+| Creature | Planet Type | Behavior | Threat Level | Drops |
+|----------|------------|----------|--------------|-------|
+| **Burrowers** | Terrestrial | Erupt from ground near mining sites | Low | Organic compounds, chitin |
+| **Skyrazors** | Terrestrial, Volcanic | Aerial predators, attack craft in flight | Medium | Aerogel membranes, sharp talons |
+| **Magma Crawlers** | Volcanic | Slow but extremely durable, AOE heat damage | Medium | Heat-resistant organics, molten core |
+| **Frost Wyrms** | Ice World | Ambush from ice, freeze weapons/engines | High | Cryo-enzymes, crystal fangs |
+| **Void Leeches** | Gas Giant Moons | Attach to hull, drain fuel and shields | Medium | Energy sacs, void residue |
+| **Lithivores** | Barren/Asteroid | Consume minerals, compete for resources | Low | Pre-processed ore, mineral gut |
+| **Apex Predators** | Any (rare spawn) | Territorial alpha, massive HP pool | Very High | Rare organics, trophy items |
+
+**Creature Mechanics:**
+- Creatures spawn near high-value resource deposits (risk/reward)
+- Players can fight or flee - combat while piloting uses ship weapons
+- Some creatures can be scared off with specific equipment (sonic emitters, flares)
+- Creature nests can be cleared for uncontested mining access (temporary)
+- Rare creature variants drop crafting materials unavailable elsewhere
+
+---
+
+#### Derelict Sites & Ancient Ruins
+
+Explorable locations scattered across the galaxy. Players pilot their craft to these sites and dock/land to explore.
+
+**Derelict Ships:**
+- Abandoned vessels from the Spira Conflict era, lost expeditions, or pirate hideouts
+- Found via scanner anomalies or purchased star charts
+- Contain salvageable components, data logs, and hidden caches
+- Some are trapped or infested with hostile drones/creatures
+- Larger derelicts have multiple sections to explore across sessions
+
+| Derelict Type | Location | Content | Rewards |
+|---------------|----------|---------|---------|
+| **Cargo Wreck** | Trade routes | 1-2 rooms, quick salvage | Random cargo, repair materials |
+| **Military Frigate** | Conflict zones | 3-5 rooms, hostile drones | Military-grade components, weapons |
+| **Research Vessel** | Deep space | 4-8 rooms, puzzles + hazards | Blueprints, research data, prototypes |
+| **Colony Ship Fragment** | Uncharted | 8-15 rooms, multi-session | Exodus-era artifacts, lore, rare tech |
+
+**Ancient Ruins (Precursor Sites):**
+- Remnants of the Absent Ones' civilization
+- Found on planet surfaces in remote, hazardous locations
+- Contain unique puzzles tied to Precursor technology
+- Rewards include Precursor blueprints and Ethercrystal-based components
+- Some ruins are one-time discoveries; others reset on a weekly timer
+
+| Ruin Type | Difficulty | Puzzle Type | Rewards |
+|-----------|-----------|-------------|---------|
+| **Signal Beacon** | Easy | Frequency matching | Star charts, scanner upgrades |
+| **Power Node** | Medium | Energy routing puzzle | Precursor components, power cells |
+| **Data Vault** | Hard | Decryption sequence | Rare blueprints, lore fragments |
+| **Gateway Fragment** | Very Hard | Multi-stage mechanical + logic | T7-T8 Precursor tech, Void Essence |
+
+---
+
+#### World Bosses
+
+Massive threats that spawn on scheduled timers. Require group coordination to defeat. Server-wide announcement when they appear.
+
+| Boss | Location | Spawn Timer | Min Players | Mechanic |
+|------|----------|-------------|-------------|----------|
+| **The Dreadnought** | Vulcan Belt asteroid field | Every 6 hours | 5-10 | Massive pirate capital ship with shield phases. Players must destroy shield generators on different hull sections while dodging broadside volleys |
+| **Hive Mother** | Glacius deep caves | Every 8 hours | 3-8 | Giant creature spawns endless swarms. Players must lure it out of its nest by destroying egg clusters, then focus fire during rage phases |
+| **The Revenant** | Uncharted Space (random) | Every 12 hours | 8-15 | Precursor automated warship. Adapts to player tactics - switches weapon types, deploys counter-drones. Must use varied damage types |
+| **Storm Colossus** | Aridian Reach dust storms | Every 4 hours | 3-6 | Living electrical storm entity. Only vulnerable during discharge cycles. Players must bait lightning strikes to create damage windows |
+
+**World Boss Rewards:**
+- Guaranteed T6+ equipment drop for all participants
+- Boss-specific crafting materials for unique recipes
+- OMEN bounty split among contributors (based on damage/healing contribution)
+- Rare cosmetic drops (boss trophies, ship skins)
+- Weekly lockout on guaranteed drops to prevent farming
+
+---
+
+#### Anomalies & Dynamic Events
+
+Random events that appear across the galaxy, creating emergent gameplay moments.
+
+**Anomaly Types:**
+
+| Anomaly | Frequency | Duration | Content |
+|---------|-----------|----------|---------|
+| **Asteroid Storm** | Common | 10-20 min | Dense asteroid field appears, rich in minerals but dangerous to navigate. Piloting skill = better yield |
+| **Distress Signal** | Common | 15 min | NPC ship under attack. Rescue for reputation + rewards, or loot the wreckage |
+| **Pirate Blockade** | Uncommon | 30 min | Pirates lock down a jump gate. Players must fight through or find alternate route |
+| **Resource Surge** | Uncommon | 20 min | Massive resource deposit surfaces temporarily. Race against other players to mine it |
+| **Void Rift** | Rare | 45 min | Tear in space spawns Precursor drones. High difficulty, exotic material drops |
+| **Ghost Ship** | Very Rare | 60 min | One of the five lost arkships detected. Explore for Exodus-era artifacts and deep lore |
+
+**Dynamic Event Rules:**
+- Events are visible on system-wide scanner
+- Multiple players can participate (shared rewards based on contribution)
+- Events in PvP zones can create intense competition
+- Some events chain into multi-part sequences across sessions
+- Event difficulty scales with number of participating players
+
+---
+
+#### NPC Spawn & Behavior System
+
+**Spawn Rules:**
+- NPCs have designated patrol routes and spawn zones per system
+- Spawn density increases in higher-risk zones
+- Cleared NPCs respawn after 5-15 minutes (zone-dependent)
+- NPCs do not spawn within 1km of city safe zones
+- Elite/rare NPCs have longer respawn timers (1-4 hours)
+
+**AI Behavior Tiers:**
+
+| AI Tier | Behavior | Found In |
+|---------|----------|----------|
+| **Basic** | Fly straight, shoot nearest target, no evasion | Friendly/Mild |
+| **Standard** | Use cover, focus fire, basic formations | Mild/Full |
+| **Advanced** | Coordinate attacks, use E-War, call reinforcements | Full/Hardcore |
+| **Elite** | Adaptive tactics, exploit player weaknesses, retreat and regroup | Hardcore/Bosses |
+
+---
 
 ### Zone System
 
@@ -2108,6 +2362,178 @@ This Fleet Battle System creates a multi-layered economy where players invest in
 - Player shops in cities
 - Contract system (hire other players)
 - Chat, friends list
+
+---
+
+## Quest System
+
+Quests give players purpose, direction, and rewards for flying their mining craft across the galaxy. The system blends handcrafted story missions with procedurally generated contracts for infinite replayability.
+
+---
+
+### Quest Sources
+
+| Source | Location | Quest Types | Refresh Rate |
+|--------|----------|-------------|--------------|
+| **Mission Board** | Every city/outpost | Contracts, bounties, deliveries | Every 4 hours |
+| **NPC Contacts** | City interiors | Story missions, faction quests | On progression |
+| **Distress Signals** | Open space (scanner) | Rescue, salvage, combat | Dynamic spawns |
+| **Exploration** | Planet surfaces | Discovery, ruins, hidden caches | On discovery |
+| **Faction Representatives** | Faction HQs in cities | Reputation quests, exclusive contracts | Daily |
+| **Player Contracts** | Market terminal | Player-created jobs (escort, haul, craft) | Player-driven |
+
+---
+
+### Quest Types
+
+#### Mining Contracts
+The bread and butter. NPCs and corporations need specific resources.
+
+| Contract | Task | Difficulty | Typical Reward |
+|----------|------|------------|----------------|
+| **Supply Order** | Deliver X units of a specific ore | Easy | OMEN + small XP |
+| **Rush Extraction** | Mine a deposit within a time limit | Medium | 2x OMEN + XP |
+| **Deep Core Sample** | Extract from a specific hazardous location | Hard | OMEN + rare blueprint |
+| **Prospecting Survey** | Scan and catalog deposits in an unexplored area | Medium | Star charts + scanner data + XP |
+| **Bulk Haul** | Fill cargo with mixed resources, deliver to distant city | Easy-Medium | Large OMEN payout |
+
+#### Combat Missions
+Clear threats, protect assets, hunt targets.
+
+| Mission | Task | Difficulty | Typical Reward |
+|---------|------|------------|----------------|
+| **Pirate Bounty** | Destroy X pirate ships in a zone | Medium | OMEN + bounty bonus |
+| **Nest Clearing** | Eliminate creature nest near a mining site | Medium | OMEN + exclusive mining access |
+| **Escort Duty** | Protect NPC hauler from point A to B | Hard | OMEN + reputation |
+| **Elimination** | Hunt a specific elite NPC pirate captain | Very Hard | Large OMEN + rare equipment |
+| **Defense Contract** | Defend outpost from timed pirate raid (wave-based) | Hard | OMEN + outpost discount |
+
+#### Exploration Missions
+Discover the unknown. Rewards curiosity and skilled piloting.
+
+| Mission | Task | Difficulty | Typical Reward |
+|---------|------|------------|----------------|
+| **Uncharted Survey** | Fly to and scan 3-5 unmarked locations | Medium | Star charts + XP |
+| **Signal Trace** | Follow a signal chain across multiple waypoints | Medium-Hard | Blueprint fragment + lore |
+| **Ruin Investigation** | Locate and explore a Precursor site | Hard | Precursor tech + XP |
+| **Lost Ship Recovery** | Find a missing vessel using clues | Hard | Salvage rights + OMEN |
+| **Cartography** | Map a dangerous region by flying through it | Medium | Permanent map data + XP |
+
+#### Delivery & Logistics
+Transport goods between locations. Tests route planning and piloting.
+
+| Mission | Task | Difficulty | Typical Reward |
+|---------|------|------------|----------------|
+| **Standard Delivery** | Haul cargo from city A to city B | Easy | OMEN (distance-based) |
+| **Priority Shipment** | Time-limited delivery across systems | Medium | 3x OMEN |
+| **Fragile Cargo** | Deliver without taking any damage | Hard | OMEN + reputation |
+| **Smuggling Run** | Deliver contraband through pirate territory | Very Hard | Large OMEN + black market access |
+| **Multi-Stop Route** | Deliver to 3-5 locations in sequence | Medium | OMEN + fuel vouchers |
+
+---
+
+### Procedural Quest Generation
+
+Most contracts are generated by the system based on the current state of the game world.
+
+**Generation Factors:**
+- **Market Demand**: If a resource is scarce, mining contracts for it appear with higher payouts
+- **Zone Activity**: Low-activity zones generate exploration quests to draw players in
+- **Pirate Density**: High pirate areas spawn more bounty and defense contracts
+- **Player Tier**: Contracts scale to the player's progression level
+- **Time of Day**: Different contract mixes during peak vs off-peak hours
+
+**Scaling Formula:**
+```
+Quest Reward = Base Reward × Zone Multiplier × Difficulty Modifier × Demand Bonus
+
+Zone Multiplier:  Friendly 1.0 | Mild 1.5 | Full 2.5 | Hardcore 5.0
+Difficulty Mod:   Easy 1.0 | Medium 1.5 | Hard 2.5 | Very Hard 4.0
+Demand Bonus:     Normal 1.0 | High 1.3 | Critical 1.8
+```
+
+---
+
+### Daily & Weekly Missions
+
+Structured recurring content that gives players consistent goals.
+
+#### Daily Missions (Reset every 24h)
+Players receive **3 daily missions** from a randomized pool. Completing all 3 grants a bonus.
+
+| Slot | Example Missions | Reward |
+|------|------------------|--------|
+| **Mission 1** | Mine 100 units of any ore / Destroy 5 pirates / Complete 1 delivery | 500 OMEN + 50 XP |
+| **Mission 2** | Explore 2 new locations / Craft 3 repair kits / Travel to another system | 750 OMEN + 75 XP |
+| **Mission 3** | Complete any 2 contracts / Sell goods worth 2000 OMEN / Dock at 3 different stations | 1000 OMEN + 100 XP |
+| **Daily Bonus** | Complete all 3 | 2000 OMEN + 200 XP + 1 random blueprint |
+
+#### Weekly Missions (Reset every 7 days)
+Longer-term goals that encourage diverse play.
+
+| Mission | Task | Reward |
+|---------|------|--------|
+| **Weekly Mining** | Extract 1000 total units of resources | 5000 OMEN + T3 repair kit bundle |
+| **Weekly Combat** | Defeat 25 hostile NPCs | 5000 OMEN + combat module crate |
+| **Weekly Explorer** | Visit 10 unique locations | 5000 OMEN + rare star chart |
+| **Weekly Trader** | Complete 10 delivery contracts | 5000 OMEN + trade reputation boost |
+| **Weekly Bonus** | Complete all 4 weekly missions | 15000 OMEN + guaranteed rare blueprint |
+
+---
+
+### Faction Reputation & Quests
+
+Three NPC factions offer exclusive questlines. Higher reputation unlocks better contracts and unique rewards.
+
+#### Reputation Tiers
+
+| Tier | Standing | Unlock |
+|------|----------|--------|
+| 0 | **Unknown** | Basic contracts only |
+| 1 | **Recognized** | Standard contracts, faction shop access |
+| 2 | **Trusted** | Advanced contracts, 5% shop discount |
+| 3 | **Honored** | Elite contracts, 10% shop discount, faction cosmetic |
+| 4 | **Revered** | Exclusive contracts, 15% shop discount, faction ship skin |
+| 5 | **Champion** | Faction title, 20% shop discount, unique equipment, faction storyline finale |
+
+#### Faction Questlines
+
+**Human Coalition (Commerce & Industry)**
+- Focus: Mining efficiency, trade routes, infrastructure
+- Questline: Rebuild trade networks disrupted by the Spira Conflict
+- Unique Rewards: Mining yield bonuses, trade fee reductions, industrial blueprints
+
+**Veth Wanderers (Knowledge & Exploration)**
+- Focus: Discovery, scanning, Precursor research
+- Questline: Follow Veth star charts to uncover Absent Ones' secrets
+- Unique Rewards: Scanner upgrades, exploration bonuses, Precursor blueprint fragments
+
+**Korvani Clans (Combat & Honor)**
+- Focus: Combat prowess, bounty hunting, territory defense
+- Questline: Prove your worth through increasingly dangerous combat trials
+- Unique Rewards: Korvani weapons, combat stat bonuses, access to Korvani-guarded zones
+
+**Reputation Rules:**
+- Gaining reputation with one faction does NOT reduce reputation with others
+- Faction quests require minimum tier standing to accept
+- Some high-tier quests have branching choices that grant bonus reputation
+- Reputation decays slowly if faction quests are ignored for 30+ days (nudge to stay engaged)
+
+---
+
+### Quest UI
+
+**In-Flight Quest Tracker:**
+- Active quest objective displayed on HUD (top-left)
+- Waypoint marker in 3D space pointing to objective
+- Distance and estimated flight time shown
+- Quick-swap between tracked quests via gesture
+
+**Mission Board Interface:**
+- Available contracts listed with filters (type, difficulty, reward, distance)
+- Contract details show: objective, location, time limit, rewards, recommended tier
+- Accept up to **5 active quests** simultaneously
+- Abandon penalty: 1-hour cooldown before same contract type reappears
 
 ---
 
