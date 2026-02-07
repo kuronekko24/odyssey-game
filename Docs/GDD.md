@@ -3219,29 +3219,311 @@ Random spawning connections to distant or hidden locations.
 
 ---
 
-### Navigation Interface
+### Galaxy Map & Exploration Reveal
 
-#### Star Map
+The galaxy map is a **fog-of-war system** — the universe starts mostly hidden and reveals itself as the player explores. Explored areas show progressively more detail based on how thoroughly the player has surveyed them.
 
-| Feature | Function |
-|---------|----------|
-| **System View** | Current system, planets, gates, stations |
-| **Galaxy View** | All systems, connections, jump routes |
-| **Route Planner** | Calculate path, fuel, toll costs |
-| **Bookmark System** | Save locations for quick access |
-| **Share Location** | Send coordinates to other players |
+---
+
+#### Map Layers
+
+The map operates at three zoom levels, each with its own fog-of-war state:
+
+**Layer 1: Galaxy View** (zoomed out — all systems)
+```
+┌──────────────────────────────────────────────────┐
+│                                                  │
+│     [???]         [???]         [???]            │  ← Unexplored systems
+│       │             │             │              │     show as dim outlines
+│       └─────────────┼─────────────┘              │
+│                     │                            │
+│               [CENTRAL NEXUS]                    │  ← Visited systems
+│                  (Banx)                          │     are fully visible
+│                     │                            │
+│          ┌──────────┴──────────┐                 │
+│      [VULCAN BELT]       [SOL PROXIMA]           │
+│        (Spira)              (Uurf)               │
+│                                                  │
+└──────────────────────────────────────────────────┘
+```
+
+**Layer 2: System View** (zoomed in — one system)
+- Shows planets, stations, gates, and routes within that system
+- Unexplored planets appear as unnamed silhouettes with basic size/type info
+- Explored planets show full detail (name, resources, gravity, zones)
+
+**Layer 3: Planet Surface View** (zoomed in — one planet)
+- Shows terrain, landing zones, outposts, and resource deposits
+- Unexplored areas are covered in fog
+- Fog lifts as the player flies over or drives through the terrain
+
+---
+
+#### Exploration States
+
+Every location has one of four discovery states, each revealing more information:
+
+| State | How to Achieve | What's Visible |
+|-------|----------------|----------------|
+| **Unknown** | Default state | Dim outline only (galaxy view) or blank fog (planet view). Tooltip shows "???" |
+| **Detected** | Fly within scanner range of the system/area, or buy a star chart | Name, type, and zone danger level. No resource or terrain data |
+| **Surveyed** | Enter the system/land on planet and activate scanner sweep | Full topography, resource deposit locations (general markers), gravity, hazards, points of interest |
+| **Mapped** | Thoroughly explore on foot/vehicle/craft. Complete cartography quests | Exact resource quantities and purity, underground deposits, creature spawns, NPC patrol routes, hidden sites |
+
+#### What Each State Reveals
+
+**Galaxy View (System-level):**
+
+| Data | Unknown | Detected | Surveyed | Mapped |
+|------|---------|----------|----------|--------|
+| System name | ??? | Visible | Visible | Visible |
+| Jump gate connections | Hidden | Visible | Visible | Visible |
+| Planet count | Hidden | "~3-5 planets" | Exact count | Exact count |
+| Zone danger level | Hidden | Visible | Visible | Visible |
+| City/station presence | Hidden | Hidden | Visible | Visible |
+| Active player count | Hidden | Hidden | Approximation | Exact count |
+| Market data | Hidden | Hidden | Hidden | Visible |
+
+**System View (Planet-level):**
+
+| Data | Unknown | Detected | Surveyed | Mapped |
+|------|---------|----------|----------|--------|
+| Planet name | ??? | Visible | Visible | Visible |
+| Planet type | ??? | Visible | Visible | Visible |
+| Gravity | Hidden | Hidden | Visible | Visible |
+| Resource types | Hidden | Hidden | General (e.g. "metallic ores") | Specific (e.g. "Tritanium, T4 purity") |
+| Landing zones | Hidden | Hidden | Visible | Visible |
+| Outposts | Hidden | Hidden | Visible | Visible |
+| Environmental hazards | Hidden | Hidden | General warnings | Exact locations and severity |
+| Points of interest | Hidden | Hidden | Hidden | Visible |
+
+**Planet Surface View (Terrain-level):**
+
+| Data | Unknown | Detected | Surveyed | Mapped |
+|------|---------|----------|----------|--------|
+| Terrain | Fog covered | Fog covered | Basic topography | Full detail |
+| Surface deposits | Hidden | Hidden | General markers (type only) | Exact markers (type + quantity + purity) |
+| Deep deposits | Hidden | Hidden | Hidden | Visible (requires terrain scanner) |
+| Creature nests | Hidden | Hidden | Hidden | Visible |
+| Derelicts/ruins | Hidden | Hidden | Scanner anomaly blip | Exact location + type |
+| NPC patrol routes | Hidden | Hidden | Hidden | Visible |
+| Safe paths | Hidden | Hidden | Hidden | Optimal routes highlighted |
+
+---
+
+#### How the Map Reveals
+
+**Passive Reveal (Fog-of-War):**
+- Flying your Nimbus reveals terrain in a radius around you based on altitude:
+  - Low altitude (ground level): ~200m reveal radius, high detail
+  - Medium altitude: ~500m reveal radius, medium detail
+  - High altitude: ~2km reveal radius, low detail (topography only, no resource data)
+- Driving a ground vehicle reveals ~100m radius with high detail
+- Revealed terrain stays permanent on your map
+
+**Active Reveal (Scanner Sweeps):**
+- Using your scanner at any location upgrades that area from Detected → Surveyed
+- Scanner range depends on equipped scanner tier:
+
+| Scanner | Sweep Radius | Detail Level |
+|---------|-------------|--------------|
+| Basic Scanner | 500m | Surface deposits, terrain |
+| Advanced Scanner | 1km | + resource quality |
+| Deep Core Scanner | 2km | + underground deposits |
+| Quantum Scanner | 5km | + hidden sites, anomalies |
+
+**Purchased Reveal (Star Charts):**
+- Buy star charts from Veth merchants or other players
+- Instantly upgrades a system or planet from Unknown → Detected
+- Some rare charts go straight to Surveyed
+- Cannot buy Mapped status — that requires boots on the ground
+
+---
+
+#### Exploration Progress & Rewards
+
+**Per-Planet Exploration Percentage:**
+Every planet tracks how much of its surface has been revealed.
+
+| % Explored | Milestone Reward |
+|------------|-----------------|
+| 25% | Terrain overview bonus (basic map landmarks) |
+| 50% | Resource hotspot data (best deposit clusters highlighted) |
+| 75% | Hidden site locations revealed on map |
+| 100% | Planet Mastery bonus: +10% mining yield on this planet, permanent fast-travel to any landing zone |
+
+**Per-System Exploration:**
+
+| Milestone | Reward |
+|-----------|--------|
+| All planets Detected | System overview star chart (shareable/sellable) |
+| All planets Surveyed | +5% scanner range in this system |
+| All planets Mapped | System Mastery title + 10% reduced fuel costs in this system |
+
+**Galaxy-Wide Progress:**
+- Total exploration percentage shown on profile
+- Exploration leaderboard (who has mapped the most)
+- Milestone titles: "Pathfinder" (25%), "Cartographer" (50%), "Trailblazer" (75%), "Galaxy Walker" (100%)
+
+---
+
+#### Exploration Fame
+
+Exploring unknown places earns **Exploration Fame (EF)** — a public reputation score displayed on the player's profile. Fame is the explorer's currency: it opens doors, attracts contracts, and establishes your name across the galaxy.
+
+**Earning Fame:**
+
+| Action | Fame Earned | Notes |
+|--------|-------------|-------|
+| First to enter an unknown system | +500 EF | One-time, first player only |
+| First to land on an unexplored planet | +200 EF | One-time, first player only |
+| Reach 25/50/75/100% planet exploration | +50/100/200/500 EF | Per planet |
+| Discover a derelict or ruin | +100-300 EF | Based on site rarity |
+| Discover an artifact or relic | +150-1000 EF | Based on artifact tier |
+| Complete a cartography contract | +50-150 EF | Repeatable |
+| Share/sell map data used by 10+ players | +100 EF | Others found your data useful |
+| Survive a trip to Uncharted Space | +300 EF | Per expedition |
+
+**"First Discovery" System:**
+- The first player to find a location, artifact, or relic gets their name permanently attached to it
+- Example: "Burrower Nest Delta — *Discovered by [PlayerName]*"
+- First discoveries grant 3x fame bonus
+- Discovery history viewable on the galaxy map (tap any discovered site to see who found it)
+
+**Fame Tiers & Perks:**
+
+| Fame | Rank | Perk |
+|------|------|------|
+| 0-999 | **Wanderer** | Access to basic cartography contracts |
+| 1,000-4,999 | **Pathfinder** | +5% scanner range, Veth merchants offer better star charts |
+| 5,000-14,999 | **Surveyor** | +10% scanner range, unique Surveyor ship skin, access to Veth generation ships |
+| 15,000-49,999 | **Explorer** | +15% scanner range, exploration-only auction house, NPC explorers recognize you |
+| 50,000+ | **Trailblazer** | +20% scanner range, unique title on leaderboard, Veth offer secret star charts to Uncharted regions |
+
+---
+
+#### Discoveries: Sites, Artifacts & Relics
+
+The galaxy is scattered with hidden things waiting to be found. These are not quest objectives — they exist in the world and reward players who explore thoroughly.
+
+**Discovery Types:**
+
+**Sites** — Locations of interest found on planet surfaces or in space.
+
+| Site Type | Where Found | How to Find | Reward |
+|-----------|------------|-------------|--------|
+| **Crash Site** | Planet surfaces | Visible from air at low altitude | Salvage, cargo, data logs |
+| **Hidden Cave** | Planet surfaces (cliff faces, canyons) | Ground-level exploration, terrain scanner | Rare minerals, creature nests, shelter |
+| **Abandoned Outpost** | Planet surfaces, remote areas | Scanner anomaly at Surveyed+ state | Equipment caches, NPC lore, sometimes operational facilities |
+| **Battlefield Remnant** | Space, orbit zones | Scanner sweep in conflict-era systems | Spira Conflict salvage, military blueprints |
+| **Precursor Marker** | Planet surfaces, moons | Quantum Scanner, or following Veth clues | Leads to Precursor ruins, lore fragments |
+| **Wormhole Pocket** | Deep space, Uncharted | Rare scanner detection | Hidden areas with unique resources |
+
+**Artifacts** — Portable objects found at discovery sites. Can be kept, studied, sold, or donated.
+
+| Artifact Type | Rarity | Found At | Value |
+|---------------|--------|----------|-------|
+| **Data Core** | Common | Crash sites, derelicts | Contains star charts, lore entries, or encrypted blueprints |
+| **Navigation Fragment** | Uncommon | Precursor markers, ruins | Reveals locations of other hidden sites when decoded |
+| **Cultural Relic** | Uncommon | Abandoned outposts, battlefields | Lore item, high sell value to collectors or faction NPCs |
+| **Prototype Component** | Rare | Research vessels, Precursor ruins | Used in crafting unique equipment variants |
+| **Exodus Artifact** | Very Rare | Colony ship fragments, deep Uncharted | Items from the original arkships — enormous lore significance and trade value |
+| **Void Shard** | Extremely Rare | Void rifts, deep Precursor sites | Mysterious material tied to the Breach — unknown potential |
+
+**Relics** — Legendary one-of-a-kind items. Only one exists per server. Finding one is a major event.
+
+| Relic | Location | Effect |
+|-------|----------|--------|
+| **The Shepherd's Compass** | Deep Uncharted Space | Permanently reveals all Precursor marker locations galaxy-wide for the holder |
+| **Arkship Black Box** | One of the five lost colony ships | Contains the truth about the Shepherd Signal — unlocks unique storyline |
+| **Korvani War Crown** | Hidden Korvani exile temple | Grants instant max Korvani reputation + unique combat ability |
+| **Veth Memory Crystal** | Veth generation ship graveyard | Grants instant max Veth reputation + unique scanner ability |
+| **Void Heart** | Beyond the Breach | ??? (endgame content, effect TBD) |
+
+**Relic Rules:**
+- Only one of each relic exists per server
+- When a relic is found, a galaxy-wide announcement is made
+- Relics can be stolen via PvP (they cannot be stored safely — must be carried or hidden)
+- If the holder quits or is inactive 30+ days, the relic returns to the world in a new location
+- Relics cannot be destroyed or traded — only taken by force or surrendered
+
+**Artifact Interactions:**
+
+| Action | Result |
+|--------|--------|
+| **Keep** | Display in ship cabin (cosmetic), some grant passive bonuses |
+| **Study** | Take to Cryo Haven research lab — decode for blueprints, maps, or lore |
+| **Sell** | Sell to players or NPC collectors for OMEN |
+| **Donate to Faction** | Large reputation boost with the relevant faction |
+| **Combine** | Some artifacts form sets that unlock hidden locations or bonus effects |
+
+---
+
+#### Map Sharing & Social
+
+| Feature | Description |
+|---------|-------------|
+| **Share Waypoint** | Send a single location to another player (free) |
+| **Share Map Data** | Export your explored data for a region and send/sell it to other players |
+| **Guild Map** | Guild members' exploration data pools together automatically |
+| **Cartography Contracts** | Quest board missions to survey unexplored areas for OMEN |
+| **Map Marketplace** | Buy/sell star charts and survey data on the market |
+
+**Map Data Economy:**
+- First player to fully map a planet can sell that data at premium prices
+- Map data degrades over time as resources deplete and respawn — buyers get a snapshot, not live updates
+- Rare/hidden locations discovered by explorers create valuable, tradeable intel
+- Veth faction reputation unlocks pre-Surveyed data for select regions
+
+---
+
+#### Map UI
+
+**In-Flight Mini-Map (Bottom-Right Corner):**
+```
+┌─────────────┐
+│ ░░░▓▓▓░░░░░ │  ░ = Unexplored fog
+│ ░░▓▓█▓▓░░░░ │  ▓ = Surveyed (basic detail)
+│ ░▓▓█▲█▓▓░░░ │  █ = Mapped (full detail)
+│ ░░▓▓█▓▓░░░░ │  ▲ = Player position
+│ ░░░▓▓▓░░░░░ │
+│ ░░░░░░░░░░░ │  [Expand Map]
+└─────────────┘
+```
+
+**Full-Screen Map (Gesture: two-finger pull up):**
+- Pinch to zoom between Galaxy → System → Planet views
+- Tap a location for details panel (shows exploration state + known info)
+- Long-press to set waypoint
+- Swipe between explored planets
+- Filter overlays: Resources, Threats, Zone type, Player activity
+- Exploration fog shown as semi-transparent dark layer with smooth edges
+
+**Map Legend:**
+| Color/Style | Meaning |
+|-------------|---------|
+| Dark fog | Unknown — never visited |
+| Light fog | Detected — basic info only |
+| Clear, muted colors | Surveyed — general data visible |
+| Clear, vivid colors | Mapped — full detail, all markers visible |
+| Pulsing glow | Active anomaly or event in that area |
+| Dotted outline | Data from purchased star chart (not personally verified) |
+
+---
 
 #### Navigation Markers
 
 | Marker | Meaning |
 |--------|---------|
-| 🟢 Green | Friendly zone |
-| 🟡 Yellow | Mild zone |
-| 🟠 Orange | Full PvP zone |
-| 🔴 Red | Hardcore zone |
-| ⭐ Star | Bookmarked location |
-| ⚠️ Warning | Recent PvP activity |
-| 💀 Skull | Gate camp reported |
+| Green | Friendly zone |
+| Yellow | Mild zone |
+| Orange | Full PvP zone |
+| Red | Hardcore zone |
+| Star icon | Bookmarked location |
+| Warning icon | Recent PvP activity |
+| Skull icon | Gate camp reported |
+| Diamond icon | Undiscovered point of interest (Surveyed+ only) |
+| Chest icon | Derelict/ruin (Mapped only) |
 
 #### Intel & Scouting
 
