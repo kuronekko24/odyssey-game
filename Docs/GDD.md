@@ -3656,32 +3656,290 @@ The galaxy is scattered with hidden things waiting to be found. These are not qu
 
 ---
 
-## New Player Experience
+## Storylines
 
-### Tutorial Flow
-Players complete a guided tutorial before accessing the open world.
+Storylines are structured quest chains that follow a narrative arc while teaching game systems. They serve as an extended tutorial — each act introduces new mechanics through story-driven missions so players learn by doing, not by reading.
 
-**Tutorial Sequence:**
-1. **Awakening** - Player wakes on damaged ship in Uurf orbit, learn basic controls
-2. **First Landing** - Land on Uurf (Verdant Plains), learn movement/interaction
-3. **Extraction 101** - Mine first resources with hand tool
-4. **Refining Basics** - Use ship's refinery to process ore
-5. **First Craft** - Create a basic mining drill
-6. **To Market** - Travel to Uurf Central Hub, sell goods for first OMEN
-7. **Your Journey Begins** - Tutorial complete, open world unlocked
-
-**Tutorial Rewards:**
-- Starter ship (basic Scout/Freighter hybrid)
-- Starter mining drill
-- 500 OMEN
-- First blueprint (Basic Components)
-
-**Post-Tutorial:**
-- Full access to Sol Proxima system
-- Other systems unlock via progression
-- Tutorial can be replayed from menu (no rewards)
+Players are never forced into storylines. They can ignore them and freeplay at any time. But the storylines offer the best rewards for their tier and always leave the player better equipped for the open world.
 
 ---
 
-*Document Version: 0.7*
-*Last Updated: 2026-02-02*
+### Main Storyline: The Shepherd's Path
+
+*"Follow the signal. Find the truth."*
+
+The central narrative follows the mystery of the **Shepherd Signal** — the transmission that led humanity to the Cradle Stars. Who sent it? Why? And what does it have to do with the Absent Ones, Banx Station, and the sealed Breach?
+
+The story spans five acts, each set in a different system, each teaching a major game pillar.
+
+---
+
+#### Act 1: Arrival (Sol Proxima)
+*"You survived the journey. Now survive the landing."*
+
+**Setting:** Uurf and surrounding Sol Proxima system
+**Tier:** T1-T2
+**Mechanics Taught:** Flight controls, mining, crafting, trading, basic navigation
+
+| Chapter | Quest | Mechanics Learned | Reward |
+|---------|-------|-------------------|--------|
+| **1.1 — Awakening** | Player wakes aboard a damaged shuttle drifting in Uurf orbit. Emergency systems only. Follow distress beacon prompts to regain control | Basic flight controls, HUD reading, thrust/camera | Ship regains power |
+| **1.2 — Rough Landing** | Ship is too damaged for orbit — must land. Guide the crippled craft to Uurf's Verdant Plains landing zone | Landing, atmospheric flight, terrain avoidance | Access to Uurf surface |
+| **1.3 — Scrap and Survive** | Ship needs repairs. NPC mechanic Kael teaches you to mine nearby Ferrite deposits and refine them | Mining laser, resource extraction, refinery | Repair kit blueprint, ship repaired |
+| **1.4 — Tools of the Trade** | Kael sends you to craft a proper mining drill and scanner upgrade from your refined materials | Crafting system, blueprints, equipment slots | Portable Drill, Basic Scanner |
+| **1.5 — First Haul** | Mine a full cargo load and fly it to Uurf Central Hub. Sell on the market | Cargo management, city navigation, market interface | 500 OMEN, market access |
+| **1.6 — The Manifest** | A merchant named Sola recognizes your shuttle's registration — it was listed on an old Exodus manifest. She gives you a data fragment | Lore introduction, inventory (artifacts), NPC dialogue | Data Fragment #1, story hook |
+| **1.7 — Beyond the Plains** | Sola asks you to investigate a faint signal in Uurf's Northern Reaches (Mild zone). First encounter with hostile creatures | Mild zones, combat basics, creature encounters, durability/repair | Combat module, 1000 OMEN |
+
+**Act 1 Completion Reward:**
+- Upgraded starter ship (S-class Scout)
+- Full Sol Proxima map (Detected state)
+- Kael and Sola become recurring contacts
+- Act 2 unlocked
+
+**What the player knows by end of Act 1:**
+How to fly, mine, craft, trade, fight basic threats, and navigate the market. They have their first story hook — their shuttle has a connection to the original Exodus.
+
+---
+
+#### Act 2: The Wider Galaxy (Vulcan Belt)
+*"There's more out there than one planet. Time to see it."*
+
+**Setting:** Vulcan Belt system, Spira industrial hub
+**Tier:** T2-T3
+**Mechanics Taught:** Inter-system travel, ground vehicles, weight/gravity, storage, deeper crafting
+
+| Chapter | Quest | Mechanics Learned | Reward |
+|---------|-------|-------------------|--------|
+| **2.1 — The Jump** | Sola arranges passage on a convoy to Vulcan Belt. Player experiences first jump gate travel | Jump gates, inter-system travel, fuel management | Arrival at Spira |
+| **2.2 — Industrial Heart** | Explore Spira's shipyard and refinery district. Meet foreman Drav who needs rare ore from the volcanic moon Caldera | City services, Spira's unique perks, NPC contacts | Refinery access, Caldera star chart |
+| **2.3 — Heavy Gravity** | Caldera is 1.5G. Player must mine Tritanium under heavy gravity, learning weight budget management | Gravity system, weight HUD, cargo limits, overweight risks | Tritanium ore, gravity mechanics mastery |
+| **2.4 — Boots on the Ground** | Deposit is too deep for mining laser. Drav lends you a Bore Rig. First ground vehicle mission | Ground vehicle controls, deployment, deep deposits | Bore Rig blueprint |
+| **2.5 — The Hauler's Dilemma** | Bore Rig + cargo exceeds your lift capacity at 1.5G. Must decide: leave the rig, refine on-site, or make two trips | Weight decisions, strategic planning, on-site refining | Hauler vehicle blueprint |
+| **2.6 — The Old Wreck** | While mining on Caldera, scanner detects an anomaly — a Spira Conflict-era wreck half-buried in lava rock. Inside: a second Data Fragment and a damaged navigation computer | Exploration, derelict sites, artifact discovery | Data Fragment #2, military salvage |
+| **2.7 — Decoding** | Take both Data Fragments to Spira's research terminal. The fragments combine to reveal partial coordinates pointing toward Central Nexus | Artifact combining, research mechanics | Partial coordinates, Banx star chart |
+
+**Act 2 Completion Reward:**
+- M-class Freighter hull (T3)
+- Ground vehicle bay unlocked
+- Vulcan Belt map (Surveyed state)
+- Drav becomes crafting contact
+
+**What the player knows by end of Act 2:**
+Inter-system travel, ground vehicles, weight/gravity management, deeper crafting, and the storage system. The story is pulling them toward Banx.
+
+---
+
+#### Act 3: Crossroads (Central Nexus)
+*"Three species. Three truths. None of them complete."*
+
+**Setting:** Central Nexus, Banx Station
+**Tier:** T3-T4
+**Mechanics Taught:** Faction reputation, alien NPC interactions, the market economy, fleet management, exploration map
+
+| Chapter | Quest | Mechanics Learned | Reward |
+|---------|-------|-------------------|--------|
+| **3.1 — The Neutral Ground** | Arrive at Banx Station. Explore the galaxy's financial hub. Meet a Custodian who reacts strangely to your Data Fragments | Banx services, cross-market trading, OMEN banking | Banx station access |
+| **3.2 — The Veth Offer** | A Veth scholar named Thessik approaches you. She recognizes the Exodus-era data and offers to decode it — for a price. You must retrieve a scanning artifact from an ice cave on a nearby moon | Veth faction introduction, reputation system, exploration quests | Veth reputation (Recognized), decoded data revealing the name "Shepherd" |
+| **3.3 — The Korvani Test** | A Korvani warrior named Grukk overhears your search. He knows of Shepherd Signal references in Korvani war archives, but demands you prove yourself in combat first | Korvani faction introduction, PvP arena basics, combat builds | Korvani reputation (Recognized), archive access |
+| **3.4 — Two Truths** | The Veth say the Shepherd Signal came from beyond the Breach. The Korvani say it came from Banx. Both provide evidence. The player must investigate Banx's deep levels | Conflicting information, player choice, Banx deep exploration | Data Fragment #3, first glimpse of Banx's strange deep corridors |
+| **3.5 — The Fleet Assembles** | Thessik and Grukk both warn that where you're heading next is dangerous. You need a fleet. Acquire a second ship and learn fleet mechanics | Fleet management, ship switching, fleet composition | Second ship (combat-fitted) |
+| **3.6 — Map the Unknown** | The decoded data points to three locations across Glacius and Aridian Reach, but they're in unexplored space. Use your scanner to reveal the path | Fog-of-war map, scanner sweeps, exploration states, star charts | Three waypoints revealed, exploration fame boost |
+| **3.7 — The Choice** | Before departing, both Thessik and Grukk offer to join your expedition — but you can only bring one. Your choice affects Act 4's approach | Faction alignment consequences, meaningful narrative choice | Faction companion NPC for Act 4 |
+
+**Act 2 Completion Reward:**
+- Fleet capacity +1
+- Central Nexus map (Surveyed)
+- Faction reputation boost (chosen faction reaches Trusted)
+- Star charts to Act 4 locations
+
+**What the player knows by end of Act 3:**
+Faction dynamics, fleet management, the exploration map system, and market economy. The story has deepened — who really sent the Shepherd Signal?
+
+---
+
+#### Act 4: The Frontier (Glacius / Aridian Reach)
+*"The answers aren't in the safe zones."*
+
+**Setting:** Glacius and Aridian Reach — Full and Hardcore zone edges
+**Tier:** T4-T6
+**Mechanics Taught:** Dangerous zones, PvP awareness, world bosses, advanced exploration, equipment degradation management
+
+| Chapter | Quest | Mechanics Learned | Reward |
+|---------|-------|-------------------|--------|
+| **4.1 — Cold Welcome** | Arrive in Glacius. The research stations here study Precursor tech. A lead researcher, Dr. Yenn, has been expecting someone with your data | Glacius city services, blueprint research, reverse engineering | Precursor scanner upgrade |
+| **4.2 — The Frozen Archive** | A Precursor ruin under Glacius ice contains the next piece. But the site is in a Full PvP zone. First real experience with PvP risk | Full zones, PvP flagging, risk assessment, escape mechanics | Data Fragment #4, first PvP zone survival |
+| **4.3 — Tooth and Claw** | The ruin is guarded by Frost Wyrms. Must clear the nest to access the inner chamber | Advanced PvE combat, creature mechanics, environmental hazards | Rare creature drops, ruin access |
+| **4.4 — The Degradation Run** | Deep inside the ruin, environmental hazards shred your equipment. Must manage durability, use repair kits, and decide what to sacrifice | Equipment degradation, field repair, malfunction system | Precursor component, maintenance skill unlock |
+| **4.5 — Dust and Blood** | Cross into Aridian Reach. Dust Port is rougher. Korvani Exiles control the outer zones. Your companion (Thessik or Grukk) has a personal connection here that creates complications | Faction dynamics in dangerous space, NPC relationships | Companion backstory, local allies |
+| **4.6 — The Storm Colossus** | One of the coordinates points to the heart of a perpetual dust storm. The Storm Colossus world boss guards a Precursor gateway. Must team up with other players to defeat it | World boss mechanics, group play, damage contribution | Data Fragment #5, world boss loot, Precursor gateway key |
+| **4.7 — Through the Gate** | Use the gateway key on the Precursor structure. It activates — briefly — and shows a vision: the Shepherd Signal's origin, somewhere beyond the Breach. The gateway burns out | Precursor tech lore, story climax setup | Vision cinematic, Breach coordinates, T6 equipment reward |
+
+**Act 4 Completion Reward:**
+- T6 equipment set (themed to chosen faction)
+- Glacius + Aridian Reach maps (Surveyed)
+- Companion reaches max loyalty
+- The Breach is now marked on your galaxy map
+
+**What the player knows by end of Act 4:**
+How to survive dangerous zones, manage equipment degradation, fight world bosses, and work with other players. The story is heading toward the endgame — the Breach.
+
+---
+
+#### Act 5: The Breach (Uncharted Space)
+*"Something answered from the Void. Now you go to ask the question."*
+
+**Setting:** Outer Ring, then Uncharted Space
+**Tier:** T6-T8
+**Mechanics Taught:** Endgame content, Hardcore zones, the Singularity, Prayer system
+
+| Chapter | Quest | Mechanics Learned | Reward |
+|---------|-------|-------------------|--------|
+| **5.1 — Point of No Return** | Prepare for the expedition to the Breach. Nexus Gate is the last safe harbor. Stock up, repair everything, assemble your best fleet | Endgame preparation, loadout optimization, risk planning | Final supply package |
+| **5.2 — Uncharted** | Enter Uncharted Space. No map. No stations. No help. Every system must be discovered from scratch. Resources are exotic but everything is Hardcore | Hardcore zone survival, total fog-of-war, self-sufficiency | Exotic material haul, massive exploration fame |
+| **5.3 — The Revenant** | The Precursor automated warship guards the approach to the Breach. Must coordinate with other players or use everything you've learned to survive | Elite world boss, adaptive AI, endgame combat | Revenant salvage, T7-T8 components |
+| **5.4 — Echoes** | Beyond the Revenant, find the remains of the five lost arkships. They didn't fail — they were *called here*. The Shepherd Signal led them to the Breach on purpose | Lost arkship exploration, Exodus artifacts, deep lore | Exodus artifacts, Arkship Black Box (if first finder) |
+| **5.5 — The Threshold** | Reach the Breach itself. A sealed rift in space, humming with energy. Your Data Fragments react — they're pieces of a key. Assemble them | Artifact set completion, endgame puzzle | The Shepherd Key |
+| **5.6 — Contact** | Use the Shepherd Key. The Breach opens — not to another place, but to a *presence*. The Singularity speaks. The Five Fields reveal themselves. The truth: the Shepherd Signal was sent by Balance, to bring new minds to the Cradle Stars, because the equation was failing. The universe needed humanity | Singularity lore reveal, Prayer system introduction | Prayer ability unlocked (without Orb — limited, at Breach only) |
+| **5.7 — The Return** | The Breach reseals. You carry the truth back to civilization. The galaxy is changed — or maybe just your understanding of it | Story resolution, post-game content hook | Main storyline completion rewards |
+
+**Act 5 Completion Reward:**
+- Title: "Shepherd" (unique, shown galaxy-wide)
+- Permanent Prayer access at the Breach (once per week, without Orb)
+- T8 blueprint (faction-specific legendary)
+- Unique ship skin: "Exodus Heritage"
+- All five systems reach Surveyed state
+- Unlocks post-game storyline hooks
+
+---
+
+### Faction Storylines
+
+Three parallel storylines, one per faction. These run alongside the main story and can be pursued independently. Each teaches faction-specific gameplay while building reputation.
+
+#### Human Coalition: "Rebuilding the Routes"
+*Restore the trade networks shattered by the Spira Conflict.*
+
+| Chapter | Focus | Mechanics Taught | Rep Required |
+|---------|-------|------------------|--------------|
+| **HC-1: Supply Chain** | Deliver supplies to struggling outposts | Delivery quests, trade routes | Recognized |
+| **HC-2: Market Maker** | Corner a market on a key resource to fund reconstruction | Market manipulation, buy/sell orders | Recognized |
+| **HC-3: Infrastructure** | Build and supply a new outpost in Mild space | Crafting at scale, logistics | Trusted |
+| **HC-4: Corporate War** | A rival corporation sabotages your outpost. Investigate and counter | PvE investigation, NPC politics | Trusted |
+| **HC-5: The Reunion** | Reconnect two isolated colonies. Establish a permanent trade route | Advanced navigation, convoy management | Honored |
+| **HC-6: The Coalition** | Unite the human settlements under one trade agreement | Diplomacy, large-scale economy | Revered |
+| **HC-7: Legacy** | Dedicate the new network. You're recognized as a founder of the modern trade era | Endgame economy mastery | Champion |
+
+**Unique Reward:** Coalition Founder title, permanent 5% trade fee reduction everywhere
+
+#### Veth Wanderers: "The Star Weavers"
+*Follow ancient star charts to uncover what the Veth have been hiding.*
+
+| Chapter | Focus | Mechanics Taught | Rep Required |
+|---------|-------|------------------|--------------|
+| **VW-1: The Listener** | Thessik teaches you to read Veth star charts. Survey three locations | Exploration map, scanner mechanics | Recognized |
+| **VW-2: Between Stars** | Dock with a Veth generation ship. Trade knowledge for passage to a hidden system | Veth culture, mobile trading posts | Recognized |
+| **VW-3: The Archive** | Access the Veth Archive — a ship filled with star maps spanning millennia. Find a pattern | Data analysis, artifact study | Trusted |
+| **VW-4: Lost Weavers** | The pattern reveals Veth who vanished searching for the Absent Ones. Track their path | Advanced exploration, Uncharted Space edges | Trusted |
+| **VW-5: The Memory** | Find a Veth Memory Crystal in a derelict generation ship. It contains a recording of the Absent Ones — they spoke to the Veth before vanishing | Deep lore, artifact recovery | Honored |
+| **VW-6: The Warning** | The memory reveals the Absent Ones left deliberately — they were fleeing something inside the Singularity. The Veth have known all along | Singularity lore, faction secrets | Revered |
+| **VW-7: Star Weaver** | The Veth acknowledge you as one of their own. You are granted access to their most secret charts | Endgame exploration mastery | Champion |
+
+**Unique Reward:** Star Weaver title, permanent +25% scanner range, Veth secret star charts to hidden locations
+
+#### Korvani Clans: "The Trial of Iron"
+*Prove your honor through combat and earn a place among the clans.*
+
+| Chapter | Focus | Mechanics Taught | Rep Required |
+|---------|-------|------------------|--------------|
+| **KC-1: Blood Pact** | Grukk sponsors you for clan trials. Win your first arena duel | Arena combat, PvP basics | Recognized |
+| **KC-2: The Hunt** | Hunt a specific elite pirate captain terrorizing Korvani trade routes | Bounty hunting, tracking, combat builds | Recognized |
+| **KC-3: Forgemaster** | The clans respect those who build as well as fight. Craft a Korvani-pattern weapon to prove your skill | Advanced crafting, Korvani blueprints | Trusted |
+| **KC-4: Clan War** | Two clans dispute a territory claim. You must pick a side and fight in a fleet battle | Fleet combat, faction politics, consequences | Trusted |
+| **KC-5: The Exile's Return** | Grukk reveals he's an exile. Help him reclaim his honor by defeating the clan champion | Advanced PvP, NPC companion story | Honored |
+| **KC-6: Korvan Prime** | Journey to the Korvani homeworld. Survive its volcanic surface and extreme gravity (1.8G) to reach the Trial Ground | Extreme gravity, hostile environment mastery | Revered |
+| **KC-7: Iron Heart** | Complete the final trial — solo combat against three Korvani champions in succession. No healing, no retreat | Endgame combat mastery | Champion |
+
+**Unique Reward:** Iron Heart title, permanent +15% combat damage, Korvani masterwork weapon blueprint
+
+---
+
+### Storyline Design Principles
+
+| Principle | Implementation |
+|-----------|---------------|
+| **Never block freeplay** | Storylines are always optional. Players can pause and return anytime |
+| **Teach by doing** | Every quest teaches a mechanic by requiring the player to use it, not by explaining it in text |
+| **Reward generously** | Storyline rewards are the best available for their tier — incentivizing completion |
+| **Scale with the player** | If a player out-levels a storyline, enemies and challenges scale up (but rewards stay appropriate) |
+| **No dead ends** | If a player fails a quest, they can retry. No permanent failure states in storylines |
+| **Meaningful choices** | Act 3's faction choice and Act 4's branching paths create replay value |
+| **Lore is earned** | The deepest secrets (Singularity, Breach, Absent Ones) are revealed through gameplay, not cutscenes |
+| **Companion bonds** | Thessik and Grukk develop over the story — players feel invested in their fates |
+
+### Storyline Progression Summary
+
+```
+ACT 1: Arrival         ACT 2: Wider Galaxy     ACT 3: Crossroads
+(Sol Proxima)          (Vulcan Belt)           (Central Nexus)
+T1-T2                  T2-T3                   T3-T4
+Flight, Mining,        Travel, Ground          Factions, Fleet,
+Craft, Trade           Vehicles, Gravity       Economy, Map
+    │                      │                       │
+    └──────────────────────┴───────────────────────┘
+                           │
+              ┌────────────┴────────────┐
+              ▼                         ▼
+    ACT 4: The Frontier          Faction Storylines
+    (Glacius/Aridian)            (Run in parallel)
+    T4-T6                        HC / VW / KC
+    PvP, Bosses,                 Reputation, Lore,
+    Degradation                  Mastery
+              │
+              ▼
+    ACT 5: The Breach
+    (Uncharted Space)
+    T6-T8
+    Endgame, Singularity,
+    The Truth
+```
+
+---
+
+## New Player Experience
+
+The New Player Experience is **Act 1 of The Shepherd's Path**. There is no separate tutorial — the story IS the tutorial.
+
+### First 30 Minutes
+
+| Time | What Happens | What's Learned |
+|------|-------------|----------------|
+| 0-2 min | Cinematic: your shuttle exits a jump gate, damaged, alarms blaring | Setting, tone |
+| 2-5 min | Regain flight controls. Follow emergency prompts to stabilize | Flight controls, HUD |
+| 5-8 min | Land on Uurf. Kael runs toward your crashed ship | Landing, atmospheric flight |
+| 8-12 min | Kael walks you through mining your first ore | Mining laser, resource nodes |
+| 12-15 min | Refine ore at Kael's workshop | Refinery, material tiers |
+| 15-20 min | Craft a mining drill | Crafting system, blueprints |
+| 20-25 min | Fly your first real mining run, fill cargo | Full flight + mining loop |
+| 25-30 min | Sell at Uurf market. Sola gives you the data fragment | Market, NPC contacts, story hook |
+
+### Onboarding Principles
+- **No text walls** — every lesson is an action the player takes
+- **NPC mentors** — Kael (practical/mechanical) and Sola (story/world) guide naturally
+- **Immediate reward loop** — mine, sell, buy something better within 15 minutes
+- **Curiosity hooks** — the data fragment makes players want to know more
+- **Safe but not boring** — Uurf is safe, but the damaged ship arrival creates urgency
+
+### Post-Act 1 Guidance
+After completing Act 1, the game presents:
+- **Continue Story** → Act 2 quest marker on galaxy map
+- **Explore Freely** → Open world reminder with current goals
+- **Daily Missions** → Available immediately
+- **Faction Introductions** → Brief pings from Veth and Korvani contacts
+
+The player is never lost. There's always a suggested next step, but never a requirement.
+
+---
+
+*Document Version: 0.8*
+*Last Updated: 2026-02-07*
