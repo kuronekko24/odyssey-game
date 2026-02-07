@@ -4255,40 +4255,628 @@ Craft, Trade           Vehicles, Gravity       Economy, Map
 
 ---
 
-## New Player Experience
+## New Player Experience — Detailed Walkthrough
 
-The New Player Experience is **Act 1 of The Shepherd's Path**. There is no separate tutorial — the story IS the tutorial.
-
-### First 30 Minutes
-
-| Time | What Happens | What's Learned |
-|------|-------------|----------------|
-| 0-2 min | Cinematic: your shuttle exits a jump gate, damaged, alarms blaring | Setting, tone |
-| 2-5 min | Regain flight controls. Follow emergency prompts to stabilize | Flight controls, HUD |
-| 5-8 min | Land on Uurf. Kael runs toward your crashed ship | Landing, atmospheric flight |
-| 8-12 min | Kael walks you through mining your first ore | Mining laser, resource nodes |
-| 12-15 min | Refine ore at Kael's workshop | Refinery, material tiers |
-| 15-20 min | Craft a mining drill | Crafting system, blueprints |
-| 20-25 min | Fly your first real mining run, fill cargo | Full flight + mining loop |
-| 25-30 min | Sell at Uurf market. Sola gives you the data fragment | Market, NPC contacts, story hook |
-
-### Onboarding Principles
-- **No text walls** — every lesson is an action the player takes
-- **NPC mentors** — Kael (practical/mechanical) and Sola (story/world) guide naturally
-- **Immediate reward loop** — mine, sell, buy something better within 15 minutes
-- **Curiosity hooks** — the data fragment makes players want to know more
-- **Safe but not boring** — Uurf is safe, but the damaged ship arrival creates urgency
-
-### Post-Act 1 Guidance
-After completing Act 1, the game presents:
-- **Continue Story** → Act 2 quest marker on galaxy map
-- **Explore Freely** → Open world reminder with current goals
-- **Daily Missions** → Available immediately
-- **Faction Introductions** → Brief pings from Veth and Korvani contacts
-
-The player is never lost. There's always a suggested next step, but never a requirement.
+The New Player Experience is **Act 1 of The Shepherd's Path**. There is no separate tutorial — the story IS the tutorial. Below is a beat-by-beat walkthrough of everything the player experiences.
 
 ---
 
-*Document Version: 0.8*
+### Chapter 1.1 — Awakening (~3 min)
+
+*The cinematic ends. The camera is now inside the cockpit. The player has control.*
+
+**What the player sees:**
+- Cockpit view. Cracks in the windshield. Sparks from a damaged console
+- Uurf fills the lower half of the screen — blue-green, cloud-streaked
+- HUD is flickering. Most elements are offline (greyed out)
+- Only the emergency thrust indicator and a pulsing beacon marker are active
+- Ship is drifting slowly, rotating slightly
+
+**Beat 1 — First Input**
+```
+HUD prompt (bottom center):
+  ⚠ EMERGENCY — Hull integrity: 34%
+  Use LEFT STICK to steer toward the beacon signal.
+                                        [Got it]
+```
+- Player taps "Got it" — prompt disappears
+- Left stick appears on screen. Player pushes it
+- The ship responds sluggishly (damaged thrusters)
+- The beacon marker (diamond icon) pulses on the HUD — player steers toward it
+
+**Beat 2 — Thrust Control**
+- After 5 seconds of steering, a new prompt fades in (no popup — just HUD text):
+```
+HUD hint (top center, fades after 8s):
+  RIGHT STICK controls camera. Look around your ship.
+```
+- Player experiments with camera. Can see the hull damage, Uurf below, stars above
+- The beacon is getting closer — a small automated relay buoy in orbit
+
+**Beat 3 — Reaching the Beacon**
+- Player reaches the beacon (within 50m triggers it)
+- The buoy flashes. Ship systems partially reboot
+- **HUD comes online piece by piece** (satisfying UI animation):
+  - Speed indicator → appears
+  - Altitude → appears
+  - Fuel gauge → appears (showing 42%)
+  - Cargo indicator → appears (0/50)
+  - Scanner → stays offline (damaged)
+  - Weapons → stays offline (damaged)
+
+**Beat 4 — Kael's Voice**
+- Radio crackles. NPC voice line:
+> *"Unidentified shuttle, this is Kael at Uurf Landing. You're leaking fuel and your vector's got you skimming atmo in about ninety seconds. I'm lighting up pad 7 — steer for the green marker and try not to die."*
+- A green waypoint marker appears on the planet surface below
+- The HUD shows a new objective:
+```
+  OBJECTIVE: Land at Uurf Landing — Pad 7
+  Distance: 12.4 km ↓
+```
+
+---
+
+### Chapter 1.2 — Rough Landing (~3 min)
+
+**What the player experiences:**
+- Ship enters Uurf's atmosphere. Screen edges glow orange (re-entry heat)
+- Ship shakes — haptic feedback pulses
+- Controls get looser as atmosphere thickens (transition from space to atmospheric flight)
+- Terrain becomes visible below: green plains, scattered rock formations, a small settlement with landing pads
+
+**Beat 1 — Atmospheric Flight**
+```
+HUD hint:
+  Entering atmosphere. Ship handling will change.
+  Pull BACK on LEFT STICK to slow descent.
+```
+- Player pulls back to brake. Ship slows. Nose comes up
+- If the player descends too fast, Kael warns: *"Easy! Ease up on the throttle or you're gonna leave a crater."*
+- Terrain avoidance isn't hard here — Verdant Plains are flat and forgiving
+
+**Beat 2 — Approach Landing Pad**
+- The green marker resolves into a visible landing pad — a lit square on the ground
+- Kael: *"Looking better. Line up with the pad. When you're over it, reduce thrust to zero."*
+```
+HUD hint:
+  Hover over the landing pad. Release LEFT STICK to cut thrust.
+```
+- Player hovers over the pad and releases
+- Ship auto-lands (assisted landing for first time). Landing gear extends, ship settles with a thud
+- Haptic feedback: solid impact. Dust particles kick up
+
+**Beat 3 — First NPC Interaction**
+- Camera transitions to third-person view outside the ship
+- Kael approaches — a weathered human mechanic, grease-stained, friendly face
+- Dialogue appears as a text overlay at the bottom of the screen (no separate dialogue screen — stays in-world):
+
+> **Kael:** "Well, you made it in one piece. Barely. Let me take a look at— yeah, okay. Your hull's half gone, you've got no scanner, no weapons, and your mining laser's running on fumes. What'd you DO to this thing?"
+>
+> **[...]** *(player taps to continue)*
+>
+> **Kael:** "Look, I can fix her up, but I'm gonna need materials. Ferrite ore — there's deposits all over the plains. I'll show you how to pull it out of the ground. Come on."
+
+- **Quest accepted** notification slides in from the side:
+```
+  NEW QUEST: Scrap and Survive
+  Mine 30 Ferrite Ore from Verdant Plains
+```
+
+---
+
+### Chapter 1.3 — Scrap and Survive (~5 min)
+
+**Beat 1 — Boarding the Ship**
+- Kael walks toward the plains. Player taps a prompt to re-board the ship:
+```
+HUD prompt:
+  Tap to board your ship.
+```
+- Player boards. Back to cockpit view
+- Kael's voice on comms: *"Fly out past the tree line. You'll see the ore deposits — reddish-brown rock formations. Can't miss 'em."*
+
+**Beat 2 — First Flight on Surface**
+- Player lifts off from the pad (thrust up)
+- This is the first time flying in atmosphere with full (damaged) controls
+- The world is open — Verdant Plains stretch out in every direction
+- Ore deposits are visible: reddish-brown rock formations with a faint shimmer
+- A HUD marker points to the nearest cluster: `Ferrite Deposit — 340m`
+
+**Beat 3 — Mining Tutorial**
+- Player flies to the deposit. When within 50m:
+```
+HUD hint:
+  Hover near the deposit. TAP the MINING LASER button to extract.
+```
+- The mining laser button illuminates on the left side of the screen
+- Player taps and holds — a beam fires from the ship to the rock face
+- **Immediate feedback:**
+  - Rock fragments break off (particles)
+  - Cargo counter ticks up: `Ferrite Ore: 1... 2... 3...`
+  - A satisfying chime on each unit collected
+  - The deposit visually depletes (bright → dull)
+
+**Beat 4 — Heat Management (taught naturally)**
+- After ~10 seconds of continuous mining, the laser heat gauge (small bar near the mining button) fills to yellow
+- Kael: *"Watch your heat — fire in bursts or you'll burn out the emitter."*
+```
+HUD hint:
+  Mining laser overheating. Release to cool down.
+```
+- Player releases. Heat drops. Player learns the burst rhythm naturally
+- If the player ignores it and overheats: laser cuts out for 3 seconds, Kael sighs: *"Told ya."*
+
+**Beat 5 — Fill the Quota**
+- Player mines across 2-3 deposits to reach 30 Ferrite Ore
+- During this time they're practicing: flying, hovering, aiming the laser, managing heat, watching cargo fill
+- This is the core loop in miniature — and it feels good already
+- Quest updates: `Ferrite Ore: 30/30 — Return to Kael`
+
+**Beat 6 — Return to Kael**
+- Player flies back to the landing pad (waypoint marker active)
+- Lands (this time without the auto-assist prompt — player does it themselves)
+- Kael meets them:
+
+> **Kael:** "Thirty units, not bad for a first run. Let me show you the refinery — we'll turn this rock into something useful."
+
+- Camera shows Kael leading player to a small refinery station next to the pad
+- Refinery UI opens:
+
+```
+┌─────────────────────────────────────────┐
+│  REFINERY                               │
+│                                         │
+│  Input:  30x Ferrite Ore                │
+│  Output: 10x Refined Steel              │
+│  Time:   5 seconds                      │
+│                                         │
+│         [ REFINE → ]                    │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+- Player taps Refine. Progress bar fills. 10 Refined Steel appears in inventory
+- Kael: *"Good stuff. Now we can actually fix your ship. But first — let me teach you to build something."*
+
+- **Quest complete** notification + reward:
+```
+  ✓ QUEST COMPLETE: Scrap and Survive
+  Reward: Repair Kit Blueprint unlocked
+  Your ship has been repaired to 75% hull integrity.
+```
+
+---
+
+### Chapter 1.4 — Tools of the Trade (~4 min)
+
+**Beat 1 — Crafting Introduction**
+- Kael leads you to a Portable Workbench beside his workshop:
+
+> **Kael:** "Any pilot worth their fuel knows how to build their own tools. Here — I'll share the blueprints for a proper mining drill and a basic scanner. Your mining laser works, but a drill pulls twice the yield."
+
+- **Blueprint unlocked** notification:
+  - Portable Drill blueprint
+  - Basic Scanner blueprint
+
+- Crafting UI opens:
+```
+┌─────────────────────────────────────────┐
+│  PORTABLE WORKBENCH                     │
+│                                         │
+│  ┌─────────────────────────────┐        │
+│  │ Portable Drill              │        │
+│  │ Requires: 5x Refined Steel  │        │
+│  │ You have: 10x ✓             │        │
+│  │           [ CRAFT → ]       │        │
+│  └─────────────────────────────┘        │
+│  ┌─────────────────────────────┐        │
+│  │ Basic Scanner               │        │
+│  │ Requires: 3x Refined Steel  │        │
+│  │ You have: 10x ✓             │        │
+│  │           [ CRAFT → ]       │        │
+│  └─────────────────────────────┘        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+- Player crafts both. 8 Refined Steel consumed, 2 remaining
+
+**Beat 2 — Equipment Slots**
+> **Kael:** "Now let's put 'em on your ship."
+
+- Equipment screen opens (first time):
+```
+┌─────────────────────────────────────────┐
+│  YOUR SHIP — XS Shuttle (T1)            │
+│                                         │
+│  Weapon:    [Mining Laser T1]           │
+│  Defense:   [Empty]                     │
+│  Engine:    [Damaged Thruster T1]       │
+│  Core:      [Basic Power Core T1]      │
+│  Utility:   [Empty] ← Tap to equip     │
+│                                         │
+│  Inventory:                             │
+│  ● Portable Drill                       │
+│  ● Basic Scanner                        │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+```
+HUD hint:
+  Drag equipment from inventory to a slot, or tap an empty slot to equip.
+```
+
+- Player equips the Portable Drill (replaces mining laser — higher yield) and Basic Scanner (utility slot)
+- Kael: *"Now you're looking like a real miner. Take her up — scanner'll show you where the good stuff is."*
+
+**Beat 3 — Scanner in Action**
+- Player takes off. The scanner is now active on the HUD
+- Nearby deposits now show type and quality indicators (before they were just visual):
+```
+  ◆ Ferrite Deposit — 85% purity — 120 units
+  ◆ Ferrite Deposit — 62% purity — 80 units
+  ◇ Tritanium Deposit — 91% purity — 40 units  [NEW RESOURCE]
+```
+- Kael on comms: *"See those blue markers? Tritanium. Rarer than Ferrite, worth a lot more. If you spot any, grab it."*
+- Player can now explore freely for a moment — the scanner reveals the world has more depth than they realized
+
+- **Quest complete:**
+```
+  ✓ QUEST COMPLETE: Tools of the Trade
+  Reward: Portable Drill equipped, Basic Scanner equipped
+  New quest available: First Haul
+```
+
+---
+
+### Chapter 1.5 — First Haul (~5 min)
+
+**Beat 1 — The Assignment**
+- Kael on comms:
+> *"Alright, here's how this works in the real galaxy. You mine, you haul it to the city, you sell it. Uurf Central Hub has the biggest market in Sol Proxima. Fill your cargo and fly it there — I'll send you the coordinates."*
+
+```
+  NEW QUEST: First Haul
+  Fill your cargo bay (50 units) and sell at Uurf Central Hub.
+```
+- A new waypoint appears: Uurf Central Hub, 8km northeast
+
+**Beat 2 — Free Mining**
+- Player mines using their new drill (visibly better — faster extraction, more yield per node)
+- Scanner shows deposit locations — player chooses where to fly
+- This is the first moment of **real player agency** — no one is telling them which deposit to hit
+- Cargo fills: `32/50... 41/50... 50/50 — CARGO FULL`
+```
+HUD notification:
+  Cargo bay full. Head to Uurf Central Hub to sell.
+```
+
+**Beat 3 — Flight to the City**
+- Player flies toward the Central Hub waypoint
+- Terrain changes as they approach: more structures, roads, other ships visible in the sky
+- The city comes into view — a sprawling hub with towers, docking platforms, ship traffic
+- Kael: *"Home sweet home. Land at the trade terminal — the big platform with the blue lights."*
+
+**Beat 4 — City Landing and Exploration**
+- Player lands at the trade terminal dock
+- Camera transitions to third-person city view (different from cockpit flight)
+- The city is alive: NPC vendors, other players' ships docked, market boards, signage
+```
+HUD hint:
+  Welcome to Uurf Central Hub. Approach the Market Terminal to sell.
+```
+
+**Beat 5 — First Sale**
+- Player approaches the Market Terminal (glowing kiosk)
+- Market UI opens:
+```
+┌─────────────────────────────────────────┐
+│  MARKET — Uurf Central Hub              │
+│                                         │
+│  SELL                                   │
+│  ┌─────────────────────────────┐        │
+│  │ 38x Ferrite Ore             │        │
+│  │ Market price: 5 OMEN each   │        │
+│  │ Total: 190 OMEN             │        │
+│  │              [ SELL → ]     │        │
+│  └─────────────────────────────┘        │
+│  ┌─────────────────────────────┐        │
+│  │ 12x Tritanium Ore           │        │
+│  │ Market price: 25 OMEN each  │        │
+│  │ Total: 300 OMEN             │        │
+│  │              [ SELL → ]     │        │
+│  └─────────────────────────────┘        │
+│                                         │
+│  Your balance: 0 OMEN                   │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+- Player sells all. Balance jumps to ~490 OMEN
+- Satisfying coin/chime sound. Balance animates counting up
+- Kael on comms: *"Not bad for your first haul. That Tritanium's good stuff — keep an eye out for it."*
+
+**Beat 6 — The Market Sticks**
+- After selling, the market stays open briefly showing the BUY tab:
+```
+HUD hint:
+  The market also sells equipment, blueprints, and resources
+  crafted by other players. Browse when you're ready.
+```
+- Player can browse but doesn't need to buy anything yet. Closes when ready
+
+- **Quest complete:**
+```
+  ✓ QUEST COMPLETE: First Haul
+  Reward: 500 OMEN bonus (total balance now ~990 OMEN)
+  Market access permanently unlocked.
+```
+
+---
+
+### Chapter 1.6 — The Manifest (~3 min)
+
+**Beat 1 — Sola Approaches**
+- As the player leaves the market terminal, an NPC approaches them
+- Sola — a sharp-eyed woman in merchant attire, datapad in hand
+
+> **Sola:** "Excuse me — pilot. That shuttle you flew in on. Registration code XT-7749. Where did you get that ship?"
+>
+> **Player options:**
+> - "I don't remember." *(default/canon)*
+> - "Why do you care?"
+> - "It's mine. That's all that matters."
+
+- Regardless of choice, Sola continues:
+
+> **Sola:** "That code is on the Exodus manifest. One of the original twelve arkships carried a shuttle bay full of these — the *HNSS Meridian*. She was one of the five that never arrived."
+>
+> **Sola:** "Except... here you are. In one of her shuttles. Five hundred years late."
+>
+> **Sola:** "I've been collecting data on the lost ships for years. Take this — it was recovered from a wreck near the Northern Reaches. It's a data fragment from the Meridian's flight recorder. I think you should have it."
+
+**Beat 2 — First Artifact**
+- **Item received: Data Fragment #1**
+- Inventory opens briefly, showing the Artifacts tab for the first time:
+```
+┌─────────────────────────────────────────┐
+│  ARTIFACTS                              │
+│                                         │
+│  ◈ Data Fragment #1                     │
+│    Origin: HNSS Meridian flight recorder│
+│    Status: Partially encrypted          │
+│    "...signal origin does not match     │
+│     any known stellar body..."          │
+│                                         │
+│  Collected: 1/? fragments              │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+**Beat 3 — Story Hook Set**
+> **Sola:** "There's a faint signal coming from the Northern Reaches — same frequency as this fragment. Could be another piece. But the Reaches are outside the safe zone. Be careful out there, pilot."
+>
+> **Sola:** "Come find me if you learn anything. I have a stall in the merchant quarter."
+
+- Sola walks away. She's now a permanent NPC contact in the city
+- The player is left with questions: Why is their shuttle from a lost arkship? What's the signal?
+
+- **Quest complete:**
+```
+  ✓ QUEST COMPLETE: The Manifest
+  Reward: Data Fragment #1, Sola unlocked as contact
+  New quest available: Beyond the Plains
+```
+
+---
+
+### Chapter 1.7 — Beyond the Plains (~7 min)
+
+**Beat 1 — Heading Out**
+- The new quest directs the player to the Northern Reaches — a Mild zone
+- Waypoint is set. Player re-boards their ship and takes off from the city
+```
+  QUEST: Beyond the Plains
+  Investigate the signal in Uurf's Northern Reaches.
+  ⚠ Warning: Mild Zone — hostile creatures reported.
+```
+
+**Beat 2 — Zone Transition**
+- As the player flies north, the terrain changes. Verdant Plains give way to rocky, harsher landscape
+- A zone transition notification appears:
+```
+  ━━━ Entering MILD ZONE: Northern Reaches ━━━
+  Hostile creatures are present.
+  Your cargo may be at risk.
+```
+- The map border shifts from green to yellow
+- Music shifts to something more tense, ambient
+
+**Beat 3 — First Creature Encounter**
+- Scanner picks up a contact. Not a deposit — a red marker:
+```
+  ▲ Burrower — Hostile — Distance: 200m
+```
+- A Burrower erupts from the ground near a rock formation. It's a medium-sized armored creature
+- Kael on comms: *"Heads up — Burrowers. Territorial. They won't chase you far, but if you're near their nest they'll come at you. Your drill won't help here — you need a weapon."*
+
+**Beat 4 — Combat Introduction**
+- The player doesn't have a weapon yet — this is intentional
+- Two options:
+  - **Fly past it** (the Burrower can't reach the ship at altitude)
+  - **Get hit** if flying low (takes minor hull damage, teaches consequence)
+- Either way, the player reaches the signal source: a small wreckage site on a ridge
+- Kael: *"That wreck's got what you need. Land nearby and I'll walk you through fitting a weapon."*
+
+**Beat 5 — Salvage and Equip**
+- Player lands near the wreckage. An interaction prompt appears:
+```
+  [Salvage Wreckage]
+```
+- Player taps. Salvage UI:
+```
+  SALVAGE — Crash Site Debris
+  Found:
+  ● Light Laser Turret T1
+  ● 2x Repair Kit (Basic)
+  ● 15x Ferrite Ore
+```
+- Equipment screen opens. Player equips the Light Laser Turret in the Weapon slot (replacing the Portable Drill, which moves to cargo)
+```
+HUD hint:
+  Weapon equipped. TAP the FIRE button (right side) to shoot.
+  Your mining drill has been moved to cargo — swap at any workbench.
+```
+
+**Beat 6 — First Combat**
+- Player takes off. The Burrower (or another one) is nearby
+- Player engages: fire button lights up on the right side of screen
+- Combat is simple — the Burrower charges, player shoots while maneuvering
+- Burrower goes down in 4-5 hits. Drops: `3x Organic Compound, 1x Chitin`
+- Kael: *"Nice shooting. Those organics are worth something too — the market buys everything."*
+- **Satisfying kill feedback**: particle burst, loot auto-collected, XP notification
+
+**Beat 7 — The Signal Source**
+- Beyond the wreck site, the signal leads to a small cave entrance in the ridge
+- Player lands. Interaction prompt:
+```
+  [Enter Cave — Investigate Signal]
+```
+- Short interior sequence (not a full dungeon — just a single chamber):
+  - Walls have faint markings — not human
+  - In the center: a damaged data terminal, partially buried
+  - Player interacts. Screen glitches. A garbled transmission plays:
+  > *"...trajectory confirmed... signal origin does not match Cradle Stars coordinates... repeat, the Shepherd Signal is not coming from any known..."* *(static, cuts out)*
+
+- **Item received: Damaged Navigation Log**
+  - This isn't a Data Fragment — it's a clue that connects to Chapter 1.6's fragment
+
+**Beat 8 — Return and Regroup**
+- Player returns to Uurf Central Hub
+- Visits Sola at her market stall:
+
+> **Sola:** "A navigation log from the Meridian? And the signal coordinates don't match the Cradle Stars? That means... the Shepherd Signal didn't come from here. It came from somewhere else. Somewhere further."
+>
+> **Sola:** "I've heard rumors of similar data fragments found in other systems — Vulcan Belt, Central Nexus. If we could piece them together..."
+>
+> **Sola:** "You've got a ship. You've got a reason. The galaxy's out there, pilot."
+
+- **Quest complete:**
+```
+  ✓ QUEST COMPLETE: Beyond the Plains
+  Rewards:
+  ● Light Laser Turret T1 (already equipped)
+  ● 1,000 OMEN
+  ● Damaged Navigation Log (artifact)
+  ● Combat XP — Combat Skill unlocked
+```
+
+---
+
+### Act 1 Complete
+
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│         ✦ ACT 1 COMPLETE ✦                 │
+│           "Arrival"                         │
+│                                             │
+│  You survived. You mined. You fought.       │
+│  Now the real journey begins.               │
+│                                             │
+│  REWARDS:                                   │
+│  ● Upgraded Ship: S-class Scout             │
+│  ● Sol Proxima map (Detected)               │
+│  ● Kael — permanent mechanic contact        │
+│  ● Sola — permanent story contact           │
+│  ● 2 Artifacts collected                    │
+│                                             │
+│  NEXT: The Wider Galaxy awaits.             │
+│  A transport convoy to Vulcan Belt          │
+│  departs soon...                            │
+│                                             │
+│  [ Continue Story → ]  [ Explore Freely ]   │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- The S-class Scout is delivered by Kael: *"She's not pretty, but she'll get you further than that wreck you rode in on. I upgraded the hull, gave you proper thrusters. Try not to crash this one."*
+- Player's old shuttle is retired (scrapped for parts — player gets bonus materials)
+
+---
+
+### What the Player Has Learned (Without a Single Tutorial Screen)
+
+| Mechanic | How They Learned It |
+|----------|---------------------|
+| Flight controls | Emergency prompt, then flying to beacon |
+| Camera/look | HUD hint during flight |
+| Landing | Guided landing on Uurf with Kael's voice |
+| Mining | Kael directed them to deposits, they extracted |
+| Heat management | Overheating happened naturally, Kael warned them |
+| Refining | Used Kael's refinery to turn ore into steel |
+| Crafting | Built drill and scanner at workbench |
+| Equipment slots | Equipped gear onto their ship |
+| Scanner usage | Saw deposits light up after equipping scanner |
+| Cargo management | Filled cargo, saw weight, flew to sell |
+| City navigation | Landed at hub, walked to market |
+| Market (selling) | Sold ore for OMEN |
+| Market (browsing) | Saw the buy tab after selling |
+| NPC dialogue | Talked to Kael and Sola |
+| Artifacts | Received Data Fragment, saw artifact inventory |
+| Zone transitions | Flew from Friendly to Mild, saw the warning |
+| Creature encounters | Met Burrowers, learned to avoid or fight |
+| Combat basics | Equipped weapon, fought creature |
+| Salvaging | Looted a wreck site |
+| Repair kits | Found them in salvage, saw them in inventory |
+| Exploration | Found a cave, investigated a signal |
+| Lore hooks | Shepherd Signal mystery, lost arkship connection |
+
+**Total time: ~30 minutes of play. Zero tutorial popups. Zero text walls. Everything learned by doing.**
+
+---
+
+### Post-Act 1 Guidance
+
+After the completion screen, the player's HUD shows:
+
+```
+  SUGGESTED:
+  ▶ Continue Story — Act 2: The Wider Galaxy (Vulcan Belt)
+  ▶ Daily Missions available (3 missions)
+  ▶ Explore Sol Proxima freely
+
+  CONTACTS:
+  💬 Kael has repair services at Uurf Landing
+  💬 Sola has a lead on the next Data Fragment
+```
+
+- **Continue Story** → Act 2 quest marker on galaxy map
+- **Daily Missions** → Available immediately (mine X, sell Y, visit Z)
+- **Explore Freely** → The whole Sol Proxima system is open
+- **Faction pings** start arriving within the next play session:
+  - A Veth scholar sends a cryptic message about star charts
+  - A Korvani warrior posts a bounty board challenge
+
+The player is never stuck. There's always a next step. But they choose the pace.
+
+---
+
+### Onboarding Design Principles
+
+| Principle | Implementation |
+|-----------|---------------|
+| **Show, don't tell** | Every mechanic taught through player action, not explanation text |
+| **NPC mentors** | Kael teaches practical skills via voice. Sola drives the story via dialogue |
+| **One thing at a time** | Each chapter introduces exactly one major system |
+| **Immediate reward** | Mine → sell → see OMEN go up. The loop pays off within 15 minutes |
+| **Escalating stakes** | Safe plains → mild zone → creatures → combat. Tension builds naturally |
+| **Curiosity over instruction** | The story makes players WANT to learn — "why is my shuttle from a lost arkship?" |
+| **Failure is gentle** | Overheat the laser? 3-second cooldown. Get hit by a Burrower? Minor hull damage. Nothing punishing |
+| **Player agency early** | Chapter 1.5 is the first moment of real choice — which deposits, what route, when to sell |
+
+---
+
+*Document Version: 0.9*
 *Last Updated: 2026-02-07*
