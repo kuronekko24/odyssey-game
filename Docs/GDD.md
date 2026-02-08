@@ -3268,14 +3268,183 @@ Each faction maintains a shared war chest funded by its members.
 
 **War Fund Spending:**
 
-| Expense | Cost | Effect |
+Spending OMEN from the war fund is the primary way factions project power. Every advantage costs money — and that money is permanently removed from the economy.
+
+#### Militia System (Faction Protection)
+
+Militia is the backbone of faction territory control. Funded weekly, militia forces make faction space safer for members and more dangerous for enemies.
+
+**Militia Tiers:**
+
+| Tier | Weekly Cost | What You Get |
+|------|-------------|-------------|
+| **Tier 0 — None** | 0 OMEN | No protection. Territory is lawless |
+| **Tier 1 — Patrol** | 5,000 OMEN/week | 3 AI patrol ships per territory. Engage hostile players on sight. 5-minute response time |
+| **Tier 2 — Garrison** | 15,000 OMEN/week | 6 AI patrol ships + 2 defense platforms at key points. 2-minute response time. Enemy players get a warning on entry |
+| **Tier 3 — Fortress** | 40,000 OMEN/week | 12 AI patrol ships + 4 defense platforms + 1 response fleet (arrives in 30 seconds). Territory scanner reveals all enemy positions. Hostile players are marked on faction members' HUDs |
+| **Tier 4 — Safeguard** | 100,000 OMEN/week | Full Tier 3 + **territory becomes a Protected Zone**: PvP is disabled for faction members (they cannot be attacked). Non-faction players can still be attacked by militia. Effectively creates a new safe zone |
+
+**Militia Rules:**
+- Militia tier is set per territory by the War Commander
+- Higher tiers require holding the territory for at least 2 consecutive weeks (can't instant-Safeguard a new conquest)
+- Militia funding is deducted weekly — if the fund runs dry, militia deactivates immediately
+- Militia strength is **publicly visible** on the Conquest Map (acts as deterrent)
+- Militia ships scale to the average tier of the faction's active players (T3 average = T3 militia ships)
+- Safeguard (T4) can only be applied to **3 territories max** per faction (forces strategic choices)
+
+**What Militia Does In Practice:**
+```
+Scenario: Enemy player enters your Tier 3 territory
+
+1. Territory scanner detects them instantly
+2. All online faction members in the zone get an alert:
+   "⚠ Hostile pilot detected: [PlayerName] — Sector 7"
+3. Their position is marked on faction members' HUDs
+4. 3 militia patrol ships converge on their position
+5. If they engage a faction member, response fleet warps in within 30 seconds
+6. Enemy must fight through militia + any faction players, or flee
+```
+
+#### Territory Upgrades
+
+Beyond militia, factions can invest in permanent (while held) infrastructure upgrades for territories.
+
+| Upgrade | Cost | Weekly Upkeep | Effect |
+|---------|------|--------------|--------|
+| **Resource Booster** | 20,000 OMEN | 3,000/week | +15% resource yield for faction members in this territory |
+| **Refinery Outpost** | 30,000 OMEN | 5,000/week | Faction-owned refinery in the territory — 20% reduced refining costs |
+| **Repair Station** | 25,000 OMEN | 4,000/week | Free basic repairs for faction members (up to 80% durability) |
+| **Scanner Array** | 15,000 OMEN | 2,000/week | All faction members get +50% scanner range in this territory |
+| **Jump Beacon** | 50,000 OMEN | 8,000/week | Faction members can warp directly to this territory from any jump gate (skips travel) |
+| **Trade Post** | 40,000 OMEN | 6,000/week | Mini-market in the territory — buy/sell without returning to city. 5% fee (goes to war fund) |
+| **Fortification** | 10,000 OMEN | 0 (one-time) | +500 bonus WP defense for this territory this week |
+
+- Upgrades are destroyed if the territory is lost — the OMEN is gone
+- This makes territory loss genuinely painful (not just a map color change)
+- Encourages factions to defend invested territories fiercely
+
+#### Diplomacy Costs
+
+| Action | Cost | Duration |
+|--------|------|----------|
+| **Alliance** | 50,000 OMEN (each faction pays) | 1 week, renewable |
+| **Extended Alliance** | 100,000 OMEN (each) | 4 weeks |
+| **Ceasefire** | Free | 1 week, mutual agreement |
+| **Faction Shop Restock** | Varies (5,000-50,000 per item) | Permanent until sold |
+
+---
+
+## Guild OMEN Sinks
+
+Guilds need their own reasons to spend OMEN beyond personal progression. Guild investment creates shared value that benefits all members — and keeps OMEN flowing out of the economy.
+
+### Guild Outpost
+
+Guilds can build a physical **outpost** in any territory their faction controls. This is the guild's home base in the field.
+
+| Feature | Build Cost | Weekly Upkeep | Function |
+|---------|-----------|--------------|----------|
+| **Outpost Core** | 25,000 OMEN | 3,000/week | Establishes the outpost. Landing pad, basic storage (1,000 units), guild bank terminal |
+| **Workshop** | 15,000 OMEN | 2,000/week | Portable Workbench + Fabricator for all guild members |
+| **Refinery** | 20,000 OMEN | 3,000/week | On-site refining, 10% faster than city refineries |
+| **Vehicle Bay** | 10,000 OMEN | 1,500/week | Store and deploy ground vehicles at the outpost |
+| **Defense Turrets** | 8,000 OMEN each (max 4) | 1,000/week each | Auto-targeting turrets that protect the outpost from raiders |
+| **Shield Generator** | 30,000 OMEN | 5,000/week | Energy shield over the outpost — must be destroyed before turrets/buildings can be damaged |
+| **Radar Tower** | 12,000 OMEN | 2,000/week | Reveals all players within 5km of the outpost on guild members' maps |
+| **Expanded Storage** | 10,000 OMEN per tier (3 tiers) | 1,000/week per tier | +2,000 storage per tier (max 7,000 total) |
+| **Respawn Beacon** | 20,000 OMEN | 3,000/week | Guild members who die in the territory respawn at the outpost instead of the nearest city |
+
+**Outpost Rules:**
+- One outpost per guild
+- Must be in faction-controlled territory (lost if territory is conquered)
+- Can be **raided** by enemy players — they must destroy the shield, then turrets, then can loot a percentage of outpost storage
+- Destroyed buildings must be rebuilt at full cost
+- If weekly upkeep isn't paid, buildings go offline one by one (cheapest first)
+
+**Outpost Total Cost (fully upgraded):**
+```
+Core:           25,000 + 3,000/week
+Workshop:       15,000 + 2,000/week
+Refinery:       20,000 + 3,000/week
+Vehicle Bay:    10,000 + 1,500/week
+Turrets (x4):  32,000 + 4,000/week
+Shield:         30,000 + 5,000/week
+Radar:          12,000 + 2,000/week
+Storage (x3):  30,000 + 3,000/week
+Respawn:        20,000 + 3,000/week
+─────────────────────────────────────
+Build total:    194,000 OMEN
+Weekly upkeep:  26,500 OMEN/week
+```
+
+That's a serious investment — and it all drains from the economy every week.
+
+### Guild Upgrades (Permanent)
+
+One-time purchases that improve the guild for all members.
+
+| Upgrade | Cost | Effect |
 |---------|------|--------|
-| **Militia Patrol Ships** | 2,000 OMEN/week | AI ships patrol faction territory, engage hostiles |
-| **Defense Platforms** | 5,000 OMEN each | Stationary turrets at key points in held territory |
-| **Response Fleet** | 10,000 OMEN/week | Auto-dispatches AI reinforcements when faction members are attacked |
-| **Alliance Payment** | 50,000 OMEN | Form alliance with another faction |
-| **Territory Fortification** | 10,000 OMEN | +500 bonus WP defense for one territory for one week |
-| **Faction Shop Restock** | Varies | Fund exclusive items in the faction shop |
+| **Bank Expansion I** | 5,000 OMEN | +25,000 OMEN cap, +5,000 resource units |
+| **Bank Expansion II** | 15,000 OMEN | +50,000 OMEN cap, +10,000 resource units |
+| **Bank Expansion III** | 50,000 OMEN | +100,000 OMEN cap, +25,000 resource units |
+| **Contract Slot +1** | 10,000 OMEN each (max 3 extra) | +1 active guild contract per purchase |
+| **Guild Emblem** | 5,000 OMEN | Custom guild emblem shown on member ships |
+| **Guild Banner** | 8,000 OMEN | Physical banner deployed at outpost and conquest battles |
+| **Member Expansion** | 25,000 OMEN | +5 member slots (max 2 purchases, 40 members total) |
+
+### Guild Weekly Expenses
+
+Recurring costs that guilds must fund to maintain their advantages.
+
+| Expense | Cost | Why It Matters |
+|---------|------|----------------|
+| **Outpost upkeep** | 3,000-26,500/week | Keeps your field base operational |
+| **Guild contracts** | 500-5,000/contract | Fund contract rewards for members |
+| **Raid supplies** | ~2,000-10,000/raid | Repair kits, fuel, consumables pooled for boss raids |
+| **War declarations** | 5,000 per war | Guild vs guild PvP |
+| **Bounty fund** | Varies | Pool OMEN to place bounties on enemies |
+
+### Guild Income Sources
+
+Guilds need to fund all this spending. Income comes from:
+
+| Source | Amount |
+|--------|--------|
+| **Guild tax** | 0-10% of member market sales (auto-deposited) |
+| **Guild contract rewards** | Portion of completed contract rewards goes to bank |
+| **Outpost trade post** | If the faction territory has a Trade Post, guild outpost gets a cut |
+| **Raid loot (Guild Bank mode)** | All loot from raids goes to bank when this mode is selected |
+| **Member donations** | Any member can deposit OMEN or resources |
+
+---
+
+## OMEN Sink Summary
+
+Every system that removes OMEN from the economy, collected in one place:
+
+| Sink | Type | Estimated Drain |
+|------|------|-----------------|
+| **Death repair costs** | Per-death | 50-6,000 OMEN per death |
+| **Station equipment repairs** | Per-visit | 100-10,000 OMEN per repair |
+| **Market transaction fees** | Per-trade | 1-5% of trade value |
+| **Jump gate tolls** | Per-travel | 50-500 OMEN per jump |
+| **Guild creation** | One-time | 10,000 OMEN |
+| **Guild outpost building** | One-time | Up to 194,000 OMEN |
+| **Guild outpost upkeep** | Weekly | Up to 26,500 OMEN/week per guild |
+| **Guild upgrades** | One-time | 5,000-50,000 each |
+| **Guild war declarations** | Per-war | 5,000 OMEN |
+| **Faction militia upkeep** | Weekly | 5,000-100,000 OMEN/week per territory |
+| **Faction territory upgrades** | One-time + weekly | 10,000-50,000 build + 2,000-8,000/week |
+| **Faction alliances** | Per-alliance | 50,000-100,000 OMEN |
+| **Faction home city change** | Per-change | 5,000 OMEN |
+| **Bounty placements** | Per-bounty | 1,000+ OMEN |
+| **Insurance premiums** | Per-policy | Varies by ship class |
+| **Crafting station fees** | Per-craft | Varies by station tier |
+| **Blueprint research** | Per-research | Varies |
+| **Guild rename/retag** | Per-change | 2,000-5,000 OMEN |
+
+**The design goal:** OMEN constantly drains from the economy through hundreds of small and large sinks. This creates perpetual demand for resource gathering and trading, which keeps the player-driven economy alive. If OMEN pooled without draining, prices would inflate and new players couldn't compete.
 
 ---
 
