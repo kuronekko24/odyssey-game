@@ -3054,6 +3054,241 @@ Guilds can challenge **world bosses** and **guild-exclusive raid bosses** for sh
 
 ---
 
+### Guild Benefits
+
+Being in a guild provides tangible advantages that solo players cannot access. These scale with guild investment, member activity, and how well the guild works together.
+
+---
+
+#### Proximity Bonuses (Passive Auras)
+
+When guild members operate near each other, everyone gets stronger. Rewards playing together without requiring formal group mechanics.
+
+| Bonus | Requirement | Effect |
+|-------|-------------|--------|
+| **Mining Swarm** | 3+ guild members mining within 500m | +10% mining yield for all |
+| **Convoy Shield** | 3+ guild members flying in formation (within 200m) | +15% shield recharge rate for all |
+| **Pack Hunters** | 3+ guild members in combat within 1km | +10% weapon damage for all |
+| **Workshop Crowd** | 2+ guild members crafting at the same station | +5% craft quality chance |
+| **Safety in Numbers** | 5+ guild members in the same zone | Hostile NPC aggro range reduced by 25% (fewer surprise attacks) |
+
+- Bonuses stack with each additional member up to a cap (shown below)
+- Displayed as a small aura icon on the HUD when active
+- Cap: bonuses max out at 8 guild members in proximity
+
+| Members in Range | Yield/Damage Bonus | Shield/Quality Bonus |
+|-----------------|-------------------|---------------------|
+| 3 | +10% | +5-15% |
+| 5 | +15% | +8-20% |
+| 8+ | +20% (cap) | +10-25% (cap) |
+
+---
+
+#### Guild Crafting
+
+Guilds unlock crafting capabilities that individual players can't access.
+
+**Collaborative Crafting:**
+High-tier items (T6+) can be built through collaborative crafting — multiple guild members each contribute their specialization to produce something none of them could make alone.
+
+```
+Example: Building a T7 Adaptive Armor Set
+
+Solo player (Armorer specialization):
+  Can craft it alone, but needs T7 Metallurgy AND T7 Electronics
+  → Almost impossible to have both at T7 as a solo player
+
+Guild collaborative craft:
+  ● Player A (Metallurgy T7): Contributes refined alloys
+  ● Player B (Electronics T6): Contributes sensor weave
+  ● Player C (Chemistry T5): Contributes bonding agent
+  → All three work at the Guild Workshop simultaneously
+  → Result: T7 Adaptive Armor with quality bonus from collaboration
+```
+
+**How Collaborative Crafting Works:**
+1. Any member initiates a collaborative project at the Guild Workshop
+2. The recipe shows required contributions by skill type
+3. Members with the right skills "sign on" to the project
+4. Each contributor adds their materials and applies their skill
+5. When all slots are filled, the craft completes
+6. **Quality bonus**: +5% per additional contributor (up to +15% with 4 contributors)
+7. Result goes to the initiator's inventory (or guild bank, by agreement)
+
+**Collaborative-Only Recipes:**
+Some items can ONLY be made through collaborative crafting — they require skills from 3+ different specialization trees at T5+.
+
+| Item | Required Skills | Min Contributors | Result |
+|------|----------------|-----------------|--------|
+| **Masterwork Hull Plating** | Metallurgy T6 + Chemistry T5 + Engineering T5 | 2-3 | Hull armor with +20% durability vs standard |
+| **Quantum Sensor Suite** | Electronics T7 + Dronecraft T5 + Engineering T6 | 2-3 | +30% scanner range, detects cloaked ships |
+| **Siege Cannon** | Weaponsmith T7 + Metallurgy T6 + Electronics T5 | 2-3 | Highest DPS weapon in the game, only mountable on L+ ships |
+| **Mobile Refinery Core** | Engineering T7 + Chemistry T6 + Metallurgy T6 | 3 | Upgrades any Crawler to 50% faster refining with zero waste |
+| **Precursor Alloy Replicator** | Metallurgy T8 + Chemistry T7 + Electronics T7 | 3 | Can replicate small amounts of Precursor materials from common inputs |
+
+These items create real demand for guilds with diverse specializations — and they're tradeable, so guilds that can produce them become famous (and wealthy).
+
+---
+
+#### Guild Refining Bonuses
+
+Guild refineries are better than public ones. The more the guild invests, the better they get.
+
+| Bonus | Source | Effect |
+|-------|--------|--------|
+| **Batch Processing** | Guild Refinery (outpost) | Refine up to 5x the normal batch size in one cycle |
+| **Reduced Waste** | Guild Refinery upgrade (15,000 OMEN) | 10% less material lost during refining (normally ~5-15% waste) |
+| **Zero Waste Mastery** | Guild Refinery upgrade (40,000 OMEN) | 0% waste on T1-T4 materials, 5% waste on T5+ |
+| **Speed Refining** | 3+ guild members using the refinery simultaneously | 20% faster refining for all users |
+| **Exotic Processing** | Guild Refinery upgrade (60,000 OMEN) | Can refine T7-T8 exotic materials (normally Spira-exclusive) |
+
+**Refinery Upgrade Path:**
+
+```
+Base Guild Refinery (outpost module): 20,000 OMEN + 3,000/week
+  └── Reduced Waste: +15,000 OMEN
+       └── Zero Waste Mastery: +40,000 OMEN
+  └── Exotic Processing: +60,000 OMEN
+
+Total fully upgraded refinery: 135,000 OMEN + 3,000/week
+```
+
+A guild with a maxed refinery is extremely valuable — members save materials on every refine, and exotic processing means they don't have to haul T7-T8 materials all the way to Spira.
+
+---
+
+#### Guild Research Lab
+
+Guilds can pool resources into long-term **research projects** that unlock exclusive blueprints and bonuses for all members.
+
+**How Guild Research Works:**
+1. Guild Master or Officer initiates a research project
+2. Members donate required materials and OMEN to the project over time
+3. A progress bar fills as donations come in
+4. When complete, all guild members permanently unlock the result
+
+**Research Projects:**
+
+| Project | Cost (Materials + OMEN) | Duration | Reward |
+|---------|------------------------|----------|--------|
+| **Efficient Engines** | 5,000 Tritanium + 10,000 OMEN | ~1 week of donations | All guild ships get +5% fuel efficiency |
+| **Reinforced Hulls** | 3,000 Ceramic-Steel + 15,000 OMEN | ~1 week | All guild ships get +5% hull durability |
+| **Advanced Drill Tips** | 2,000 Neodyne + 8,000 OMEN | ~5 days | +10% mining yield for guild members |
+| **Rapid Repair Protocol** | 1,000 Quantum Polymers + 12,000 OMEN | ~1 week | Repair kit effectiveness +25% for guild members |
+| **Shared Schematics** | 500 of each T4 component + 20,000 OMEN | ~2 weeks | Unlock 3 random T5 blueprints for the guild |
+| **Deep Core Resonance** | 200 Psionic Crystals + 30,000 OMEN | ~2 weeks | Guild ground vehicles detect deep deposits 50% further |
+| **Void Adaptation** | 100 Void Essence + 50,000 OMEN | ~3 weeks | Guild ships take 25% less environmental damage in Uncharted Space |
+| **Masterwork Techniques** | 50 Phase-Shift Alloys + 80,000 OMEN | ~4 weeks | +10% chance to craft at one quality tier higher than normal |
+
+**Research Rules:**
+- Only one research project active at a time
+- All guild members can contribute materials/OMEN
+- Progress is permanent — doesn't decay if donations slow down
+- Completed research benefits are permanent as long as you're in the guild
+- If you leave the guild, you lose the research bonuses
+- Research bonuses are visible on the guild profile (recruiting incentive)
+
+---
+
+#### Guild Specialization Bonus
+
+When a guild has members covering multiple crafting specializations, everyone gets passive bonuses from each other's expertise.
+
+**How It Works:**
+- For every crafting skill tree where at least one guild member is T5+, ALL guild members get a small passive bonus related to that skill
+
+| Skill Tree Covered (T5+) | Passive Bonus for All Members |
+|--------------------------|-------------------------------|
+| **Metallurgy** | +3% armor durability on crafted/equipped gear |
+| **Chemistry** | +3% fuel efficiency |
+| **Weaponsmith** | +3% weapon damage |
+| **Electronics** | +3% scanner range |
+| **Engineering** | +3% ship speed |
+| **Shipwright** | +3% hull hit points |
+| **Dronecraft** | +3% drone efficiency |
+
+- Bonuses stack — a guild covering all 7 trees gets all 7 bonuses simultaneously
+- Only counts the highest-tier member per tree (no double-dipping)
+- Encourages guilds to recruit diverse specialists rather than 30 of the same type
+- Displayed on the Guild Panel as "Guild Expertise" with icons for each covered tree
+
+**Example:**
+```
+Guild: Iron Wolves (23 members)
+
+Guild Expertise:
+  ✓ Metallurgy (Kira, T6)     → +3% armor durability
+  ✓ Weaponsmith (Voss, T7)    → +3% weapon damage
+  ✓ Engineering (Drav, T5)    → +3% ship speed
+  ✓ Electronics (Mira, T5)   → +3% scanner range
+  ✗ Chemistry                  → No member at T5+
+  ✗ Shipwright                 → No member at T5+
+  ✗ Dronecraft                 → No member at T5+
+
+Active bonuses: 4 of 7 trees covered
+Recruiting need: Chemist, Shipwright, Drone Engineer
+```
+
+---
+
+#### Guild Reputation
+
+Guilds build a public **Guild Reputation** score based on their collective achievements. Higher reputation unlocks exclusive guild-wide perks and signals quality to potential recruits.
+
+**Earning Guild Reputation:**
+
+| Action | Rep Earned |
+|--------|-----------|
+| Complete a guild contract | +50 |
+| Win a guild boss raid | +100 |
+| Win a conquest battle (as contributing guild) | +150 |
+| First discovery by any member | +25 |
+| Fully map a planet (guild map data) | +75 |
+| Win a guild war | +200 |
+| Maintain guild outpost for 4 consecutive weeks | +100 |
+
+**Guild Reputation Tiers:**
+
+| Rep | Tier | Perks Unlocked |
+|-----|------|----------------|
+| 0 | **Unknown** | No bonuses |
+| 500 | **Established** | Guild name appears in gold in chat. +1 guild contract slot |
+| 2,000 | **Respected** | 5% discount at all city markets for members. Access to T5 guild research |
+| 5,000 | **Renowned** | Guild emblem displayed on member ships. 10% discount at all markets. Access to T6 guild research |
+| 15,000 | **Legendary** | Guild gets a permanent NPC recruiter in their Home City. 15% market discount. Access to all guild research. Guild name announced galaxy-wide on major achievements |
+
+**Guild Reputation Decay:**
+- Reputation decays 2% per week if no guild activities are completed (encourages active play)
+- Reputation cannot drop below the minimum for your current tier (you don't lose tier perks from minor inactivity)
+
+---
+
+#### Solo vs Guild Comparison
+
+A clear look at what guild membership provides:
+
+| Feature | Solo Player | Guild Member |
+|---------|-------------|--------------|
+| Mining yield | Base | +10-20% (proximity + research) |
+| Refining waste | 5-15% | 0-5% (guild refinery) |
+| Crafting quality | Base chance | +5-15% (collaborative + research) |
+| Scanner range | Base | +3-10% (specialization + research) |
+| Ship stats | Base | +3% per covered skill tree (up to 7 trees) |
+| Repair kit effectiveness | Base | +25% (research) |
+| Market fees | Standard | Up to 15% discount (guild reputation) |
+| T6+ crafting | Need multiple T6+ skills yourself | Collaborative craft with guildmates |
+| Exclusive items | Cannot craft | Collaborative-only recipes |
+| Exotic refining | Must use Spira | Guild refinery (if upgraded) |
+| Boss raids | World bosses only (public) | World bosses + 4 exclusive guild raid bosses |
+| Exploration | Your data only | Pooled data from 30 players |
+| Field base | None | Guild outpost with workshops, refinery, defenses |
+| Respawn in field | Nearest city | Guild outpost (if beacon built) |
+| Protection | On your own | Militia (faction) + outpost turrets + guildmates on HUD |
+
+**The pitch:** Solo is viable. Guild is better. The benefits compound — a well-run guild with diverse specialists, a funded outpost, and completed research projects gives every member a measurable edge in everything they do.
+
+---
+
 ## Factions
 
 Factions are large-scale political entities tied to the six major cities. Every player belongs to a faction — it's determined by where they set their **Home City**.
