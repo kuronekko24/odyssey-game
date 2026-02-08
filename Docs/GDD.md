@@ -5619,17 +5619,338 @@ The player is now in-game. They're sitting in a damaged shuttle drifting in Uurf
 
 ---
 
-## Technical Targets
+## Server Architecture & Networking
 
-### Performance
-- 30 FPS stable on mid-range devices
-- 60 FPS option on high-end
-- Seamless planet transitions (streaming)
-- Server-authoritative economy
+Odyssey runs on a **fully server-authoritative** architecture with a **single-shard universe**. All game state — economy, combat, loot, player positions — is owned and validated by the server. Clients send inputs; the server simulates the world and sends state updates back. This is non-negotiable for a game with a finite currency supply (OMEN), real-money premium currency (NOVA), and full-loot PvP zones. The architecture is designed to start small (1K–5K CCU at launch) and scale progressively without a rewrite.
 
-### Supported Devices
-- **iOS:** iPhone 8+, iOS 14+
-- **Android:** Android 9+, 3GB RAM minimum
+---
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        CLIENTS (Mobile)                         │
+│   iOS / Android — WebSocket connection to nearest gateway       │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ WebSocket (TLS)
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     GATEWAY LAYER                               │
+│   Load Balancer → Gateway Servers (auth, routing, compression)  │
+│   Handles connection lifecycle, heartbeat, reconnection         │
+└──────────────────────────┬──────────────────────────────────────┘
+                           │ Internal RPC / Message Queue
+                           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                   GAME SERVER LAYER                              │
+│   Zone Servers — each runs one or more zones of the galaxy      │
+│   20 Hz tick rate, authoritative simulation                     │
+│   Stateless (zone state loaded from DB, flushed periodically)   │
+└─────────┬─────────────────────────────┬─────────────────────────┘
+          │                             │
+          ▼                             ▼
+┌──────────────────────┐  ┌──────────────────────────────────────┐
+│   ECONOMY SERVICE    │  │         SHARED SERVICES               │
+│   Market orders      │  │   Chat, Friends, Guild, Matchmaking,  │
+│   OMEN/NOVA ledger   │  │   Leaderboards, Quest State,          │
+│   Trade validation   │  │   Notification, Analytics Pipeline    │
+│   Blockchain bridge  │  │                                       │
+│   (future module)    │  │                                       │
+└─────────┬────────────┘  └──────────────┬───────────────────────┘
+          │                              │
+          ▼                              ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                     PERSISTENCE LAYER                            │
+│   PostgreSQL (primary) — economy, player data, world state      │
+│   Redis (cache) — session state, leaderboards, rate limiting    │
+│   Object Storage — assets, logs, backups, replays               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+### Core Principles
+
+| Principle | Implementation |
+|-----------|---------------|
+| **Server is Truth** | Clients never determine game outcomes. Combat damage, loot rolls, crafting results, market trades, OMEN/NOVA balances — all calculated server-side. Client sends intent ("fire weapon at target X"), server resolves the result |
+| **Single Shard** | One galaxy, one economy, one player universe. No parallel shards splitting the community. Zones are the unit of scaling — add more zone server capacity as player count grows |
+| **Cloud Agnostic** | Architecture defined in terms of capabilities (compute, DB, load balancer, message queue), not vendor-specific services. Deployable on AWS, GCP, or bare metal with containerization |
+| **Stateless Servers** | Game servers and services hold no critical state in memory long-term. All persistent state lives in PostgreSQL. If a server crashes, another picks up the zone within seconds |
+| **Horizontally Scalable** | Every layer can scale by adding more instances. Gateway: more WebSocket servers. Game: more zone servers. Economy: read replicas + queue-based writes. DB: connection pooling + read replicas |
+| **Progressive Scaling** | Launch with minimal infrastructure (single region, few servers). Add regions, capacity, and services as player base grows. No over-provisioning at launch |
+
+---
+
+### Network Protocol
+
+**WebSocket over TLS** for all client-server communication.
+
+| Aspect | Detail |
+|--------|--------|
+| **Protocol** | WebSocket (RFC 6455) over TLS 1.3 |
+| **Why WebSocket** | Works on all mobile networks, no firewall issues, no NAT traversal problems, built-in browser support if web client is ever needed. TCP reliability for a game where every OMEN transaction matters |
+| **Connection** | Client connects to the nearest gateway via DNS-based routing. Single persistent connection per session |
+| **Message Format** | Binary — MessagePack or FlatBuffers for compact serialization. No JSON for real-time game state (too large, too slow to parse) |
+| **Compression** | Per-message deflate (permessage-deflate extension) for large payloads. Delta compression for state updates — only send what changed since last tick |
+| **Heartbeat** | Client sends ping every **10 seconds**. Server responds with pong + server timestamp (for clock sync). 3 missed heartbeats = connection timeout |
+| **Reconnection** | Client auto-reconnects with exponential backoff (1s, 2s, 4s, max 30s). Server holds player session for **60 seconds** after disconnect — if client reconnects within window, player resumes exactly where they were (ship stays in space, not teleported) |
+| **Bandwidth Target** | <**5 KB/s** average downstream per client during normal gameplay. <**15 KB/s** peak during large combat encounters. <**1 KB/s** upstream (player inputs are small) |
+
+#### Message Types
+
+| Category | Direction | Examples | Priority |
+|----------|-----------|----------|----------|
+| **Input** | Client → Server | Move command, fire weapon, interact, dock, trade request | High |
+| **State Update** | Server → Client | Entity positions, HP changes, zone population, nearby ships | High |
+| **Economy** | Bidirectional | Market order, trade confirm, OMEN/NOVA balance update, craft request | Critical (guaranteed delivery + server acknowledgment) |
+| **Social** | Bidirectional | Chat message, friend request, guild invite | Medium |
+| **System** | Server → Client | Server announcements, maintenance warnings, event notifications | Low |
+| **Analytics** | Client → Server | Performance metrics, input latency, FPS samples | Low (batched, non-blocking) |
+
+All economy messages use a **request-acknowledge-confirm** pattern: client sends request → server validates → server sends acknowledge with result. Client does not update local state until server confirms. This prevents desync on anything involving currency or items.
+
+---
+
+### Game Server (Zone Simulation)
+
+Each game server process runs the authoritative simulation for one or more **zones** of the galaxy.
+
+#### Tick Rate
+
+**20 Hz (50ms per tick)** — consistent across all zone types.
+
+| Per-Tick Operations | Description |
+|---------------------|-------------|
+| **Input Processing** | Dequeue all player inputs received since last tick. Validate and apply movement, actions, commands |
+| **Physics / Collision** | Simple 2D collision detection (isometric plane). Ship-to-ship, ship-to-asteroid, weapon projectile-to-target. No complex physics — grid-aligned with interpolation |
+| **Combat Resolution** | Process weapon fire, apply damage (accounting for shields, armor, modules), check for kills, generate loot tables on destruction |
+| **AI / NPC** | Update NPC patrol paths, pirate aggro logic, drone behavior, merchant inventory restocks |
+| **State Snapshot** | Build delta snapshot of all entity states that changed this tick. Serialize and broadcast to all connected clients in the zone |
+| **Persistence Flush** | Queue critical state changes (HP, inventory, position) for async DB write. Economy operations (OMEN transfers) are synchronous with DB transaction |
+
+#### Zone Capacity
+
+| Zone Type | Max Players | Entities (Total) | Notes |
+|-----------|-------------|-------------------|-------|
+| **Open Space (Normal)** | 100 per zone | ~500 (ships + asteroids + NPCs + projectiles) | If player count exceeds limit, overflow players are placed in the adjacent zone and see a "zone is busy" indicator |
+| **Station / City** | 50 per instance | ~200 (players + NPCs + props) | Stations auto-instance when population exceeds 50. Players can switch instances manually |
+| **Planet Surface** | 50 per instance | ~300 (players + nodes + NPCs + fauna) | Same instancing as stations |
+| **Hardcore Zone** | 50 per zone | ~300 | Deliberately lower cap — fights should be personal, not zergs |
+| **Conquest Zone** | 200 per zone | ~1000 | Higher cap for large-scale guild battles. Dedicated higher-spec server |
+
+#### Interest Management (Relevance Filtering)
+
+Clients don't receive updates for every entity in the zone — only those within their **area of interest (AOI)**.
+
+| Player State | AOI Radius | Update Frequency |
+|-------------|-----------|-----------------|
+| **Flying (normal speed)** | 150 units (~3 screen widths) | Every tick (20 Hz) for nearby entities, every 5th tick (4 Hz) for edge-of-AOI entities |
+| **Docked / Station** | Station bounds only | Every tick for same-station players, no updates from space |
+| **Combat** | 200 units (expanded to include all combatants) | Every tick for all combat participants regardless of distance |
+| **Warping** | None (warp is instantaneous transition) | No updates during warp animation. Full snapshot on arrival at destination zone |
+
+Entities leaving AOI get a "fade out" message; entering AOI get a "spawn" message with full state. This prevents pop-in on the client.
+
+---
+
+### Gateway Layer
+
+Gateways sit between clients and game servers. They handle connection management, authentication, routing, and protocol translation.
+
+| Responsibility | Detail |
+|---------------|--------|
+| **Connection Management** | Accept WebSocket connections, TLS termination, heartbeat monitoring, graceful disconnect handling |
+| **Authentication** | Validate session tokens on connect (JWT). Reject expired/invalid tokens. Rate-limit connection attempts per IP |
+| **Routing** | Route client messages to the correct zone server based on the player's current zone. Handle zone transfers (player warps to a new zone → gateway reconnects them to the new zone server seamlessly) |
+| **Compression** | Compress outbound state updates. Decompress inbound messages if client uses compression |
+| **Rate Limiting** | Per-client message rate limits (max 30 inputs/sec). Reject excess messages, flag suspicious clients for anti-cheat review |
+| **Buffering** | Buffer messages during zone transfers so clients don't see a gap. Queue outbound messages if client's send buffer is full (slow connection) |
+
+**Scaling:** Each gateway handles ~2,000 concurrent WebSocket connections. Add more gateway instances behind the load balancer as CCU grows. Gateways are stateless — any gateway can serve any client.
+
+---
+
+### Economy Service
+
+The economy is the most security-critical service in Odyssey. It runs as a **separate service** from game servers to isolate it from zone simulation failures and to enable independent scaling, auditing, and hardening.
+
+| Responsibility | Detail |
+|---------------|--------|
+| **OMEN Ledger** | Double-entry ledger for all OMEN movement. Every transfer has a debit and credit entry. Ledger is append-only — no updates or deletes. Total OMEN across all entries always sums to 1,000,000,000 |
+| **NOVA Ledger** | Same double-entry system for NOVA. Ties to IAP receipt validation (Apple/Google) |
+| **Market Engine** | Order book matching for player-to-player market trades. Price-time priority. Supports limit orders and instant-buy/sell against existing orders |
+| **Trade Validation** | All player-to-player trades (direct or market) pass through the economy service. It validates: sender has the items/OMEN, receiver has space, no duplicated items, correct tax deduction |
+| **Transaction Atomicity** | Every economy operation is a PostgreSQL transaction. Either the full trade completes (items move AND OMEN moves) or nothing happens. No partial states |
+| **Audit Log** | Every transaction is logged with: timestamp, participants, items/amounts, source (market/trade/quest/loot/craft), result. Queryable for investigation |
+| **Rate Limiting** | Per-player limits on economy operations (max 60 trades/min, max 100 market orders/min). Prevents bot-driven market manipulation |
+
+#### Blockchain Bridge (Future Module)
+
+The economy service is designed with a clean **asset ownership interface** that can be backed by either the PostgreSQL ledger (default) or a blockchain backend.
+
+| Layer | Interface | Current Implementation | Future Blockchain Implementation |
+|-------|-----------|----------------------|--------------------------------|
+| **Currency** | `transfer(from, to, amount, currency)` | PostgreSQL ledger entry | On-chain token transfer |
+| **Asset Ownership** | `ownerOf(assetId)`, `transfer(assetId, from, to)` | PostgreSQL ownership table | NFT ownership query / transfer |
+| **Balance Query** | `balanceOf(playerId, currency)` | PostgreSQL aggregate query | On-chain balance check |
+| **Transaction History** | `history(playerId, filters)` | PostgreSQL audit log | On-chain event log + off-chain index |
+| **Minting** | `mint(assetType, metadata, owner)` | PostgreSQL insert | NFT mint to player wallet |
+
+The blockchain bridge is an **optional module** — the game works fully without any chain. When/if enabled:
+- Players link a crypto wallet to their account (optional)
+- OMEN/NOVA can be withdrawn to on-chain tokens (with cooldown and fees to prevent market abuse)
+- Ships/equipment can be minted as NFTs (cosmetic metadata + stats snapshot)
+- The on-chain state is a **mirror** of the authoritative server state, not the source of truth. Server always wins in case of conflict
+
+---
+
+### Persistence Layer
+
+#### PostgreSQL (Primary Database)
+
+All persistent game data lives in PostgreSQL. Chosen for ACID transactions (critical for economy), complex query support (market orders, leaderboards, analytics), and mature tooling.
+
+| Data Domain | Tables (Conceptual) | Access Pattern |
+|-------------|---------------------|----------------|
+| **Player Accounts** | `players`, `sessions`, `auth_tokens`, `settings` | Read on login, update on settings change. Low write volume |
+| **Player State** | `ships`, `inventory`, `equipment`, `skills`, `quests`, `reputation` | Read on zone entry, write on state change. Medium write volume — batched every 5 seconds per player |
+| **Economy** | `omen_ledger`, `nova_ledger`, `market_orders`, `trade_history`, `audit_log` | High write volume — every transaction. Append-only ledger tables. Market orders are hot tables (frequent insert/update/delete) |
+| **World State** | `zones`, `resource_nodes`, `npc_state`, `conquest_territory`, `guild_structures` | Read on zone server startup, periodic flush. Medium write volume |
+| **Social** | `friends`, `guilds`, `guild_members`, `guild_bank`, `chat_log` | Read on login, write on social actions. Low-medium write volume |
+| **Analytics** | `events`, `sessions`, `economy_snapshots` | Write-heavy, append-only. Archived to cold storage after 90 days |
+
+#### Write Optimization
+
+| Strategy | Detail |
+|----------|--------|
+| **Batched Writes** | Non-critical state changes (player position, HP) are batched and flushed to DB every **5 seconds** per zone server. If a server crashes, max 5 seconds of position/HP state is lost (acceptable — players respawn) |
+| **Synchronous Economy Writes** | OMEN/NOVA transfers, market trades, and item transfers are written to DB synchronously within a transaction BEFORE the server confirms to the client. No fire-and-forget for money |
+| **Connection Pooling** | PgBouncer or equivalent connection pooler in front of PostgreSQL. Game servers share a pool rather than each holding dedicated connections |
+| **Read Replicas** | Leaderboards, market price history, analytics queries, and other read-heavy workloads run against read replicas — never touch the primary |
+| **Partitioning** | Ledger tables partitioned by month. Audit logs partitioned by week. Old partitions archived to cold storage |
+
+#### Redis (Cache & Real-Time State)
+
+Redis handles ephemeral, high-frequency data that doesn't need the durability of PostgreSQL.
+
+| Use Case | Data | TTL |
+|----------|------|-----|
+| **Session Cache** | Player session tokens, current zone, connection state | 24 hours (refreshed on activity) |
+| **Leaderboard** | Sorted sets for various rankings (OMEN earned, PvP kills, mining output) | Rebuilt every 5 minutes from DB |
+| **Rate Limiting** | Per-player action counters (trades/min, messages/min, login attempts) | Rolling window, 1–5 minute TTL |
+| **Zone Population** | Current player count per zone (for instancing decisions and UI display) | Updated every tick, 30 second TTL |
+| **Market Price Cache** | Recent trade prices for quick display (avoids hitting DB on every market screen open) | 30 seconds |
+| **Pub/Sub** | Cross-server messaging: guild chat, friend online notifications, system announcements | N/A (ephemeral) |
+
+---
+
+### Scaling Strategy
+
+Designed to grow from launch (1K–5K CCU) to mature (100K+ CCU) without architectural changes — only infrastructure additions.
+
+#### Launch Configuration (1K–5K CCU)
+
+| Component | Instances | Specs |
+|-----------|-----------|-------|
+| **Load Balancer** | 1 | Cloud-managed (ALB/NLB equivalent) |
+| **Gateway Servers** | 2–3 | 2 vCPU, 4 GB RAM each |
+| **Zone Servers** | 4–8 | 4 vCPU, 8 GB RAM each. Each handles 5–10 zones |
+| **Economy Service** | 2 (active-standby) | 2 vCPU, 4 GB RAM. Hot standby for failover |
+| **Shared Services** | 2–3 | Chat, friends, guild, matchmaking. Can share instances at this scale |
+| **PostgreSQL** | 1 primary + 1 read replica | 4 vCPU, 16 GB RAM, SSD storage |
+| **Redis** | 1 instance | 2 vCPU, 8 GB RAM |
+| **Region** | 1 (closest to primary player base) | Add second region when latency complaints emerge |
+
+**Estimated Monthly Cost:** $1,500–$3,000/mo at launch scale (cloud-dependent).
+
+#### Growth Configuration (10K–50K CCU)
+
+| Change | Detail |
+|--------|--------|
+| **Gateways** | Scale to 10–15 instances behind load balancer |
+| **Zone Servers** | Scale to 20–40 instances. Hot zones (popular areas) get dedicated servers |
+| **Economy Service** | Scale to 3–4 active instances with queue-based write distribution |
+| **PostgreSQL** | Upgrade to 8+ vCPU, 32+ GB RAM. Add 2–3 read replicas. Enable connection pooling |
+| **Redis** | Cluster mode (3+ nodes) for high availability |
+| **Regions** | 2–3 regions (e.g., US, EU, Asia). Players connect to nearest gateway. All regions share one DB (single shard universe) with region-aware replication |
+| **CDN** | Add CDN for asset delivery (game updates, voxel asset bundles) |
+
+#### Mature Configuration (100K+ CCU)
+
+| Change | Detail |
+|--------|--------|
+| **Zone Servers** | 100+ instances. Auto-scaling based on zone population. Conquest zones get temporary high-spec instances during battles |
+| **PostgreSQL** | Vertically scaled primary (16+ vCPU, 64+ GB RAM). 5+ read replicas. Consider Citus or similar for horizontal scaling of analytics/ledger tables |
+| **Economy Service** | Dedicated cluster with its own DB connection pool. Queue-based architecture to handle trade spikes |
+| **Global Routing** | Anycast or GeoDNS routing to nearest region. 4+ regions |
+| **Monitoring** | Dedicated observability stack (metrics, logs, traces, alerting). Full-time on-call rotation |
+
+---
+
+### Latency Budget
+
+Total input-to-visual-feedback target: **<200ms** for the 95th percentile player.
+
+| Segment | Budget | Notes |
+|---------|--------|-------|
+| **Client Input → WebSocket Send** | <10ms | Local processing. Immediate on modern phones |
+| **Network (Client → Gateway)** | <50ms | Depends on player's ISP and distance to region. Target <50ms for same-region players |
+| **Gateway → Zone Server** | <5ms | Internal network, same datacenter |
+| **Server Tick Processing** | <50ms | One full tick cycle (20 Hz). Worst case: input arrives just after a tick, waits up to 50ms |
+| **Zone Server → Gateway** | <5ms | Internal network |
+| **Network (Gateway → Client)** | <50ms | Same as inbound |
+| **Client Rendering** | <33ms | One frame at 30 FPS |
+| **Total** | <203ms | Within budget. Client-side prediction makes it feel faster |
+
+#### Client-Side Prediction
+
+Even though the server is authoritative, the client uses **prediction** for responsive feel:
+
+| Predicted (Client) | Authoritative (Server) |
+|--------------------|----------------------|
+| Ship movement and turning | Final position (server corrects if >threshold drift) |
+| Weapon fire animation / SFX | Hit detection, damage calculation, kill confirmation |
+| UI interactions (menu open, button press) | Trade execution, craft result, OMEN/NOVA balance |
+| Shield/armor bar animation (optimistic) | Actual HP values (corrected on next server update) |
+| Resource node "harvesting" animation | Actual resource yield, inventory update |
+
+If the server's authoritative state disagrees with the client's prediction, the client **snaps to server state** with a smooth interpolation (no teleporting). For economy operations, the client shows a "pending" state until server confirms — never shows optimistic OMEN/NOVA changes.
+
+---
+
+### Failover & Recovery
+
+| Failure | Recovery |
+|---------|----------|
+| **Gateway crash** | Load balancer routes new connections to healthy gateways. Existing clients on crashed gateway reconnect automatically (60-second session hold on zone server) |
+| **Zone server crash** | Zone goes offline for 5–15 seconds while a replacement instance loads zone state from DB. Players in the zone see a "reconnecting" message. Max 5 seconds of position/HP state lost (last batch flush). Economy state is never lost (synchronous writes) |
+| **Economy service crash** | Hot standby takes over within seconds. In-flight transactions are rolled back (PostgreSQL transaction guarantee). Clients retry automatically |
+| **PostgreSQL primary crash** | Read replica promoted to primary (automated failover). 5–30 second downtime depending on replication lag. All writes during failover are queued and replayed |
+| **Redis crash** | Cache is rebuilt from DB on restart. Session tokens re-validated. Leaderboards regenerated. 30–60 seconds of degraded performance, no data loss |
+| **Full region outage** | Players routed to secondary region. Higher latency but playable. Single-shard DB means economy continuity is maintained |
+
+---
+
+### Technical Targets
+
+#### Client Performance
+
+| Target | Spec |
+|--------|------|
+| **Frame Rate** | 30 FPS stable on mid-range devices, 60 FPS option on high-end |
+| **Load Time** | <10 seconds from app launch to gameplay (cached assets) |
+| **Asset Streaming** | Seamless zone transitions with pre-loading. No loading screens between adjacent zones |
+| **Memory** | <512 MB total app memory on mid-range devices |
+| **Battery** | <15% battery drain per hour of active gameplay (target) |
+| **Download Size** | <200 MB initial install. Additional assets streamed on demand |
+
+#### Supported Devices
+
+| Platform | Minimum | Recommended |
+|----------|---------|-------------|
+| **iOS** | iPhone 8+, iOS 14+ | iPhone 12+, iOS 16+ |
+| **Android** | Android 9+, 3 GB RAM, OpenGL ES 3.0 | Android 12+, 6 GB RAM, Vulkan |
 
 ---
 
