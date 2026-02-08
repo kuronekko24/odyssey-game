@@ -5121,6 +5121,261 @@ The player is now in-game. They're sitting in a damaged shuttle drifting in Uurf
 
 ---
 
+## Live Ops & Monitoring
+
+Post-launch, the dev team needs visibility into every major game system to detect imbalances early and act fast. This section defines the dashboards, alerts, and tuning tools used to keep Odyssey healthy.
+
+---
+
+### Economy Dashboard
+
+Real-time overview of the OMEN economy and resource flow.
+
+**OMEN Flow**
+- Total OMEN minted vs. destroyed per hour/day/week
+- Net inflation rate (minted − sunk)
+- Running supply graph with trend line
+- Breakdown by source: mining sales, quest rewards, NPC bounties, market taxes returned
+- Breakdown by sink: crafting fees, repair costs, guild expenses, market listing fees, equipment loss on death
+
+**Market Prices**
+- Live price ticker for all tradeable resources and items
+- Historical price charts (1h, 24h, 7d, 30d)
+- Price volatility index per item category
+- Comparison view: current price vs. crafting cost vs. NPC vendor baseline
+
+**Wealth Distribution**
+- Gini coefficient tracking over time
+- Wealth brackets: percentage of players in each OMEN range
+- Top 100 richest players / guilds (flagging sudden spikes)
+- New player average OMEN at 1h, 1d, 7d, 30d milestones
+
+**Sink/Faucet Balance**
+- Stacked bar chart: all faucets vs. all sinks
+- Per-system breakdown (combat, crafting, trading, quests, guild ops)
+- Projected OMEN supply at current rates (7d, 30d, 90d forecast)
+- Alert threshold: net inflation > 5% per week or net deflation > 3% per week
+
+---
+
+### Market Health Monitors
+
+Granular tracking of the player-driven marketplace.
+
+**Price Trends**
+- Per-resource price graph with moving averages (1h, 24h, 7d)
+- Per-item-tier price tracking (Tier 1–5 resources, crafted gear by tier)
+- Price floor / ceiling detection — flag items trading below crafting cost or above 10x historical average
+
+**Trade Volume**
+- Total trades per hour/day broken down by resource tier and item category
+- Active seller count vs. active buyer count
+- Market liquidity score: average time-to-sell per item category
+- Dead markets: items with <5 trades per day flagged for review
+
+**Supply & Demand**
+- Outstanding buy orders vs. sell orders per item
+- Supply velocity: rate resources enter the market vs. rate they are consumed
+- Demand spikes: sudden increases in buy orders for specific items (may indicate exploit or content shift)
+
+**Anomaly Detection**
+- Price crash alert: item drops >40% in 24h
+- Hyperinflation alert: item rises >200% in 24h
+- Wash trading detection: repeated buy/sell between same accounts
+- Market manipulation patterns: coordinated buy-outs of a single resource
+
+---
+
+### Combat & Equipment Balance
+
+Tracking weapon/ship/loadout performance to maintain build diversity.
+
+**Weapon & Module Usage**
+- Usage rate per weapon type as percentage of all equipped weapons
+- Usage rate per combat module (shields, EMP, stealth, etc.)
+- Diversity index: are players converging on a single meta or exploring varied builds?
+- Tier distribution: percentage of players using each equipment tier in PvP vs. PvE
+
+**Win Rates**
+- Win rate by ship class (Scout, Frigate, Cruiser, etc.) in PvP arenas
+- Win rate by primary weapon type
+- Win rate by combat philosophy archetype (Brawler, Kiter, Ambusher, Support)
+- Matchup matrix: ship class vs. ship class win rates
+
+**Kill/Death Ratios**
+- Average K/D by ship class
+- K/D by zone type (safe, contested, lawless)
+- K/D by player progression bracket (new, mid-game, endgame)
+- Outlier detection: players with K/D >10x average flagged for review
+
+**Equipment Lifecycle**
+- Average durability lifespan per item tier before destruction
+- Repair frequency per item category
+- Equipment loss rate on death by zone type
+- Item tier distribution across active players (are Tier 5 items too common or too rare?)
+
+**Fleet Battle Metrics**
+- Average fleet size in engagements
+- Most common fleet compositions
+- Win rate by fleet composition archetype
+- Battle duration distribution
+
+---
+
+### Player Behavior Analytics
+
+Understanding how players engage with Odyssey to identify friction, optimize retention, and guide content priorities.
+
+**Session Metrics**
+- Average session duration (segmented by new / mid / endgame players)
+- Sessions per day per player
+- Session start/end patterns (time of day, day of week)
+- Peak concurrent users over time
+
+**Zone Population**
+- Real-time heatmap: player density per planet, city, and zone
+- Zone transition flow: where players go after each zone
+- Underused zones: areas with consistently low traffic
+- Overcrowded zones: areas where server performance may degrade
+
+**Progression Tracking**
+- Funnel: percentage of players reaching each progression milestone
+- Average time to reach each skill level bracket
+- Bottleneck detection: stages where players stall for >2x expected duration
+- Skill tree distribution: which trees are most/least invested in
+
+**Retention & Churn**
+- D1, D7, D30 retention rates
+- Churn point analysis: last action before a player stops playing
+- Returning player rate: players who churned but came back
+- Cohort analysis: retention curves by signup week
+
+**Quest Engagement**
+- Quest completion rate per quest type (story, daily, weekly, faction, procedural)
+- Quest abandonment rate and at which step
+- Average quest completion time vs. design target
+- Most/least popular procedural quest templates
+
+---
+
+### Alerts & Anomaly Detection
+
+Automated monitoring that pages the team when something goes wrong.
+
+**Economy Alerts**
+| Alert | Trigger | Severity |
+|-------|---------|----------|
+| Inflation spike | Net OMEN minted > 5% of supply in 24h | Critical |
+| Deflation spiral | Net OMEN destroyed > 3% of supply in 24h | High |
+| Market crash | Any top-50 traded item drops >40% in 24h | High |
+| Hyperinflation | Any item rises >200% in 24h | High |
+| Wealth concentration | Top 1% holds >50% of total OMEN | Medium |
+| Dead market | Any resource tier has <10 trades in 24h | Medium |
+
+**Combat Alerts**
+| Alert | Trigger | Severity |
+|-------|---------|----------|
+| Meta convergence | Any single weapon/module used by >40% of PvP players | High |
+| Ship class dominance | Any ship class win rate >65% in arenas | High |
+| Kill farming | Player K/D >20x average sustained over 24h | Medium |
+| Equipment glut | Any Tier 5 item held by >30% of endgame players | Medium |
+
+**Player Health Alerts**
+| Alert | Trigger | Severity |
+|-------|---------|----------|
+| Retention drop | D7 retention falls >5 percentage points week-over-week | Critical |
+| Progression wall | >20% of players stuck at same stage for >3 days | High |
+| Zone depopulation | Any major zone loses >50% population in 7 days | High |
+| Session collapse | Average session duration drops >25% week-over-week | High |
+| Quest failure spike | Any quest type fails >60% of attempts | Medium |
+
+**Faction & Guild Alerts**
+| Alert | Trigger | Severity |
+|-------|---------|----------|
+| Faction imbalance | Any faction holds >40% of total territory | High |
+| Faction depopulation | Any faction has <10% of active players | High |
+| Guild monopoly | Any guild controls >25% of a system's territory | Medium |
+| Guild collapse | >5 guilds dissolve in a single week | Medium |
+
+**Alert Routing**
+- Critical: Push notification to on-call + Slack #odyssey-alerts
+- High: Slack #odyssey-alerts + daily digest
+- Medium: Daily digest + weekly review dashboard
+
+---
+
+### Balance Adjustment Tools
+
+Levers the team can pull to correct issues detected by monitoring. All changes are logged with before/after values and the alert that triggered them.
+
+**Economy Levers**
+- **Drop rates**: Adjust resource drop rates per tier, per zone, per extraction method
+- **Crafting costs**: Modify OMEN fees and material requirements per recipe
+- **Market fees**: Adjust listing fee and transaction tax percentages
+- **Repair costs**: Scale repair OMEN cost and material requirements
+- **NPC vendor prices**: Adjust baseline buy/sell prices
+- **Quest rewards**: Modify OMEN and item rewards per quest type
+- **Sink multipliers**: Global multiplier on all OMEN sinks (emergency inflation control)
+- **Faucet multipliers**: Global multiplier on all OMEN sources (emergency deflation control)
+
+**Combat Levers**
+- **Damage values**: Per-weapon damage, fire rate, range adjustments
+- **Module stats**: Shield HP, EMP radius, stealth duration, etc.
+- **Ship class stats**: Hull HP, speed, cargo capacity, module slots per class
+- **Durability rates**: Equipment degradation speed per activity type
+- **Death penalties**: Percentage of equipment lost on death by zone type
+- **Spawn rates**: PvE enemy spawn frequency and density per zone
+- **Enemy difficulty**: PvE enemy HP, damage, AI aggression per zone tier
+
+**Progression Levers**
+- **XP curves**: Skill XP requirements per level
+- **Blueprint unlock rates**: Drop chance for blueprints by tier
+- **Reputation gain rates**: Faction reputation earned per action type
+
+**World Levers**
+- **Zone resource density**: How many resource nodes spawn per zone
+- **Wormhole frequency**: How often random wormholes appear
+- **Event frequency**: Spawn rate for world events (pirate raids, resource surges, etc.)
+
+**Safeguards**
+- All lever changes require two-person approval for Critical-severity responses
+- Maximum adjustment per lever per 24h: ±25% (prevents overreaction)
+- Automatic rollback if a lever change causes a new Critical alert within 1h
+- Full audit log: who changed what, when, why, linked to which alert
+
+---
+
+### Faction & Guild Health
+
+Monitoring the social and territorial systems to prevent domination or collapse.
+
+**Territory Control**
+- Map overlay: real-time territory ownership by faction
+- Territory change velocity: how fast borders shift per week
+- Contested zones: territories that change hands frequently (healthy conflict indicator)
+- Stale zones: territories held by one faction for >30 days without challenge
+
+**Faction Population**
+- Active player count per faction (daily/weekly active)
+- New player faction selection distribution
+- Faction switching rate: players leaving one faction for another
+- Faction engagement score: average quest/conquest participation per member
+
+**Guild Activity**
+- Active guilds: guilds with >50% of members active in last 7 days
+- Guild size distribution: histogram of guild member counts
+- Guild economic output: total OMEN earned/spent per guild per week
+- Guild territory efficiency: territory controlled vs. guild size
+- Dormant guilds: guilds with <25% activity rate flagged for potential dissolution
+
+**Conquest Balance**
+- Conquest win rate by faction
+- Average conquest battle participation (players per battle)
+- Territory reward distribution: are conquest rewards concentrating in top guilds?
+- Faction war fund health: OMEN reserves per faction over time
+
+---
+
 ## Vertical Slice (Phase 1)
 
 ### Deliverables
