@@ -2826,8 +2826,491 @@ This Fleet Battle System creates a multi-layered economy where players invest in
 - Player shops in cities
 - Contract system (hire other players)
 - Chat, friends list
+- Guild system (up to 30 members)
+- City-based factions with conquest warfare
 
 ---
+
+## Chat System
+
+In-game communication across four channels. Chat is accessible from any screen via a collapsible panel.
+
+### Chat Channels
+
+| Channel | Scope | Who Can See | Icon |
+|---------|-------|-------------|------|
+| **Direct** | 1-to-1 | You and one other player | Envelope |
+| **Guild** | Your guild | All online guild members | Shield |
+| **Faction** | Your faction | All online faction members | Banner |
+| **Global** | Everyone | All online players | Globe |
+
+### Chat UI
+
+```
+┌─────────────────────────────────────────────┐
+│ [DM] [Guild] [Faction] [Global]    [─ Hide] │
+│─────────────────────────────────────────────│
+│ [Guild]                                     │
+│ Kira: anyone running T5 ore to Spira?       │
+│ Voss: I've got a Hauler going in 10         │
+│ Kira: can I tag along? got 800 units        │
+│ Voss: sure, meet at pad 3                   │
+│ You: I'll escort, need the combat XP        │
+│                                             │
+│ ┌─────────────────────────────────┐ [Send]  │
+│ │ Type a message...               │         │
+│ └─────────────────────────────────┘         │
+└─────────────────────────────────────────────┘
+```
+
+- Chat panel slides up from the bottom of the screen
+- Collapsible — tap to minimize during gameplay, shows unread badge
+- Swipe between channels or tap tabs
+- Chat history persists per session (cleared on logout)
+- Timestamps shown on hover/long-press
+
+### Chat Features
+
+| Feature | Description |
+|---------|-------------|
+| **Quick Reply** | Tap a player's name to start a DM |
+| **Share Location** | Tap the pin icon to share your current coordinates in chat |
+| **Share Item** | Drag item from inventory to chat to show item stats |
+| **Link Contract** | Share a quest/contract in chat for others to accept |
+| **Mute Player** | Long-press a name → Mute (hides their messages) |
+| **Block Player** | Long-press a name → Block (hides all interaction + prevents DMs) |
+| **Report** | Long-press a message → Report (sends to moderation) |
+
+### Chat Rules
+- Profanity filter enabled by default (can be toggled off for Global only)
+- Spam throttle: max 5 messages per 10 seconds per channel
+- Global chat has a minimum player tier requirement (T2+) to prevent spam from new grief accounts
+- Blocked players cannot see your messages or send you DMs
+- Chat is text only — no images, no links (prevents phishing/exploits)
+
+---
+
+## Friends & Social
+
+### Friends List
+
+| Feature | Description |
+|---------|-------------|
+| **Add Friend** | Search by callsign, or tap player name in chat/world |
+| **Max Friends** | 100 |
+| **Online Status** | Shows online/offline and current system |
+| **Quick Actions** | DM, invite to guild, invite to fleet, share location |
+| **Favorite** | Pin up to 10 friends to the top of the list |
+| **Remove** | Unfriend without notification to the other player |
+
+### Player Inspection
+
+Tap any player in the world or chat to view their profile card:
+
+```
+┌─────────────────────────────────────────────┐
+│  PILOT: StarReaper                          │
+│  Guild: Iron Wolves                         │
+│  Faction: Dust Port Compact                 │
+│                                             │
+│  Tier: T5                                   │
+│  Exploration Fame: 8,200 (Surveyor)         │
+│  Arena Rank: Gold                           │
+│  Bounty: 0 OMEN                             │
+│                                             │
+│  Ship: M-class Gunship                      │
+│  (Equipment details hidden)                 │
+│                                             │
+│  [Add Friend] [DM] [Inspect Ship]           │
+│  [Report] [Block]                           │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- Equipment details are hidden by default (prevents easy target assessment)
+- Combat Scanner module reveals equipment to the scanning player only
+- Bounty is always visible
+- Exploration Fame and Arena Rank are always public
+
+---
+
+## Guilds
+
+Player-created organizations for cooperative play. Guilds are the core social unit — they mine together, fight together, and share resources.
+
+### Creating a Guild
+
+| Requirement | Details |
+|-------------|---------|
+| **Minimum Tier** | Player must be T2+ |
+| **Creation Cost** | 10,000 OMEN |
+| **Naming** | 3-20 characters, unique, profanity filtered |
+| **Tag** | 2-4 character abbreviation shown next to member names (e.g. [IW] StarReaper) |
+| **Founder** | Creator becomes Guild Master automatically |
+
+### Guild Limits
+
+| Stat | Value |
+|------|-------|
+| **Max Members** | 30 |
+| **Max Officers** | 5 |
+| **Guild Bank Capacity** | 50,000 OMEN + 10,000 resource units (upgradeable) |
+| **Guild Contracts** | 3 active at a time (upgradeable) |
+
+### Guild Ranks & Permissions
+
+| Rank | Count | Permissions |
+|------|-------|-------------|
+| **Guild Master** | 1 | Everything. Promote/demote, disband, set tax, manage bank, declare war |
+| **Officer** | Up to 5 | Invite/kick members, manage bank withdrawals, accept contracts, lead raids |
+| **Veteran** | Unlimited | Deposit to bank, access shared storage, participate in guild contracts |
+| **Member** | Unlimited | Guild chat, guild map data, participate in group content |
+| **Recruit** | Unlimited | Guild chat only. 7-day probation before promotion to Member |
+
+### Guild Features
+
+#### Guild Bank
+- Shared pool of OMEN and resources
+- Guild Master sets a **tax rate** (0-10%) on member market sales — auto-deposited to bank
+- Officers can withdraw up to a daily cap set by the Guild Master
+- Members can deposit freely but cannot withdraw
+- Transaction log visible to all members (transparency)
+
+#### Guild Bank Upgrades
+
+| Upgrade | Cost | Effect |
+|---------|------|--------|
+| Bank Expansion I | 5,000 OMEN | +25,000 OMEN cap, +5,000 resource units |
+| Bank Expansion II | 15,000 OMEN | +50,000 OMEN cap, +10,000 resource units |
+| Bank Expansion III | 50,000 OMEN | +100,000 OMEN cap, +25,000 resource units |
+| Contract Slot +1 | 10,000 OMEN | +1 active guild contract (max 6) |
+| Shared Workbench | 20,000 OMEN | Portable crafting station accessible by all members at guild outpost |
+| Shared Refinery | 30,000 OMEN | Portable refinery accessible by all members at guild outpost |
+
+#### Guild Map
+- All guild members' exploration data automatically pools together
+- If one member maps a region, every member can see it
+- Guild map layer toggled on/off in the map UI
+- Shared waypoints — officers can place persistent markers visible to all members
+
+#### Guild Contracts
+- Special missions that require multiple guild members working together
+- Higher rewards than solo contracts
+- Examples:
+  - "Deliver 5,000 units of Tritanium to Spira within 48 hours" (logistics)
+  - "Clear 50 pirate ships from the Vulcan Belt" (combat)
+  - "Fully map the surface of planet X" (exploration)
+- Rewards split among contributors based on participation
+
+#### Guild Boss Raids
+
+Guilds can challenge **world bosses** and **guild-exclusive raid bosses** for shared loot.
+
+**How Guild Raids Work:**
+1. An Officer or Guild Master initiates a raid from the Guild Panel
+2. A rally point is set (waypoint visible to all online members)
+3. Members fly to the rally point — a minimum player count is required to start
+4. The boss encounter begins when the raid leader triggers it
+5. During the fight, only guild members can damage the boss and receive loot
+6. Loot is distributed after the kill
+
+**Raid Loot Distribution:**
+
+| Method | How It Works | Set By |
+|--------|-------------|--------|
+| **Round Robin** | Items rotate between participants one at a time | Default |
+| **Need/Pass** | Each item shown to group, players vote Need or Pass, random among Need voters | Officer choice |
+| **Contribution** | Loot priority based on damage/healing contribution percentage | Officer choice |
+| **Guild Bank** | All loot goes to guild bank for later distribution | Guild Master choice |
+
+**Guild Raid Bosses (Exclusive):**
+
+| Boss | Location | Min Players | Loot |
+|------|----------|-------------|------|
+| **Pirate Warlord** | Rotates monthly | 8 | T5-T6 weapons, OMEN, rare blueprints |
+| **Hive Patriarch** | Glacius deep caves | 10 | T6 creature-based components, unique organics |
+| **Precursor Sentinel** | Ancient ruins (varies) | 12 | T7 Precursor tech, artifact fragments |
+| **Void Herald** | Uncharted Space | 15 | T8 exotic materials, legendary blueprints |
+
+- Raid bosses are separate from world bosses — instanced to the guild
+- Weekly lockout per boss (can only loot once per week per boss)
+- Boss difficulty scales with number of participants (8-player version is harder per-person than 15-player)
+
+### Guild Management
+
+| Action | Cost | Notes |
+|--------|------|-------|
+| **Create Guild** | 10,000 OMEN | One-time |
+| **Rename Guild** | 5,000 OMEN | 30-day cooldown |
+| **Change Tag** | 2,000 OMEN | 30-day cooldown |
+| **Transfer Leadership** | Free | Requires confirmation from both parties |
+| **Disband Guild** | Free | Requires Guild Master, bank must be empty, 7-day warning period |
+| **Leave Guild** | Free | Cannot rejoin same guild for 24 hours |
+| **Kick Member** | Free | Officer+ only, kicked player cannot rejoin for 7 days |
+
+### Guild Dissolution
+- If the Guild Master is inactive for 30 days, leadership auto-transfers to the highest-ranked active Officer
+- If ALL members are inactive for 60 days, the guild is automatically disbanded and bank contents are mailed to the Guild Master's account
+
+---
+
+## Factions
+
+Factions are large-scale political entities tied to the six major cities. Every player belongs to a faction — it's determined by where they set their **Home City**.
+
+### The Six Factions
+
+| Faction | Home City | Identity | Strength |
+|---------|-----------|----------|----------|
+| **Sol Proxima Coalition** | Uurf | Builders, traders, diplomats | Economy, population |
+| **Vulcan Industrial Union** | Spira | Workers, engineers, manufacturers | Production, crafting |
+| **Banx Custodians** | Banx | Financiers, brokers, neutralists | Wealth, market control |
+| **Glacius Research Collective** | Cryo Haven | Scientists, explorers, inventors | Technology, exploration |
+| **Aridian Compact** | Dust Port | Miners, survivalists, frontier folk | Mining, endurance |
+| **Outer Ring Syndicate** | Nexus Gate | Smugglers, risk-takers, opportunists | Combat, exotic trade |
+
+### Joining a Faction
+
+- Every player must set a **Home City** — this determines your faction
+- Home City is chosen after completing Act 1 (new players default to Uurf/Sol Proxima Coalition)
+- Changing Home City costs 5,000 OMEN and has a 30-day cooldown
+- Your faction tag appears in Faction chat and on your profile
+
+### Faction Benefits
+
+| Benefit | Description |
+|---------|-------------|
+| **Faction Chat** | Communication with all faction members galaxy-wide |
+| **Market Discount** | 2% reduced fees at your Home City market |
+| **Faction Missions** | Exclusive daily/weekly contracts with faction-themed rewards |
+| **Territory Bonuses** | Buffs when operating in faction-controlled territory |
+| **Faction Shop** | Exclusive cosmetics, blueprints, and gear earned through faction contribution |
+
+### Faction Contribution
+
+Players earn **Faction Points (FP)** by helping their faction:
+
+| Action | FP Earned |
+|--------|-----------|
+| Complete faction daily mission | 50 FP |
+| Complete faction weekly mission | 200 FP |
+| Sell goods at Home City market | 1 FP per 100 OMEN traded |
+| Win territory battle for your faction | 100-500 FP |
+| Donate OMEN to faction war fund | 1 FP per 50 OMEN |
+| Defend faction territory from attack | 50-200 FP |
+
+**Faction Rank (personal):**
+
+| FP | Rank | Perk |
+|----|------|------|
+| 0 | Citizen | Basic faction benefits |
+| 1,000 | Supporter | +1% Home City market discount |
+| 5,000 | Defender | Faction cosmetic unlock, +2% discount |
+| 15,000 | Commander | Faction ship skin, can vote in faction elections |
+| 50,000 | Hero | Unique title, +3% discount, can run for Faction Council |
+
+---
+
+## Faction Wars — Conquest System
+
+Faction Wars are a persistent, board-game-style conquest layer on top of the galaxy map. Factions compete to control **territories** — zones on the galaxy map that provide economic and strategic bonuses.
+
+### The Conquest Board
+
+The galaxy map is divided into **territories** — each one represents a region of space (a section of a system, a planet, or a cluster of resource nodes).
+
+```
+┌─────────────────────────────────────────────┐
+│              CONQUEST MAP                   │
+│                                             │
+│    [SOL]  ───  [NEXUS]  ───  [GLACIUS]     │
+│     ██         ░░░░░          ▓▓▓▓         │
+│     ██         ░░░░░          ▓▓▓▓         │
+│      │            │              │          │
+│    [VULCAN] ── [BANX] ──── [ARIDIAN]      │
+│     ████       ●●●●●        ▒▒▒▒▒         │
+│     ████       ●●●●●        ▒▒▒▒▒         │
+│                                             │
+│  ██ Sol Coalition    ░░ Outer Ring Syndicate│
+│  ▓▓ Glacius Collective  ▒▒ Aridian Compact │
+│  ████ Vulcan Union   ●● Banx Custodians    │
+│                                             │
+│  Contested: ░▓ (stripes)                   │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+### Territory Types
+
+| Type | Count | Location | Bonus When Held |
+|------|-------|----------|-----------------|
+| **Core Territory** | 6 (one per faction) | Each faction's home system | Cannot be conquered — always belongs to home faction |
+| **Inner Territory** | ~12 | Systems adjacent to core | +5% resource yield for faction members |
+| **Outer Territory** | ~18 | Frontier and contested space | +10% resource yield, unique resource access |
+| **Strategic Points** | ~6 | Key chokepoints (jump gates, trade routes) | Reduced travel costs, gate toll income |
+| **Wild Territory** | ~8 | Uncharted Space edges | +15% resource yield, exotic materials |
+
+**Total: ~50 territories across the galaxy**
+
+### How Conquest Works
+
+Faction Wars operate on a **weekly cycle**:
+
+**Monday-Friday: Campaign Phase**
+- Factions accumulate **War Points (WP)** for target territories through player actions:
+
+| Action | WP Earned |
+|--------|-----------|
+| Mining in the contested territory | 1 WP per 100 units extracted |
+| Killing enemy faction players in the territory | 10 WP per kill |
+| Completing faction missions in the territory | 25 WP per mission |
+| Donating OMEN to the war effort for that territory | 1 WP per 100 OMEN |
+| Defending the territory from raids | 5 WP per raid repelled |
+
+- Progress is visible on the Conquest Map — territories show a capture bar:
+```
+  Territory: Vulcan Outer Belt
+  Defending: Vulcan Industrial Union — 2,450 WP
+  Attacking: Sol Proxima Coalition  — 1,890 WP
+  Status: CONTESTED ████████████░░░░░░░░ 56% Vulcan
+```
+
+**Saturday: Battle Day**
+- Contested territories (where attackers accumulated enough WP to challenge) trigger **Conquest Battles**
+- Battles are scheduled events — announced 24 hours in advance
+- Players from both factions can join (up to 30 per side)
+- Format: fleet battle with objective control (capture and hold points in the territory)
+- Battle lasts 30 minutes or until one side captures all objectives
+
+**Sunday: Resolution**
+- Territories change hands based on Battle Day results
+- New bonuses take effect immediately
+- Leaderboards update — top contributors per faction recognized
+- New campaign targets announced for the following week
+
+### Conquest Battle Format
+
+```
+┌─────────────────────────────────────────────┐
+│  CONQUEST BATTLE — Vulcan Outer Belt        │
+│                                             │
+│  Vulcan Union vs Sol Coalition              │
+│  Players: 24 vs 21                          │
+│  Time: 18:32 remaining                      │
+│                                             │
+│        [A] ████ Vulcan                      │
+│         │                                   │
+│  [B] ░░░░ Contested ─── [C] ████ Vulcan    │
+│         │                                   │
+│        [D] ████ Sol                         │
+│                                             │
+│  Capture Points: Vulcan 3 — Sol 1           │
+│  Hold all 4 to win instantly.               │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+- 4 capture points per battle (A, B, C, D)
+- Stand near a point with no enemies to capture (30 seconds)
+- Hold majority of points to drain enemy tickets
+- Ticket system: each side starts with 500 tickets, losing points drains 1 ticket/second per point deficit
+- First to 0 tickets or hold all 4 points for 60 seconds: loses
+
+### Conquest Rewards
+
+| Reward | Who Gets It |
+|--------|-------------|
+| **Territory bonuses** | All faction members (passive, automatic) |
+| **Battle participation OMEN** | All players who joined the battle |
+| **Battle MVP** | Top contributor gets bonus OMEN + exclusive cosmetic |
+| **Weekly Faction Ranking** | Top 3 factions get galaxy-wide announcement + trophy |
+| **Personal War Points** | Contribute to your Faction Rank progression |
+
+### Faction War Diplomacy
+
+Factions can form temporary alliances or declare focus targets:
+
+| Diplomatic Action | How It Works |
+|-------------------|-------------|
+| **Alliance** | Two factions agree to non-aggression + shared defense for one week. Max 1 alliance at a time. Costs both factions 50,000 OMEN from war fund |
+| **Focus War** | Faction Council declares one enemy faction as priority target. +25% WP earned against that faction for the week |
+| **Ceasefire** | Two factions agree to stop contesting each other's territories for one week. Free, requires mutual agreement |
+| **Betrayal** | Breaking an alliance mid-week. The betrayer's faction loses 20% of all held territory WP. Reputation penalty |
+
+### Faction Council
+
+Each faction has a **Faction Council** of 5 elected players who make diplomatic and strategic decisions.
+
+| Role | How Chosen | Power |
+|------|-----------|-------|
+| **Faction Leader** | Elected by council members from among themselves | Declares alliances/wars, sets war fund tax rate, represents faction |
+| **War Commander** | Appointed by Faction Leader | Chooses which territories to attack/defend each week |
+| **Treasurer** | Appointed by Faction Leader | Manages war fund spending and faction shop inventory |
+| **2x Councilors** | Elected by faction members (Defender rank+) | Vote on diplomacy, can veto Faction Leader decisions (requires both) |
+
+**Elections:**
+- Held every 30 days
+- Only players at Defender rank or higher can vote
+- Only players at Commander rank or higher can run for council
+- Voting is anonymous, results are public
+- Council members who go inactive for 7+ days are auto-replaced by the next highest vote-getter
+
+### Faction War Fund
+
+Each faction maintains a shared war chest funded by its members.
+
+| Income Source | Amount |
+|---------------|--------|
+| Faction tax on member market sales | Rate set by Faction Leader (0-5%) |
+| Direct OMEN donations | Any amount, any member |
+| Territory income | Held Strategic Points generate 1,000 OMEN/day for the fund |
+| Conquest Battle victory bonuses | 5,000 OMEN per territory won |
+
+**War Fund Spending:**
+
+| Expense | Cost | Effect |
+|---------|------|--------|
+| **Militia Patrol Ships** | 2,000 OMEN/week | AI ships patrol faction territory, engage hostiles |
+| **Defense Platforms** | 5,000 OMEN each | Stationary turrets at key points in held territory |
+| **Response Fleet** | 10,000 OMEN/week | Auto-dispatches AI reinforcements when faction members are attacked |
+| **Alliance Payment** | 50,000 OMEN | Form alliance with another faction |
+| **Territory Fortification** | 10,000 OMEN | +500 bonus WP defense for one territory for one week |
+| **Faction Shop Restock** | Varies | Fund exclusive items in the faction shop |
+
+---
+
+## Guild & Faction Interaction
+
+### How Guilds Fit Into Factions
+
+```
+Faction (city-wide, hundreds/thousands of players)
+  └── Guilds (up to 30 members each)
+        └── Individual players
+```
+
+- A guild's faction is determined by the Guild Master's Home City
+- All guild members should ideally be in the same faction (but it's not enforced)
+- Guild members in a different faction cannot participate in that faction's Conquest Battles
+- Guilds that contribute the most WP to faction wars get recognized on the faction leaderboard
+
+### Guild vs Guild
+
+Guilds can declare **Guild Wars** independent of faction politics:
+
+| Feature | Details |
+|---------|---------|
+| **Declaration** | Guild Master pays 5,000 OMEN to declare war on another guild |
+| **Duration** | 7 days or until one side surrenders |
+| **Effect** | Members of warring guilds can attack each other in ANY zone (even Mild) |
+| **Scoring** | Kills tracked on a war scoreboard |
+| **Victory** | Side with more kills at end of 7 days wins |
+| **Reward** | Winning guild receives a trophy + OMEN bounty (funded by declaration cost) |
+| **Surrender** | Either guild can surrender — the other side wins immediately |
+
+---
+
+## Monetization (F2P)
 
 ## Quest System
 
