@@ -5146,6 +5146,231 @@ All visual decisions are constrained by the mobile performance targets defined i
 
 ---
 
+## Audio & Music Design
+
+Odyssey's audio identity is **retro chiptune** — warm, melodic, and unmistakably game-y. The soundtrack draws from the FTL school of electronic game music: chill and atmospheric during exploration, sharp and urgent during combat. Sound effects are **stylized and chunky** to match the voxel art — every interaction should feel satisfying and tactile, like pressing buttons on a toy spaceship. Audio is a first-class design element, not an afterthought.
+
+---
+
+### Audio Pillars
+
+| Pillar | Description |
+|--------|-------------|
+| **Memorable Melodies** | Players should be humming Odyssey's themes after a session. Catchy, looping chiptune melodies are the foundation — not ambient wash |
+| **Satisfying Feedback** | Every player action — mining a node, firing a weapon, opening a menu, completing a craft — has a chunky, rewarding sound. Audio IS the feedback loop |
+| **Sharp Contrast** | Exploration is calm and inviting; combat is intense and urgent. The audio shift is immediate and unmistakable — players know they're in danger before they read the HUD |
+| **Biome Identity** | Each biome type has a distinct musical personality. Players should recognize where they are by sound alone |
+
+---
+
+### Main Theme
+
+Odyssey has a **signature chiptune melody** that defines the game's audio identity.
+
+| Context | Usage |
+|---------|-------|
+| **Title Screen** | Full arrangement — the definitive version. Upbeat, adventurous, slightly melancholic. Builds from a simple pulse-wave melody to a layered arrangement with arpeggiated bass, square-wave harmony, and triangle-wave lead |
+| **New Player Intro** | Stripped-down arrangement plays during the Act 1 opening cinematic (Awakening) — solo melody on a soft synth pad, conveying wonder and vulnerability |
+| **Key Story Moments** | Motif reprised in minor key during dark story beats, triumphant major key during victories. Fragments woven into biome tracks as subtle callbacks |
+| **Achievement / Level Up** | 4-bar fanfare derived from the main melody. Instant recognition — "that's the Odyssey sound" |
+| **Credits** | Full orchestral-chiptune hybrid arrangement with all biome motifs woven in |
+
+**Style Reference:** FTL's title theme — immediately recognizable, sets the tone for the entire experience, simple enough to hum but layered enough to reward repeated listening.
+
+---
+
+### Music System
+
+#### Track Structure
+
+Music uses a **simple crossfade system** — each gameplay state has a dedicated track, and transitions between states crossfade over a defined duration. No dynamic stem layering.
+
+| Transition | Crossfade Duration |
+|------------|-------------------|
+| Exploration → Combat | **1.5 seconds** (fast — urgency) |
+| Combat → Exploration | **4 seconds** (slow — tension release) |
+| Space → Station | **3 seconds** |
+| Station → Space | **3 seconds** |
+| Any → Death Screen | **0.5 seconds** fade to silence, then death sting |
+| Any → Menu / Pause | **1 second** fade to 30% volume (music continues underneath) |
+| Zone → Different Zone (same state) | **5 seconds** (smooth biome-to-biome blend) |
+
+#### Track List by Context
+
+**Biome Exploration Tracks** (one per biome type):
+
+| Biome | Mood | Instruments | Tempo |
+|-------|------|-------------|-------|
+| **Temperate** | Warm, pastoral, hopeful | Soft square-wave melody, gentle arpeggiated bass, light triangle percussion | 90–100 BPM |
+| **Arid / Desert** | Dusty, vast, lonesome | Detuned pulse-wave lead, sparse bass plucks, echo-heavy delay, filtered noise percussion | 80–90 BPM |
+| **Volcanic** | Heavy, ominous, industrial | Low sawtooth drones, distorted bass, metallic percussion hits, slow pulse | 70–80 BPM |
+| **Ice / Tundra** | Crystalline, quiet, delicate | High-register triangle-wave arpeggios, minimal bass, reverb-heavy, sparse bells | 70–85 BPM |
+| **Jungle / Lush** | Lively, curious, layered | Fast arpeggiated patterns, bouncy bass line, chirpy high-frequency blips, rhythmic shakers | 110–120 BPM |
+| **Industrial** | Mechanical, rhythmic, busy | Sequenced bass patterns, rhythmic noise gates, clicking percussion, metallic stabs | 100–110 BPM |
+| **Exotic / Uncharted** | Eerie, wondrous, alien | Detuned harmonics, glitchy artifacts, reversed samples, unpredictable rhythm, wide stereo panning | 60–80 BPM |
+| **Open Space** | Vast, serene, contemplative | Slow pad swells, distant pulse-wave melody (main theme fragment), deep sub-bass hum, minimal percussion | 70–80 BPM |
+
+**Combat Tracks** (per zone danger level):
+
+| Zone Type | Mood | Key Differences from Exploration |
+|-----------|------|----------------------------------|
+| **Mild Zone PvP** | Alert, competitive | +Driving percussion, +staccato bass, tempo jumps +20 BPM from current biome track. Still controlled — this is a fair fight |
+| **Full Zone PvP** | Intense, high-stakes | +Heavy distorted bass, +rapid hi-hat patterns, +aggressive lead melody. Tempo 130–140 BPM regardless of biome. The stakes are real |
+| **Hardcore Zone** | Frantic, desperate | Full Zone track + additional dissonant layers, glitchy stutters, compressed dynamics. Audio communicates "you could lose everything" |
+| **PvE / NPC Combat** | Action, adventure | Upbeat combat music without the tension/desperation of PvP. Heroic melody, driving but not frantic. 110–120 BPM |
+| **Conquest Battle** | Epic, warlike | Unique track — longest and most layered. Military-style percussion, call-and-response melody lines, builds to a climax. 120–130 BPM |
+
+**Station & UI Tracks:**
+
+| Context | Mood | Notes |
+|---------|------|-------|
+| **Major City (Uurf, Banx, Spira, etc.)** | Each city gets a unique arrangement of its biome track — same melody/key but different instrumentation and tempo | Uurf = warm and bustling, Banx = sleek and refined, Spira = industrial and rhythmic |
+| **Market Screen** | Calm, focused, slightly jazzy | Low-key track that doesn't distract from reading numbers. Soft bass groove, muted melody |
+| **Crafting Screen** | Meditative, rhythmic | Repetitive but pleasant — matches the rhythm of crafting actions. Builds subtly as craft queue fills |
+| **Guild Hall** | Social, warm, communal | Upbeat arrangement of the main theme with added warmth. Slightly louder and more lively than solo exploration |
+| **Inventory / Menus** | Neutral, quiet | Current location's track continues at reduced volume. No dedicated menu music |
+
+**Special Tracks:**
+
+| Context | Description |
+|---------|-------------|
+| **Title Screen** | Main theme — full arrangement (see Main Theme section) |
+| **Death Screen** | 2-second sting (descending minor chord), then silence for 3 seconds, then a muted, slow reprise of the main theme melody. Somber but not punishing |
+| **Warp / Jump** | 3-second swoosh effect with a rising pitch, then the destination biome track fades in |
+| **Singularity Orb Compression** | Unique one-off — deep resonant tone building over the compression animation, climaxing with a crystalline chime burst. Designed to feel momentous (you just compressed 1,000,000 OMEN) |
+| **First Undock (Tutorial)** | Soft reprise of the main theme building to the full Open Space track as the player leaves the station for the first time. Goosebump moment |
+| **Storyline Cutscenes** | Composed per-scene. Arrangements of the main theme and biome motifs tailored to the narrative beat |
+
+---
+
+### Sound Effects
+
+All SFX are **stylized and chunky** — designed to feel satisfying and tactile, matching the voxel art's handcrafted personality. Sound effects use synthesized/processed sources rather than realistic recordings. Every action the player takes should have an audio reward.
+
+#### SFX Design Principles
+
+| Principle | Implementation |
+|-----------|---------------|
+| **Punchy Attacks** | All SFX have a fast, sharp attack transient — sounds "snap" into existence. No slow fades in |
+| **Short Tails** | SFX decay quickly to avoid muddying the mix. Exceptions: explosions and ambient reverb |
+| **Pitch Variation** | Repeated sounds (mining ticks, weapon fire, footsteps) randomly vary pitch ±5% per instance to avoid machine-gun repetition |
+| **Layered Feedback** | Important actions layer 2-3 sounds: e.g., crafting success = anvil ring + sparkle chime + low bass thump |
+| **Stereo Position** | SFX pan based on screen position (left/right of center). Off-screen events play at reduced volume with directional panning |
+
+#### Weapon SFX
+
+| Weapon Type | Sound Character | Notes |
+|-------------|----------------|-------|
+| **Laser** | Bright zap with a sustained buzz tail | Pitch rises with charge time. Continuous beam = sustained tone with wobble |
+| **Cannon** | Deep, punchy thud with metallic ring | Low-frequency heavy hit. Screen shake pairs with audio impact |
+| **Missile** | Whoosh launch → hiss travel → bass-heavy boom impact | 3-part sound: launch is sharp, travel is quiet hiss, impact is the payoff |
+| **Railgun** | Charge whine (rising pitch) → sharp crack on fire | Charge duration matches the weapon's charge mechanic. Crack is the most satisfying sound in the game |
+| **Mining Laser** | Warm hum + rhythmic clink on each extraction tick | Clink pitch varies by resource type: metallic for ores, crystalline for gems, soft for organics |
+| **EMP / Disruptor** | Electrical crackle + bass drop | Sounds like systems failing — static bursts, power-down whine |
+
+#### Impact & Damage SFX
+
+| Event | Sound |
+|-------|-------|
+| **Shield Hit** | Electric sizzle + high-frequency ripple. Sounds like energy being absorbed. Pitch drops as shields get low |
+| **Armor Hit** | Metallic clang + crunch. Heavier and more solid than shield hits |
+| **Hull Hit** | Deep structural groan + crack. Sounds painful — the ship is hurting |
+| **Critical Hit** | Normal hit sound + additional sharp "crack" layer + brief bass swell. Unmistakable — you know it was a crit |
+| **Shield Break** | Descending electric whine → pop → silence. The silence sells it — shields are gone |
+| **Ship Destruction** | Rapid crumpling metal → bass explosion → debris scatter (tinkling voxel chunks) → fade to muffled ringing. 2–3 seconds total |
+| **Wreck Loot Spawn** | Soft chime cascade as items appear in wreck container |
+
+#### UI SFX
+
+| Action | Sound | Notes |
+|--------|-------|-------|
+| **Button Press** | Soft chunky click (like pressing a mechanical keyboard key) | Pitch varies by button importance: primary = higher, cancel = lower |
+| **Menu Open** | Quick ascending 3-note blip | Matches the voxel slide-in animation |
+| **Menu Close** | Quick descending 2-note blip | Matches the slide-out animation |
+| **Tab Switch** | Light tick | Subtle, non-intrusive |
+| **Item Pickup / Loot** | Bright ascending chime — pitch and layering scales with item tier | T1 = single soft blip, T8 = multi-layered sparkle cascade |
+| **OMEN Received** | Coin-like clink with warm resonance | Satisfying — players should enjoy hearing money come in |
+| **NOVA Received** | Crystalline shimmer, cooler tone than OMEN | Premium feel — distinct from OMEN |
+| **Craft Start** | Mechanical whir + click (materials loading in) | |
+| **Craft Success** | Anvil ring + sparkle chime + bass thump | Triumphant, satisfying. The payoff for waiting |
+| **Craft Failure** | Descending buzz + dull thud | Disappointing but not punishing. Brief |
+| **Trade Confirm** | Double chime (both parties) + register "ka-ching" | Mutual confirmation feel |
+| **Level Up / Skill Unlock** | Main theme fanfare (4 bars) + ascending arpeggio | The most rewarding sound in the game |
+| **Quest Complete** | Triumphant brass-style chiptune stinger + OMEN clink cascade | 3 seconds, unmissable |
+| **Error / Rejected Action** | Low buzz + single dull tone | Non-aggressive — communicates "nope" without frustration |
+| **Chat Message Received** | Soft blip | Unobtrusive, blends into background |
+| **Warning / Alert** | Rapid 3-pulse beep, ascending pitch | Catches attention without being alarming |
+| **Critical Alert (hull low, zone danger)** | Klaxon-style repeating pulse, filtered to avoid being grating | Urgent but not annoying — player should act, not panic |
+
+#### Ambient SFX
+
+Ambient sound layers run continuously beneath the music to build atmosphere. Each context has an ambient bed:
+
+| Context | Ambient Layer |
+|---------|--------------|
+| **Open Space** | Deep sub-bass hum (the void), distant star crackle, faint radio static, occasional metallic ping from hull thermal expansion |
+| **Asteroid Belt** | Space ambient + low rumble of nearby rocks, occasional small impact ticks on hull |
+| **Nebula** | Space ambient + ethereal whisper-like tones, soft electrical crackle, muffled filter on all sounds |
+| **Station Interior** | Mechanical hum of life support, distant clanks and hisses, muffled PA announcements, crowd murmur (busy stations) |
+| **Planet — Temperate** | Wind, rustling vegetation, distant animal calls (alien chirps/trills), water if near shore |
+| **Planet — Desert** | Howling wind, sand hiss, deep silence between gusts, distant metallic groaning (heat expansion) |
+| **Planet — Volcanic** | Rumbling bass, bubbling lava, hissing gas vents, cracking rock |
+| **Planet — Ice** | Whistling wind, creaking ice, crystalline chimes from ice formations, muffled footsteps |
+| **Planet — Jungle** | Dense layered sounds: insect-like buzzing, dripping water, creature calls, rustling canopy |
+| **Planet — Industrial** | Machinery drone, rhythmic pounding, hydraulic hisses, sparking welders, conveyor clatter |
+| **Exotic / Precursor Ruins** | Unearthly tones, resonant humming from ancient tech, glitchy digital artifacts, spatial audio that feels "wrong" |
+
+All ambient layers are **looping and seamless** — no audible loop points. Volume is low enough to sit beneath music and SFX without competing.
+
+---
+
+### Spatial Audio
+
+Even with a fixed isometric camera, spatial audio cues help the player track off-screen events:
+
+| Feature | Implementation |
+|---------|---------------|
+| **Stereo Panning** | Sounds pan left/right based on their screen-space position. Object at screen-left = audio pans left |
+| **Distance Attenuation** | Sounds from distant objects are quieter and low-pass filtered (muffled). Nearby events are louder and brighter |
+| **Off-Screen Indicators** | Combat sounds, explosions, and mining activity from off-screen play at reduced volume with directional panning — gives the player spatial awareness beyond the viewport |
+| **Doppler (Ships)** | Fast-moving ships get a subtle pitch shift as they pass (rising → falling). Subtle, not realistic — just enough to convey speed |
+| **Headphone Support** | Stereo widening for headphone users. No full 3D/binaural (mobile constraints), but wider stereo image than speakers |
+| **Speaker Mode** | Reduced stereo width for phone speakers. Center-heavy mix to ensure nothing is lost on small mono speakers |
+
+---
+
+### Audio Settings
+
+Players can customize their audio experience:
+
+| Setting | Options | Default |
+|---------|---------|---------|
+| **Master Volume** | 0–100% slider | 80% |
+| **Music Volume** | 0–100% slider | 70% |
+| **SFX Volume** | 0–100% slider | 100% |
+| **Ambient Volume** | 0–100% slider | 60% |
+| **UI Sounds** | On / Off | On |
+| **Combat Music** | On / Off (some players prefer ambient during combat) | On |
+| **Critical Alerts** | Audio + Visual / Visual Only | Audio + Visual |
+| **Haptic Feedback** | On / Off (vibration on weapon fire, impacts, explosions, UI presses) | On |
+| **Background Audio** | Continue playing when app is backgrounded / Pause | Pause |
+
+---
+
+### Audio Performance Budget
+
+| Constraint | Limit | Notes |
+|------------|-------|-------|
+| **Simultaneous Voices** | Max **24** active sound channels | Music: 2 (crossfade pair), Ambient: 2, SFX: up to 20 |
+| **SFX Priority System** | Player actions > combat impacts > environmental > ambient detail | When voice limit is hit, lowest-priority sounds are culled first |
+| **Audio Memory** | <**32 MB** total audio assets in memory | Use compressed formats (OGG Vorbis / AAC). Stream music, preload SFX |
+| **Music File Size** | <**3 MB** per track (compressed) | ~2–3 minute loops, stereo, 44.1kHz |
+| **SFX File Size** | <**100 KB** per effect (compressed) | Most SFX are <1 second. Longer effects (explosions, ambient) up to 3 seconds |
+| **Latency** | <**50ms** from input to SFX playback | Critical for combat feedback — sounds must feel instant |
+| **Format** | OGG Vorbis (Android) / AAC (iOS) | Platform-native decoders for minimal CPU overhead |
+
+---
+
 ## First-Time User Flow
 
 The complete step-by-step experience from app install to gameplay. Designed to get players into the action as fast as possible — under 3 minutes from tap to flying.
