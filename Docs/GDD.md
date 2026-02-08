@@ -4859,6 +4859,293 @@ The initial splash screen shown at app launch displays:
 
 ---
 
+## Art Direction & Visual Style
+
+Odyssey uses a **2.5D isometric voxel art style** with medium-detail voxels, flat hand-painted lighting, and biome-driven color palettes. The visual target is approachable, charming, and highly readable on mobile screens — closer to Voxie Tactics than Minecraft. Every visual decision prioritizes clarity at small screen sizes while maintaining a cohesive, warm identity across the galaxy.
+
+---
+
+### Visual Pillars
+
+| Pillar | Description |
+|--------|-------------|
+| **Readable at a Glance** | Silhouettes, color coding, and scale differences ensure the player can instantly parse ship types, resource nodes, enemies, and terrain — even on a 5" phone screen |
+| **Warm & Inviting** | Soft, desaturated colors and rounded voxel shapes make the universe feel welcoming, not hostile — players should want to explore, not dread the unknown |
+| **Handcrafted Feel** | Environments should look like dioramas built by hand — imperfect, charming, full of small details that reward zooming in |
+| **Biome Identity** | Every planet, station, and zone has a distinct color signature so players always know where they are without checking the map |
+
+---
+
+### Camera & Perspective
+
+**Fixed Isometric Camera** — all gameplay contexts (stations, planets, open space, combat) use the same isometric angle for visual consistency.
+
+| Context | Camera Behavior |
+|---------|----------------|
+| **Stations & Cities** | Fixed isometric, tight zoom — buildings, NPCs, market terminals, and docking bays fill the frame. Player ship is parked/docked in view |
+| **Planet Surface** | Fixed isometric, medium zoom — terrain tiles, resource nodes, ground vehicles, and mining operations visible. Parallax background layers add depth |
+| **Open Space** | Fixed isometric, wide zoom — ship moves across a 2D plane. Asteroids, nebulae, and other ships rendered as voxel props at varying depth layers. Background star field and distant planets provide parallax |
+| **Combat** | Same isometric angle, camera auto-frames the engagement. Slight zoom-in on weapon fire / explosions for impact. Camera shake on heavy hits (subtle — mobile comfort) |
+| **Docking / Undocking** | Smooth zoom transition between space view and station view — no hard cuts |
+
+**Zoom Levels:**
+- Player can pinch-zoom between **3 fixed zoom levels** (close / default / wide) in all contexts
+- Default zoom is tuned per context (tighter in stations, wider in space)
+- No free rotation — isometric angle is locked to maintain the 2.5D illusion
+
+---
+
+### Voxel Fidelity
+
+Medium-detail voxels — small enough to create recognizable, detailed shapes, large enough to read as intentionally voxelized. The Voxie Tactics / Octopath Traveler HD-2D aesthetic is the north star: you can clearly see the voxel construction, but objects have form, character, and personality.
+
+| Element | Voxel Resolution | Notes |
+|---------|-----------------|-------|
+| **Ships (XS–S)** | ~16×16×8 voxels | Compact, strong silhouettes. Class identity comes from shape (pointy = Scout, boxy = Freighter) |
+| **Ships (M)** | ~24×24×12 voxels | More detail — visible cockpits, thruster vents, cargo bays |
+| **Ships (L–XL)** | ~32×32×16 voxels | Maximum detail. Modular look — you can see individual weapon mounts and module hardpoints |
+| **Characters / NPCs** | ~8×8×16 voxels | Chibi proportions (large head, small body). Expressive through color and accessories, not facial detail |
+| **Buildings / Structures** | ~32×32×32+ voxels | Chunky architecture with visible interior glow through windows. Each city has signature building shapes |
+| **Terrain Tiles** | ~8×8×4 voxels per tile | Tiled seamlessly. Surface detail (grass tufts, rock cracks, sand ripples) via color variation, not geometry |
+| **Resource Nodes** | ~8×8×8 voxels | Glowing, distinct shapes per resource type. Must pop against terrain from default zoom |
+| **Asteroids** | ~12×12×12 voxels | Irregular, jagged shapes. Color indicates resource content |
+| **Drones** | ~6×6×4 voxels | Tiny, buzzy, recognizable by glow color and movement pattern |
+| **Weapons / Equipment** | ~4×4×8 voxels | Visible when mounted on ships. Lasers glow, cannons have visible barrels, missiles have fins |
+
+**Scale Hierarchy:** The size difference between a player's S-class Scout and an XL Capital ship should be immediately dramatic — Capitals should feel like floating cities next to a Scout's tiny silhouette.
+
+---
+
+### Color Palette
+
+#### Palette Philosophy
+
+Soft, desaturated tones dominate. No pure blacks, no pure whites, no fully saturated primaries. The palette leans warm overall but shifts per biome. Colors should feel like they've been gently sun-bleached — lived in, not factory-new.
+
+#### Global Palette (used everywhere)
+
+| Role | Color Range | Hex Examples | Usage |
+|------|------------|--------------|-------|
+| **Background / Space** | Deep navy, muted indigo | `#1a1e3a`, `#2b2d5e` | Star field, deep space, UI backdrops |
+| **Highlight / Interactive** | Warm amber, soft gold | `#d4a855`, `#c49244` | Interactable objects, quest markers, UI accents |
+| **Danger / Enemy** | Dusty red, terracotta | `#b85450`, `#8c3a36` | Hostile ships, PvP zones, damage indicators |
+| **Friendly / Safe** | Sage green, soft teal | `#7a9e7e`, `#5f8a8b` | Friendly zones, allied ships, positive feedback |
+| **OMEN Currency** | Warm gold with soft glow | `#d4a855` | OMEN icons, transaction confirmations |
+| **NOVA Currency** | Cool silver-blue with shimmer | `#8eafc4` | NOVA icons, premium UI elements |
+| **Neutral / Inactive** | Warm gray, stone | `#8a8578`, `#6b665d` | Disabled buttons, unowned territory, background props |
+
+#### Biome Palettes
+
+Each biome has a **dominant tone**, an **accent tone**, and a **sky/atmosphere color** that together create instant location recognition.
+
+| Biome | Dominant | Accent | Sky / Atmosphere | Example Locations |
+|-------|----------|--------|-----------------|-------------------|
+| **Temperate** | Sage green, warm tan | Cream, soft yellow | Pale blue with wispy clouds | Uurf (Sol Proxima) |
+| **Arid / Desert** | Dusty orange, terracotta | Bleached bone, sandstone | Hazy amber, pale peach | Dust Port regions |
+| **Volcanic** | Deep crimson, charcoal | Molten amber, ash gray | Dark red-brown haze, ember particles | Volcanic planets |
+| **Ice / Tundra** | Pale blue, frost white | Cool lavender, steel gray | White-gray overcast, soft snowfall | Ice planets, deep space stations |
+| **Jungle / Lush** | Deep emerald, moss | Bright amber flowers, teal water | Humid green-gray, dappled light | Lush exoplanets |
+| **Industrial** | Gunmetal, rust | Weld-spark orange, warning yellow | Smoggy gray-brown | Spira, Forge Station, factory planets |
+| **Exotic / Uncharted** | Deep violet, void blue | Ethereal teal glow, crystalline white | Black with bioluminescent particles | Uncharted Space, Precursor ruins |
+| **Nebula (Space)** | Varies per nebula | Translucent layered gradients | N/A — nebula IS the backdrop | Space regions between systems |
+
+**Transitions:** When flying between biomes or zones, the color palette cross-fades over **3–5 seconds** so the shift feels natural, not jarring.
+
+---
+
+### Lighting
+
+**Flat / Hand-Painted Lighting** — minimal dynamic shadows, maximum readability.
+
+| Aspect | Approach |
+|--------|----------|
+| **Primary Light** | Single fixed directional light per scene, baked into voxel face colors at build time. Light direction consistent across all isometric views (top-left source) |
+| **Shadows** | Painted into the voxel colors, not cast dynamically. Underside/right-side faces use slightly darker versions of the surface color. No real-time shadow maps |
+| **Ambient Occlusion** | Subtle, pre-baked AO in tight corners (where walls meet floors, inside crevices). Adds depth without rendering cost |
+| **Glow / Emission** | Key interactive and important objects emit a soft bloom glow: resource nodes, OMEN drops, active weapon fire, engines, station lights, quest markers. Glow is the main way to draw attention |
+| **Time of Day** | Planets have a fixed time-of-day per zone (some areas are always dusk, others always noon). No real-time day/night cycle — each area is designed for its specific lighting |
+| **Space Lighting** | Ships are lit by the nearest star (warm tone near stars, cool tone in deep space). Nebulae cast faint colored ambient light on nearby objects |
+| **Weapon VFX** | Lasers = bright energy-colored glow trails. Cannons = muzzle flash + impact spark. Missiles = exhaust trail + explosion bloom. All are flat 2D sprite effects layered over the voxel scene |
+| **Explosions** | Ship destruction uses a burst of warm-toned particles (voxel chunks flying outward) + a brief screen flash. Wreck remains as a dim, non-glowing object |
+
+**Performance Principle:** No per-pixel lighting, no real-time shadows, no dynamic global illumination. All lighting is solved at asset creation time. The GPU budget goes to particle effects, UI rendering, and maintaining 30+ FPS on target devices.
+
+---
+
+### Ship Visual Design
+
+Ships are the player's primary visual identity — they must be instantly recognizable by class and size, customizable, and satisfying to watch in motion.
+
+#### Design Language Per Size
+
+| Size | Silhouette | Proportions | Visual Density |
+|------|-----------|-------------|----------------|
+| **XS** | Compact, rounded | Slightly taller than wide. Pod-like | Minimal — 2-3 colors, simple shape |
+| **S** | Sleek, angular or tapered | Longer than tall. Wing-like extensions | Low — visible cockpit, 1-2 mounted weapons |
+| **M** | Chunky, functional | Roughly cubic with asymmetric features | Medium — cargo bays, weapon turrets, thruster banks |
+| **L** | Imposing, layered | Wide and flat or tall and blocky. Bridge visible | High — multiple weapon mounts, antenna arrays, hangar doors |
+| **XL** | Massive, city-like | Dwarfs all other ships. Multi-section | Maximum — docking ports, drone bays, command towers, running lights |
+
+#### Engine & Thruster VFX
+
+| Ship State | Thruster Visual |
+|------------|----------------|
+| **Idle / Docked** | No thruster glow — engines dark |
+| **Cruising** | Soft glow from thruster voxels + 2-3 small particle trails (color matches ship accent) |
+| **Boost / Warp Charge** | Bright glow + elongated trails + slight motion blur on the ship |
+| **Warp Jump** | Stretch effect (ship elongates briefly), flash, then gone. Arrival = reverse stretch + flash |
+| **Damaged** | Thruster glow flickers, trails are uneven/sputtering, smoke particles from hull |
+
+#### Ship Customization (Visual)
+
+| Layer | Options | Source |
+|-------|---------|--------|
+| **Hull Color** | Primary + accent color selection (from unlocked palette) | Default set free; rare colors from crafting, loot, NOVA store |
+| **Decals** | Small voxel patterns applied to hull (stripes, insignia, symbols) | Guild crests auto-applied; others from achievements/store |
+| **Thruster Trail Color** | Changes particle trail color | Cosmetic crafting or NOVA store |
+| **Weapon Glow** | Tints weapon fire VFX | Cosmetic drops from Hardcore zones |
+| **Name Plate** | Voxel-style text floating below ship (visible to other players) | Free — player names their ship |
+
+All cosmetics are **visual only** — zero gameplay impact.
+
+---
+
+### Environment Design
+
+#### Station & City Interiors
+
+Stations are viewed from the fixed isometric angle. They feel like detailed voxel dioramas the player navigates through.
+
+| Element | Design Approach |
+|---------|----------------|
+| **Buildings** | Chunky, stacked-block architecture. Each city has a signature shape language (Uurf = rounded domes, Spira = angular industrial, Banx = ornate crystalline) |
+| **NPCs** | Chibi voxel characters stationed at fixed positions (vendors, quest givers, guards). Idle animations: head bobs, arm waves, tool usage |
+| **Market Terminals** | Glowing kiosk-like structures with floating voxel holograms showing item previews |
+| **Docking Bays** | Open-topped hangars where the player's ship is visible, parked. Other players' ships visible in adjacent bays |
+| **Ambient Detail** | Floating cargo crates, sparking welders, steam vents, holographic signage, wandering drones — all pre-placed, not spawned dynamically |
+
+#### Planet Surfaces
+
+| Element | Design Approach |
+|---------|----------------|
+| **Terrain** | Tile-based voxel terrain with gentle elevation changes. Biome palette applied uniformly with subtle per-tile color variation |
+| **Resource Nodes** | Distinct glowing shapes that pop against the terrain: crystal spires, ore boulders, gas vents. Glow intensity indicates quality/tier |
+| **Vegetation** | Voxel trees, bushes, coral (on ocean biomes), mushrooms (cave biomes). Shapes are simple — 3-5 voxel clusters with color variation. No individual leaf detail |
+| **Structures** | Ruins, abandoned mines, Precursor artifacts. Larger and more detailed than vegetation. Unique per biome |
+| **Weather** | Particle-based: sand particles (desert), snow (tundra), rain (temperate), ash (volcanic), spores (jungle). All are flat 2D particles for performance |
+
+#### Open Space
+
+| Element | Design Approach |
+|---------|----------------|
+| **Star Field** | Multi-layer parallax background. Closest layer = medium stars (voxel dots), middle = faint star clusters, far = nebula gradients |
+| **Asteroids** | Voxel rocks in varying sizes, slowly rotating. Clustered in belts with visible density gradients |
+| **Nebulae** | Soft gradient clouds (2D sprites) in the background, tinted per region. Foreground nebulae have faint particle effects |
+| **Planets (Distant)** | Large voxel spheres in the background, slowly rotating. Surface detail visible (continents, ice caps, cloud layers) |
+| **Space Debris** | Post-combat: voxel chunks, cargo containers, flickering wreck hulls. Despawn after wreck timer (10 min) |
+| **Zone Boundaries** | Subtle color shift in the background + faint grid-line effect at boundary edges. No hard walls — the palette change IS the boundary |
+
+---
+
+### UI Art Style
+
+The UI is **voxel-integrated** — buttons, panels, icons, and HUD elements use the same chunky voxel/pixel aesthetic as the game world. The UI should feel like part of the universe, not a layer on top of it.
+
+#### UI Principles
+
+| Principle | Implementation |
+|-----------|---------------|
+| **Chunky & Tactile** | Buttons look like voxel blocks with visible depth (top face lighter, sides darker). Press animations squish the button down like pushing a physical block |
+| **Readable First** | Despite the voxel aesthetic, text is always rendered in a clean pixel font at high readability. No voxel-rendered text except for decorative headers |
+| **Color Coded** | UI elements follow the global palette: amber for interactive, red for danger, green for safe, gray for inactive. No new colors introduced |
+| **Consistent Depth** | UI panels have a slight 3D voxel border (2-3 pixel thick edges with lighting). Panels float over the game world with a subtle drop shadow |
+
+#### HUD Layout (In-Flight)
+
+```
+┌─────────────────────────────────────────────┐
+│ [Ship HP Bar]              [Zone: Mild ⚔]   │
+│ [Shield Bar]                [Mini-Map □]     │
+│                                              │
+│                                              │
+│              ISOMETRIC GAME VIEW             │
+│                                              │
+│                                              │
+│ [OMEN: 12,450]            [Cargo: 34/200]   │
+│ [Module Cooldowns]   [⚡ Fire] [🛡 Shield]  │
+│            [◀ Thrust Stick ▶]                │
+└─────────────────────────────────────────────┘
+```
+
+- HP/Shield bars are chunky pixel bars with voxel-style end caps
+- Module cooldowns are small square voxel icons with a radial fill overlay
+- Fire and Shield buttons are large, thumb-friendly voxel blocks
+- Mini-map is a simplified top-down voxel render of the surrounding area
+
+#### Menu & Inventory Screens
+
+| Element | Style |
+|---------|-------|
+| **Item Icons** | Tiny isometric voxel renders of each item (pre-rendered, not real-time). Tier indicated by border color (T1 = gray, T4 = blue, T6 = purple, T8 = gold) |
+| **Panels / Windows** | Rounded-corner voxel frames with a semi-transparent dark background. Stacked depth effect (active panel in front, inactive panels dimmed behind) |
+| **Buttons** | Voxel blocks with embossed text. Primary actions = amber block. Cancel/back = gray block. Danger actions = red block |
+| **Scrolling Lists** | Market orders, inventory grids, guild member lists use chunky row separators with alternating warm/cool gray backgrounds |
+| **Transitions** | Menus slide in from screen edges with a slight bounce (like voxel blocks being placed). Close = slide out + subtle poof particle |
+| **Tooltips** | Small voxel-bordered popups that appear on long-press. Show item stats, descriptions, tier info |
+
+#### Tier Color System
+
+Used consistently across all UI to instantly communicate item/equipment quality:
+
+| Tier | Color | Hex | Glow |
+|------|-------|-----|------|
+| T1 (Scrap) | Warm gray | `#8a8578` | None |
+| T2 (Basic) | Off-white | `#c8c0b0` | None |
+| T3 (Standard) | Soft green | `#7a9e7e` | Faint |
+| T4 (Quality) | Muted blue | `#6888a8` | Faint |
+| T5 (Superior) | Dusty purple | `#8a6e9e` | Soft |
+| T6 (Elite) | Deep violet | `#6e4a8e` | Medium |
+| T7 (Prototype) | Warm orange | `#c47a3a` | Medium |
+| T8 (Legendary) | Burnished gold | `#c49a2a` | Strong + particle sparkle |
+
+---
+
+### Animation Guidelines
+
+All animations are **voxel-friendly** — snappy, discrete, and satisfying. No fluid skeletal animation — movement is expressed through position changes, rotations, squash/stretch, and particle effects.
+
+| Element | Animation Style |
+|---------|----------------|
+| **Ship Movement** | Smooth position interpolation. Ships tilt slightly into turns (2-3° max). No banking or complex rotation |
+| **Ship Damage** | Brief red flash on hit. Voxel chunks break off at low HP thresholds (75%, 50%, 25%). Smoke particles at <25% |
+| **Ship Destruction** | Expand briefly → burst into voxel chunks that scatter outward with physics → fade after 2 seconds. Flash + screen shake |
+| **Mining** | Laser beam (flat sprite) connects ship to node. Node pulses on each extraction tick. Small voxel fragments chip off the node |
+| **Crafting** | Item voxels assemble piece by piece in the crafting UI (like a stop-motion build). Success = golden flash. Failure = pieces scatter |
+| **NPC Idle** | Simple 2-3 frame loops: head bob, arm swing, tool spark. All pose-based, not interpolated |
+| **UI Buttons** | Press = squish down (scale Y to 0.85). Release = bounce back. Hover/focus = gentle pulse glow |
+| **Loot Drop** | Items pop out of wreck in an arc, land with a small bounce, then glow with tier-appropriate color |
+| **Warp / Jump** | Ship stretches along travel axis → white flash → disappear. Arrival = reverse. Star field streaks during warp |
+| **Zone Transition** | Background palette cross-fades. Subtle vignette pulse at the boundary. No loading screen for same-instance zones |
+
+---
+
+### Performance Budget
+
+All visual decisions are constrained by the mobile performance targets defined in Technical Targets (30 FPS stable on mid-range, 60 FPS on high-end).
+
+| Budget | Allocation |
+|--------|-----------|
+| **Draw Calls** | Target <200 per frame. Voxel meshes are batched aggressively by chunk. UI is a single atlas draw |
+| **Polygon Count** | Target <50K triangles per frame (voxel meshes + UI + particles). Voxel LOD: distant objects use lower-resolution voxel meshes |
+| **Texture Memory** | <128 MB. Voxel palettes use shared color lookup textures (1 palette texture per biome). No unique textures per object |
+| **Particle Count** | <500 active particles per frame. Particles are 2D billboards, not voxel geometry |
+| **Lighting** | Zero real-time lights. All lighting baked into voxel vertex colors. Glow effects use additive blend sprites |
+| **Shader Complexity** | Simple unlit/vertex-lit shaders only. No PBR, no normal maps, no real-time reflections |
+| **LOD Tiers** | 3 tiers: Full detail (<50m), Reduced (50–200m), Silhouette (>200m, single-color low-poly shape) |
+| **Asset Streaming** | Voxel chunks stream in at zone boundaries. Pre-load adjacent zones during gameplay to avoid pop-in |
+
+---
+
 ## First-Time User Flow
 
 The complete step-by-step experience from app install to gameplay. Designed to get players into the action as fast as possible — under 3 minutes from tap to flying.
