@@ -5121,6 +5121,425 @@ The player is now in-game. They're sitting in a damaged shuttle drifting in Uurf
 
 ---
 
+## Anti-Cheat & Security
+
+Odyssey's player-driven economy (finite 1B OMEN supply, real-money NOVA currency), full-loot PvP zones, guild banks, and territory conquest create massive incentives for exploitation. Every system that touches OMEN, NOVA, items, or competitive outcomes must be hardened against cheating, duplication, market manipulation, and unauthorized access. This section defines the security architecture, detection systems, and response protocols the dev team must implement.
+
+---
+
+### Server Authority Model
+
+The server is the single source of truth for all game state that affects the economy, combat outcomes, or player progression. The client is a rendering and input layer — it can **request** actions but never **execute** them unilaterally.
+
+#### Server-Authoritative Systems
+
+| System | Server Responsibility | Client Role |
+|--------|----------------------|-------------|
+| **OMEN Balances** | Stores, validates, and mutates all balances | Displays cached balance; sends spend/transfer requests |
+| **NOVA Balances** | Tracks purchases, validates against payment processor | Displays balance; sends purchase/exchange requests |
+| **Inventory** | Owns item database; validates all add/remove/move operations | Renders inventory UI; sends equip/unequip/drop requests |
+| **Market Orders** | Processes order matching, fee deduction, escrow | Submits order parameters; renders order book |
+| **Combat Resolution** | Calculates all damage, hit detection, death, loot drops | Sends fire/ability inputs; renders combat effects |
+| **Crafting** | Validates materials, rolls success/failure, creates items | Sends craft requests; renders progress bar |
+| **Guild Bank** | Enforces permissions, caps, logs all transactions | Sends deposit/withdraw requests; renders transaction log |
+| **Territory Control** | Tracks War Points, runs Conquest Battles, assigns ownership | Sends WP-earning action results; renders territory map |
+| **Skill Progression** | Calculates EXP gains, validates tier unlocks | Sends action completions; renders skill tree |
+| **Resource Nodes** | Spawns nodes, tracks depletion, validates extraction yields | Sends mining inputs; renders extraction effects |
+| **Singularity Orbs** | Validates 1,000,000 OMEN compression, tracks all 1,000 max Orbs | Sends compress/destroy requests; renders Orb visuals |
+
+#### Client-Trusted Systems (with Server Validation)
+
+| System | Client Authority | Server Validation |
+|--------|-----------------|-------------------|
+| **Movement Prediction** | Client-side interpolation for responsiveness | Server validates position deltas against max speed per ship size; rejects impossible movement |
+| **Camera / View** | Full client control | None (no gameplay impact) |
+| **Cosmetic Rendering** | Local rendering of owned skins | Server confirms skin ownership before transmitting to other clients |
+| **Chat Input** | Client composes messages | Server enforces rate limits, filters, link blocking |
+| **UI / HUD Layout** | Full client control | None (no gameplay impact) |
+
+**Key Principle:** No economic mutation — OMEN transfer, NOVA exchange, item creation, market order, guild bank operation, or crafting action — ever originates from the client as a completed fact. The client sends a **request** with parameters; the server independently validates preconditions, executes the action, and returns the authoritative result.
+
+---
+
+### Economy Security
+
+#### Transaction Validation
+
+Every economic action must satisfy all of the following before execution:
+
+| Check | Description |
+|-------|-------------|
+| **Balance Sufficiency** | Sender has ≥ requested amount (OMEN, NOVA, or items) at time of execution |
+| **Atomicity** | Transaction completes fully or rolls back entirely — no partial state |
+| **Idempotency** | Duplicate requests (same ID, same parameters) are rejected, not re-executed |
+| **Double-Spend Prevention** | Funds are locked (reserved) at request time; concurrent requests against the same balance are serialized |
+| **Audit Trail** | Every mutation records: timestamp, actor, action, before-state, after-state, request ID |
+| **Rollback Safety** | All transactions can be reversed by an admin tool within the audit window |
+
+#### Market Order Protections
+
+| Protection | Implementation |
+|------------|---------------|
+| **Escrow** | OMEN/items are moved to escrow on order creation; returned if order is cancelled or expires |
+| **Price Validation** | Buy/sell orders rejected if price exceeds **10× the 24-hour rolling average** for that item — prevents wash trading and price manipulation |
+| **Quantity Limits** | Single order capped at **10,000 units** for common resources, **100 units** for T6+ equipment |
+| **Server-Side Fees** | Market fees (1–5% depending on city) deducted by the server at settlement, never by the client |
+| **Order Rate Limiting** | Max **100 create/cancel operations per hour** per account (see Rate Limiting section) |
+| **Cross-Market Isolation** | Orders placed at one city are not visible/fillable at another (matches per-city storage model) |
+
+#### Direct Trade Protections
+
+| Protection | Implementation |
+|------------|---------------|
+| **Two-Stage Confirmation** | Both players must confirm trade contents independently; any modification resets both confirmations |
+| **Escrow Lock** | Items and OMEN move to escrow on first confirmation; **30-second timeout** — if second confirmation doesn't arrive, escrow returns to owners |
+| **Anti-Scam Flags** | Server flags trades where NOVA:OMEN ratio deviates >**300%** from the current market rate; flagged trades require a secondary confirmation ("This trade is significantly below/above market rate. Are you sure?") |
+| **New Account Restrictions** | Accounts younger than **7 days** cannot initiate direct trades involving >**10,000 OMEN** or any T5+ equipment |
+| **Trade Logging** | All direct trades are logged with full item/currency details for audit review |
+
+#### Item Duplication Prevention
+
+| Vector | Mitigation |
+|--------|-----------|
+| **Craft Duplication** | Materials are **locked** (removed from inventory) at craft start, not on completion — failed crafts return partial materials server-side |
+| **Transfer Duplication** | Items are removed from sender's inventory **before** being added to recipient's; network failure during transfer triggers rollback to sender |
+| **Simultaneous Use** | Items can only exist in one context at a time (equipped OR in inventory OR in market OR in guild bank OR in escrow — never multiple) |
+| **Ghost Items** | Server runs periodic inventory reconciliation — any item ID that exists in multiple locations triggers an alert and quarantines all copies |
+| **Death Loot Duplication** | Wreck loot container is generated server-side with a unique ID; loot is removed from the dead player's inventory atomically before the container spawns |
+
+#### Guild Bank Security
+
+| Protection | Implementation |
+|------------|---------------|
+| **Permission Enforcement** | Only Guild Master and Officers (max 5) can withdraw; Veterans and below can deposit only — enforced server-side regardless of client state |
+| **Daily Withdrawal Caps** | Guild Master sets per-Officer daily OMEN withdrawal cap (enforced server-side); resets at 00:00 UTC |
+| **Concurrent Access** | Guild bank operations are serialized per guild — no two operations execute simultaneously |
+| **Full Audit Log** | Every deposit, withdrawal, and cap change is logged with actor, timestamp, amount, and running balance — visible to all guild members |
+| **Dissolution Protection** | Guild disbanding requires **72-hour cooldown** with member notification; bank contents distributed proportionally or transferred to successor |
+
+#### Currency Integrity Monitoring
+
+**Real-Time Alerts** (trigger investigation within 15 minutes):
+
+| Alert | Condition | Severity |
+|-------|-----------|----------|
+| Whale Balance | Any account holds >**10,000,000 OMEN** | Medium |
+| Rapid Accumulation | Any account gains >**100,000 OMEN/hour** from non-market sources | High |
+| Negative Balance | Any OMEN or NOVA balance drops below **0** | Critical |
+| Orb Anomaly | Singularity Orb count exceeds **1,000** or Orb exists without corresponding 1,000,000 OMEN lock | Critical |
+| Supply Drift | Total circulating OMEN + compressed OMEN ≠ **1,000,000,000** | Critical |
+
+**Daily Audits** (automated, reviewed by ops team):
+
+| Audit | Validation |
+|-------|-----------|
+| **OMEN Supply** | Total OMEN in circulation + OMEN locked in Singularity Orbs + OMEN in escrow + OMEN in guild banks = **1,000,000,000** exactly |
+| **NOVA Reconciliation** | Total NOVA across all accounts = total purchased via payment processor − total spent on non-transferable items (battle pass, cosmetics consumed) |
+| **Item Census** | Total items in existence matches cumulative (crafted + looted + quest-rewarded) − (destroyed + lost on death + deconstructed) |
+
+#### NOVA / Real-Money Protections
+
+| Protection | Implementation |
+|------------|---------------|
+| **Payment Verification** | NOVA is only credited after payment processor confirms settlement (not on charge initiation) |
+| **Chargeback Flagging** | If a chargeback occurs, all NOVA trades made by that account within the prior **48 hours** are flagged for review; account is suspended until resolved |
+| **Fraud Detection** | Purchases from >3 different payment methods in 24 hours, or >**$500 USD** in a single day, trigger manual review |
+| **RMT Detection** | Repeated one-sided trades (OMEN/items for nothing in return) between the same accounts are flagged as potential real-money trading |
+| **RMT Sanctions** | First offense: 7-day trade ban + warning. Second offense: 30-day ban. Third offense: permanent ban with OMEN/item seizure |
+
+---
+
+### Combat Integrity
+
+#### Hit Validation
+
+All weapon fire is validated server-side before damage is applied:
+
+| Check | Validation Rule |
+|-------|----------------|
+| **Position Verification** | Server compares attacker and target positions at time of fire; rejects hits where server-side positions diverge by >**15%** from client-reported positions |
+| **Range Check** | Weapon range enforced per weapon type (Short/Medium/Long/Very Long) with **±5% tolerance** for network latency |
+| **Line of Sight** | Server performs simplified LOS check — projectiles cannot pass through planetary bodies, stations, or large asteroids |
+| **Cooldown Enforcement** | Server tracks weapon fire timestamps; shots faster than the weapon's fire rate are silently dropped |
+| **Ammo Consumption** | For ammo-based weapons (Missiles, Torpedoes), server deducts ammo before applying damage; shots without ammo are rejected |
+
+#### Damage Calculation
+
+Damage is calculated **entirely server-side** — the client never influences damage numbers:
+
+```
+1. Base Damage       → weapon tier × weapon type base DPS
+2. Type Effectiveness → apply damage type multiplier vs. target defense type
+                        (Energy → strong vs. Shields, weak vs. Armor)
+                        (Kinetic → strong vs. Armor, weak vs. Shields)
+                        (Explosive → strong vs. Hull, weak vs. Shields)
+                        (EMP → strong vs. Electronics, weak vs. Hull)
+3. Critical Roll     → server RNG; crit chance based on attacker modules/skills
+4. Module Modifiers  → damage bonuses/penalties from equipped modules
+5. Defense Application:
+   a. Shields absorb first (if active) → reduce by shield resistance
+   b. Armor absorbs next → reduce by armor resistance
+   c. Hull takes remainder → 0 HP = destruction
+```
+
+All random rolls (critical hits, crafting success, loot drops) use a **server-side CSPRNG** — the client has no visibility into the RNG seed or state.
+
+#### Movement Validation
+
+| Check | Rule | Flag Threshold |
+|-------|------|----------------|
+| **Velocity Cap** | Max velocity enforced per ship size (XS = Very Fast, S = Fast, M = Medium, L = Slow, XL = Very Slow) based on equipped thruster stats | Exceeding max speed × **1.1** for >2 seconds |
+| **Position Delta** | Server compares client-reported position against predicted position (last known position + velocity × time) | Delta > max speed × elapsed time × **1.15** |
+| **Acceleration** | Acceleration rate capped by thruster module specs | Acceleration exceeds thruster max × **1.1** |
+| **Anti-Teleport** | Flag any position jump >**500 meters** in a single tick without a valid warp gate or jump drive event | Immediate flag + position correction |
+| **Warp Validation** | Warp/jump events validated against warp gate proximity, jump drive cooldown, and fuel consumption | Invalid warp = position reset to last valid location |
+
+Flagged movement triggers server-side position correction (rubber-banding). Repeated flags (>**10 in 5 minutes**) escalate to automated investigation.
+
+#### Zone Boundary Enforcement
+
+| Rule | Implementation |
+|------|---------------|
+| **Friendly Zone** | PvP damage packets in Friendly zones are **silently dropped** — no damage applied, no notification to attacker |
+| **Mild Zone (Unflagged)** | Damage against unflagged players in Mild zones is rejected; flagging status is server-authoritative |
+| **Zone Transition** | Zone type is determined by server-side position, not client-reported zone — prevents "zone spoofing" to avoid PvP penalties |
+| **Death Penalty Enforcement** | Loot drops on death are calculated server-side per zone rules (Friendly = none, Mild PvP = cargo only, Full = cargo + all modules, Hardcore = total loss including ship hull) |
+
+#### Death & Loot Validation
+
+| Step | Server Action |
+|------|--------------|
+| **Death Determination** | Server confirms hull HP = 0; records cause of death (PvP kill, PvE, environmental) |
+| **Loot Calculation** | Server applies zone-specific drop rules; generates loot manifest |
+| **Wreck Spawning** | Server creates wreck container with unique ID at death location; wreck persists for **10 minutes** |
+| **Loot Priority** | Killer gets **5-second exclusive loot window**; after 5s, wreck is open to all players in range |
+| **Inventory Removal** | Dropped items are atomically removed from the dead player's inventory before wreck container is populated |
+| **Respawn** | Server assigns respawn location (same spot for Friendly, nearest major city for Mild/Full/Hardcore); Hardcore deaths assign backup ship or free T1 XS Shuttle |
+| **Repair Cost** | Server calculates repair cost based on ship size and zone multiplier (1× Friendly, 2× Mild PvP, 3× Full, N/A Hardcore) |
+| **Death Replay** | Server records the last **30 seconds** of combat data (positions, damage events, abilities used) for the dead player's review — aids in cheat reporting |
+
+---
+
+### Anti-Cheat Systems
+
+#### Memory Tampering Detection
+
+| Method | Description |
+|--------|-------------|
+| **Binary Signature Verification** | Client binary hash is verified against known-good signatures at launch and periodically during session |
+| **Periodic Memory Scans** | Client-side anti-cheat module scans for known cheat tool signatures, injected DLLs, and modified game memory regions |
+| **Code Injection Detection** | Monitors for unauthorized code loaded into the game process (hooking, DLL injection, function patching) |
+| **Debugger Detection** | Detects attached debuggers, memory inspectors, and breakpoints — flags account for review |
+
+All client-side detections are **supplementary** — the server authority model is the primary defense. Client-side anti-cheat catches cheaters faster but is not relied upon for security.
+
+#### Packet Manipulation Prevention
+
+| Protection | Implementation |
+|------------|---------------|
+| **Sequence Numbers** | Every client→server packet includes an incrementing sequence number; out-of-order or missing packets trigger re-sync and logging |
+| **Timing Validation** | Server tracks packet timing; packets arriving faster than physically possible (sub-millisecond bursts) are flagged |
+| **Structure Validation** | Packets are validated against expected schema; malformed packets are dropped and logged |
+| **Encryption** | All client↔server traffic is encrypted (TLS 1.3 minimum); prevents packet sniffing and man-in-the-middle injection |
+
+#### Modded Client Detection
+
+The server watches for behavioral signatures that indicate a modified client:
+
+| Signal | Detection Method | Response |
+|--------|-----------------|----------|
+| **Impossible Values** | Client reports damage, speed, or resource yields exceeding server-calculated maximums | Silent flag; server uses its own values |
+| **Unauthorized Data Requests** | Client requests data it shouldn't have access to (other player inventories, hidden node locations, server RNG state) | Request denied; account flagged |
+| **Bot-Like Response Times** | Consistent sub-human reaction times (<50ms) across hundreds of actions | Behavioral analysis queue |
+| **Non-Human Packet Patterns** | Perfectly regular packet timing, zero variance in input patterns, inhuman precision | Behavioral analysis queue |
+| **Wallhack Detection** | Client requests rendering data for objects that should be occluded by server-side visibility checks | Flag + visibility data restricted |
+
+Confirmed modded clients are placed in a **shadowban** pool: the player can still play but is matchmade only with other flagged accounts, market orders are deprioritized, and their actions are logged at maximum detail for evidence gathering before a formal ban.
+
+#### Bot Detection
+
+| Bot Type | Detection Methods | Threshold |
+|----------|------------------|-----------|
+| **Mining Bots** | Identical extraction patterns repeated >**50 times** without variation; mining during impossible hours (24/7 with no breaks); pathing to nodes not yet visible on client | >8 hours continuous mining with <5% route variation |
+| **Trading Bots** | Order placement faster than UI interaction allows; pattern-matched buy-low-sell-high across multiple markets within seconds; >**500 market actions/hour** | >200 market actions/hour with >90% profit rate |
+| **Combat Bots** | Perfect dodge timing, frame-perfect weapon switching, zero input variation across engagements; farming the same NPC spawn with identical kill patterns | >100 identical engagement patterns in 24 hours |
+| **Pathing Bots** | Movement along mathematically perfect paths (zero deviation from optimal route); instant course corrections; no collision avoidance variation | Route deviation <**1%** across >20 repetitions |
+
+**Bot Mitigation Escalation:**
+
+| Stage | Action | Trigger |
+|-------|--------|---------|
+| 1 | **Behavioral CAPTCHA** | First flag — present an in-game interaction challenge (e.g., "dock at this station" with a randomized approach vector) |
+| 2 | **Rate Limiting** | Second flag within 24h — reduce action rates to 50% of normal caps |
+| 3 | **Behavioral Fingerprinting** | Ongoing — build a behavioral profile; compare against known bot signatures using ML classifier |
+| 4 | **Delayed Ban Wave** | Confirmed bots are not banned immediately — bans are issued in **weekly waves** to prevent bot developers from identifying exact detection triggers |
+
+---
+
+### Account Security
+
+#### Authentication
+
+| Feature | Implementation |
+|---------|---------------|
+| **Password Requirements** | Minimum 10 characters, at least 1 uppercase, 1 lowercase, 1 number, 1 special character; checked against breached password databases |
+| **Two-Factor Authentication** | Optional by default; **mandatory** for accounts holding >**1,000 NOVA** or >**1,000,000 OMEN** |
+| **2FA Method** | TOTP-based (compatible with Google Authenticator, Authy, etc.) |
+| **Backup Codes** | 10 single-use backup codes generated at 2FA enrollment; stored hashed server-side |
+| **Recovery** | Account recovery requires email verification + support ticket with identity verification; 72-hour cooldown on recovery actions |
+
+#### Session Management
+
+| Rule | Implementation |
+|------|---------------|
+| **Single Session** | Maximum **1 active game session** per account at any time; new login terminates the previous session |
+| **Session Expiry** | Sessions expire after **24 hours** of continuous use; re-authentication required |
+| **Idle Timeout** | Sessions are suspended after **30 minutes** of no input; character is safely docked or despawned |
+| **Token Binding** | Session tokens are bound to device fingerprint + IP address; token reuse from a different device/IP is rejected and triggers a security alert |
+| **Secure Token Storage** | Tokens stored in platform-secure storage (iOS Keychain, Android Keystore); never persisted in plaintext |
+
+#### Device Binding
+
+| Feature | Implementation |
+|---------|---------------|
+| **New Device Notification** | Login from an unrecognized device triggers an email notification with device details and location |
+| **Trusted Device Limit** | Maximum **3 trusted devices** per account; adding a 4th requires removing an existing one |
+| **Device Fingerprinting** | Combines hardware ID, OS version, screen resolution, and installed fonts; stored as a hash |
+| **Suspicious Device Flagging** | Devices associated with previously banned accounts are flagged; login from flagged devices triggers enhanced verification |
+
+#### Suspicious Login Detection
+
+| Pattern | Automated Action |
+|---------|-----------------|
+| **New Country** | Login from a country not seen in the last 90 days → email verification required before session is granted |
+| **VPN / Proxy** | Login from known VPN/proxy IP ranges → CAPTCHA challenge + email notification |
+| **Failed Attempts** | 5 failed login attempts in 10 minutes → account locked for **30 minutes**; 15 failed in 1 hour → locked for **24 hours** + email alert |
+| **Long Inactive** | First login after >**90 days** of inactivity → email verification + mandatory password review prompt |
+| **Banned Device Association** | Device fingerprint matches a previously banned account → login blocked; manual support review required |
+| **Impossible Travel** | Login from two locations >**500 km apart** within **1 hour** → second session terminated; email verification required |
+
+---
+
+### Exploit Response Protocol
+
+#### Severity Tiers
+
+| Severity | Response Time | Examples |
+|----------|--------------|---------|
+| **Critical** | <**1 hour** | OMEN duplication, NOVA generation without payment, Singularity Orb exploit, server-wide item duplication, authentication bypass |
+| **High** | <**4 hours** | Market manipulation allowing guaranteed profit, guild bank unauthorized access, combat damage exploit (infinite damage), zone boundary bypass (PvP in Friendly zones) |
+| **Medium** | <**24 hours** | Minor item duplication (limited scope), speed hacking, resource yield manipulation, trade scam exploits |
+| **Low** | <**7 days** | Cosmetic exploits, UI manipulation, non-economic exploits, minor information leaks |
+
+#### Triage Procedure
+
+| Step | Action |
+|------|--------|
+| 1. **Disable** | Immediately disable the affected system (e.g., disable market trading, lock crafting, pause guild bank operations) — announce maintenance via in-game banner |
+| 2. **Announce** | Post downtime notice in-game, on social media, and on the official site with estimated duration (do not disclose exploit details) |
+| 3. **Investigate** | Identify root cause using server logs, audit trails, and affected account activity; determine exploit entry point and scope |
+| 4. **Impact Assessment** | Quantify: how much OMEN/NOVA was generated or duplicated, how many accounts are affected, how long the exploit was active |
+
+#### Exploiter Categorization & Sanctions
+
+| Category | Definition | Sanctions |
+|----------|-----------|-----------|
+| **Innocent** | Used exploit unknowingly once or twice (e.g., got unexpected extra items from a bugged trade) | Items/OMEN removed; no punishment; explanatory email sent |
+| **Opportunist** | Noticed the exploit and used it a handful of times (3–10 uses) before reporting or stopping | Items/OMEN removed; **3-day suspension** + formal warning |
+| **Abuser** | Deliberately exploited repeatedly (10+ uses) for personal gain without reporting | Full rollback of gained assets; **30-day ban**; placed on watch list for 90 days |
+| **Distributor** | Shared exploit instructions with others or sold exploit services | Full rollback; **permanent ban**; associated accounts investigated; legal action considered for financial damage exceeding **$10,000 USD** |
+
+#### Rollback Procedures
+
+**When to Rollback:**
+- Exploited OMEN exceeds **100,000,000** (100M) OR
+- More than **10%** of active player accounts are affected OR
+- Exploit duration was less than **6 hours** (clean rollback feasible)
+
+**Rollback Scope Options:**
+
+| Scope | When Used | Method |
+|-------|-----------|--------|
+| **Transaction-Specific** | Small number of accounts, clear exploit transactions | Reverse specific transactions from audit log; restore pre-exploit balances |
+| **Targeted Account** | Identified exploiter accounts (<100 accounts) | Roll back all account state to pre-exploit snapshot; legitimate concurrent activity reviewed case-by-case |
+| **Full Server** | Widespread exploitation affecting economy integrity, <6h duration | Restore full server state from last clean snapshot; **all player progress during the window is lost** — compensation issued (NOVA credits + XP boost) |
+
+**Communication Protocol:**
+1. Announce rollback scope and reason within **1 hour** of decision
+2. Provide exact time window affected
+3. Detail compensation for legitimate players impacted by rollback
+4. Publish post-mortem within **72 hours**
+
+#### Post-Resolution
+
+| Action | Timeline |
+|--------|----------|
+| **Patch** | Hotfix deployed within **24 hours** of root cause identification; if complex, temporary mitigation (system disable) remains until fix ships |
+| **Ban Wave** | Exploiter bans issued **48–72 hours** after patch (delay prevents revealing detection methods) |
+| **Internal Post-Mortem** | Written within **5 business days**; covers root cause, timeline, impact, response evaluation, and prevention measures |
+| **Public Transparency Blog** | Published within **7 days** for Medium+ severity exploits; describes what happened (without technical exploit details), actions taken, and preventive measures |
+| **Bug Bounty Rewards** | Players who responsibly reported the exploit receive rewards |
+
+**Bug Bounty Reward Table:**
+
+| Severity | Reward |
+|----------|--------|
+| **Critical** | **10,000 NOVA** + exclusive "Guardian" title + unique ship skin |
+| **High** | **2,500 NOVA** + "Warden" title |
+| **Medium** | **500 NOVA** |
+| **Low** | **100 NOVA** |
+
+Rewards are only issued for **responsible disclosure** — reports submitted through the official bug bounty portal without public disclosure or personal exploitation.
+
+---
+
+### Rate Limiting & Abuse Prevention
+
+#### Per-Player Rate Limits
+
+| Action | Soft Cap (warning) | Hard Cap (blocked) | Reset Period |
+|--------|-------------------|-------------------|--------------|
+| **Market Orders** (create + cancel) | 80/hr | 100/hr | Rolling 1 hour |
+| **Crafting Actions** | 400/hr | 500/hr | Rolling 1 hour |
+| **Guild Bank Withdrawals** | 8/hr | 10/hr | Rolling 1 hour |
+| **Direct Trades** | 15/hr | 20/hr | Rolling 1 hour |
+| **Chat Messages** | 25/min | 30/min | Rolling 1 minute |
+| **Resource Extraction** | 1,500 units/hr | 2,000 units/hr | Rolling 1 hour |
+| **NOVA Purchases** | 4/hr | 5/hr | Rolling 1 hour |
+| **Trade Requests Sent** | 10/hr | 15/hr | Rolling 1 hour |
+| **Market Listing Cancels** | 30/hr | 50/hr | Rolling 1 hour |
+| **Fleet Commands** | 40/hr | 60/hr | Rolling 1 hour |
+
+Hitting a **soft cap** displays a warning ("You're performing this action very frequently. Slow down to avoid being rate limited.") and logs the event. Hitting a **hard cap** blocks the action for the remainder of the reset period and flags the account for bot detection review.
+
+#### Action Throttling
+
+Server-enforced cooldowns that prevent exploiting game mechanics through rapid inputs:
+
+| Action | Minimum Interval | Notes |
+|--------|-----------------|-------|
+| **Weapon Fire** | Per weapon fire rate stat | Cannot exceed equipped weapon's stated fire rate; server drops excess fire packets |
+| **Module Activation** | Per module cooldown stat | Cooldown tracked server-side; early activation attempts silently rejected |
+| **Fleet Undock** | **5 seconds** between undock commands | Prevents rapid dock/undock cycling for invulnerability |
+| **Warp Gate Use** | **10 seconds** between warps | Prevents warp spam; fuel consumed server-side |
+| **Docking** | **3 seconds** between dock requests | Prevents dock-spam griefing at stations |
+| **Skill Respec** | **24 hours** between respecs | Prevents constant respeccing to game different content |
+| **Guild Invite** | **5 seconds** between invites sent | Prevents invite spam |
+
+#### Spam Prevention
+
+| Category | Protection | Implementation |
+|----------|-----------|---------------|
+| **Chat Frequency** | Max **30 messages/minute** (hard cap) | Exceeding = 5-minute chat mute; repeated = escalating mutes (15 min, 1 hr, 24 hr) |
+| **Duplicate Messages** | Identical messages within **60 seconds** are blocked | Only first instance delivered; sender sees a "message already sent" notice |
+| **Link Blocking** | URLs in chat are blocked by default | Whitelisted domains only (official site, official Discord); others replaced with "[link removed]" |
+| **Market Listing Spam** | Listing and immediately cancelling the same item >**5 times in 10 minutes** triggers a **30-minute market cooldown** | Prevents UI spam in the order book |
+| **Trade Request Spam** | >**3 declined trade requests** to the same player in 1 hour = **1-hour trade block** to that player | Prevents harassment via trade window |
+| **Mail Spam** | Max **10 mails/hour** to unique recipients; max **3 mails/hour** to the same recipient | Exceeding = mail system locked for 1 hour |
+| **Broadcast Spam** | Guild/faction broadcast messages limited to Officers+ with **5-minute cooldown** | Prevents notification fatigue |
+
+---
+
 ## Live Ops & Monitoring
 
 Post-launch, the dev team needs visibility into every major game system to detect imbalances early and act fast. This section defines the dashboards, alerts, and tuning tools used to keep Odyssey healthy.
