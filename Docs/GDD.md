@@ -2237,6 +2237,256 @@ Hardcore:  ★★★★★ Risk  |  ★★★★★ Reward
 
 ---
 
+### Death & Respawn System
+
+Death works differently depending on the zone. In safe space, you get knocked down and recover on the spot. In dangerous space, you lose your ship and wake up at the nearest major city. Every death costs OMEN in repairs.
+
+---
+
+#### Friendly Zone — Knockdown
+
+You cannot die in Friendly zones (no PvP, creatures are non-lethal near cities). But you CAN be knocked down by environmental hazards, crash damage, or equipment failure.
+
+**What Happens:**
+1. Ship takes critical damage → emergency systems trigger
+2. Ship auto-lands (or drifts to a stop if in space near a city)
+3. Screen dims. HUD shows:
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│          ⚠ SYSTEMS OFFLINE                 │
+│                                             │
+│   Your ship has been knocked out of         │
+│   commission. Emergency repairs underway.   │
+│                                             │
+│          Restarting in: 0:15                │
+│                                             │
+│   Repair cost: 120 OMEN                     │
+│                                             │
+│          ████████████░░░░░░                 │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+4. **Rest timer**: 15-30 seconds (based on damage severity)
+5. Ship reboots at the same location with hull repaired to functional state
+6. **OMEN deducted automatically** for emergency repairs
+
+**Knockdown Rules:**
+- You stay exactly where you are — no relocation
+- No cargo loss, no equipment loss
+- Repair cost scales with ship tier and damage severity
+- Other players can see your downed ship (cosmetic sparks/smoke)
+- If knocked down while mining, your mining progress on the current node is lost
+- Ground vehicles knocked down separately from your ship (same mechanic)
+
+**Knockdown Repair Costs:**
+
+| Ship Size | Base Repair Cost | Severe Damage Cost |
+|-----------|-----------------|-------------------|
+| XS | 50 OMEN | 150 OMEN |
+| S | 120 OMEN | 350 OMEN |
+| M | 300 OMEN | 900 OMEN |
+| L | 800 OMEN | 2,400 OMEN |
+| XL | 2,000 OMEN | 6,000 OMEN |
+
+---
+
+#### Mild Zone — Knockdown + Cargo Risk
+
+Same as Friendly but with cargo consequences if killed by another player (PvP requires mutual flagging).
+
+**PvE Death (creatures, hazards):**
+- Same knockdown mechanic as Friendly
+- Same rest timer (15-30 seconds), same location
+- Repair cost applies
+- **No cargo loss** from PvE knockdown
+
+**PvP Death (flagged combat):**
+- Ship is destroyed (not knocked down)
+- **Cargo is dropped** at the wreck site (lootable by anyone)
+- Hull and equipment are saved — you keep your ship and loadout
+- Player respawns at **nearest major city** with their ship restored (minus cargo)
+- Repair cost is 2x the base knockdown rate
+
+**Mild Zone Death Screen (PvP):**
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│          ✕ SHIP DESTROYED                  │
+│          Killed by: [PlayerName]            │
+│                                             │
+│   Your cargo has been lost at the           │
+│   wreck site.                               │
+│                                             │
+│   Hull and equipment saved.                 │
+│                                             │
+│   Repair cost: 240 OMEN                     │
+│                                             │
+│   Respawning at: Uurf Central Hub           │
+│   in: 0:10                                  │
+│                                             │
+│          [ Respawn → ]                      │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+---
+
+#### Full Zone — Destruction + Stripped
+
+Real consequences. You lose cargo AND equipped modules. Your hull survives but arrives empty.
+
+**Death (PvP or PvE):**
+1. Ship explodes — destruction animation, debris field
+2. Everything drops at the wreck site:
+   - All cargo
+   - All equipped modules (weapons, shields, thrusters, etc.)
+   - Drones deployed from this ship
+3. **Hull is saved** — the empty frame respawns with you
+4. Player respawns at **nearest major city**
+5. Ship arrives with zero equipment — must re-equip from storage or buy new gear
+
+**Full Zone Death Screen:**
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│          ✕ SHIP DESTROYED                  │
+│          Killed by: [PlayerName / NPC]      │
+│                                             │
+│   LOST:                                     │
+│   ● All cargo (dropped at wreck)            │
+│   ● All equipped modules (dropped)          │
+│   ● 2x Mining Drones (destroyed)            │
+│                                             │
+│   SAVED:                                    │
+│   ● Ship hull (S-class Scout T4)            │
+│                                             │
+│   Repair cost: 1,800 OMEN                   │
+│                                             │
+│   Respawning at: Cryo Haven                 │
+│   in: 0:15                                  │
+│                                             │
+│          [ Respawn → ]                      │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Full Zone Wreck Sites:**
+- Your wreck persists for 10 minutes — anyone can loot it
+- The killer gets first access (5-second looting priority)
+- After 10 minutes, remaining loot despawns
+- You can attempt to return to your own wreck to recover gear (risky — the killer may be waiting)
+
+---
+
+#### Hardcore Zone — Total Loss
+
+Everything is gone. Ship, equipment, cargo, drones — all of it. This is the real risk.
+
+**Death (PvP or PvE):**
+1. Ship explodes — no respawn of hull
+2. Everything drops at wreck site (lootable)
+3. Player respawns at **nearest major city** in their **backup ship**
+   - If no backup ship: provided a free T1 XS Shuttle (the bare minimum)
+4. All fleet ships in the Hardcore zone at time of death are also at risk (fleet scatters — individual ships may escape or be hunted)
+
+**Hardcore Zone Death Screen:**
+```
+┌─────────────────────────────────────────────┐
+│                                             │
+│          ✕ TOTAL LOSS                      │
+│          Killed by: [PlayerName / NPC]      │
+│                                             │
+│   DESTROYED:                                │
+│   ● M-class Freighter T5 (hull gone)       │
+│   ● All equipped modules                    │
+│   ● All cargo (480 units)                   │
+│   ● 3x Mining Drones                        │
+│                                             │
+│   Estimated value lost: 84,500 OMEN         │
+│                                             │
+│   Respawning at: Dust Port                  │
+│   Ship: S-class Scout T3 (backup)           │
+│                                             │
+│          [ Respawn → ]                      │
+│                                             │
+└─────────────────────────────────────────────┘
+```
+
+**Backup Ship System:**
+- Players designate one ship as their **backup** at any major city
+- The backup ship must be docked at a city (not in your active fleet)
+- If your active ship is destroyed in Hardcore, you respawn in your backup
+- If no backup is set, you get a free T1 XS Shuttle
+- Smart players keep a decent backup ready before entering Hardcore zones
+
+---
+
+#### Ground Vehicle Death
+
+Ground vehicles follow the same zone rules as ships:
+
+| Zone | What Happens | Recovery |
+|------|-------------|----------|
+| Friendly | Knockdown, rest timer, repair cost | Same location, full recovery |
+| Mild (PvE) | Knockdown, rest timer, repair cost | Same location, full recovery |
+| Mild (PvP) | Vehicle destroyed, cargo dropped | Vehicle hull saved, respawn at nearest Vehicle Bay |
+| Full | Vehicle destroyed, cargo + equipment dropped | Vehicle hull saved, respawn at nearest Vehicle Bay, must re-equip |
+| Hardcore | Total loss | Vehicle gone, respawn at city Vehicle Bay |
+
+- Vehicles left planetside when your ship is destroyed are NOT lost — they stay at their last location
+- You can return to retrieve them later (unless someone else destroys them in PvP zones)
+
+---
+
+#### Respawn Timing
+
+| Zone | Timer | Location |
+|------|-------|----------|
+| Friendly | 15-30 seconds | Same spot (knockdown) |
+| Mild (PvE) | 15-30 seconds | Same spot (knockdown) |
+| Mild (PvP) | 10 seconds | Nearest major city |
+| Full | 15 seconds | Nearest major city |
+| Hardcore | 15 seconds | Nearest major city |
+
+- Respawn timers are intentionally short — the punishment is the loss, not waiting
+- "Nearest major city" = the closest of the 6 cities by jump distance to where you died
+- While waiting to respawn, players can review what was lost and check their backup loadout
+
+---
+
+#### Repair Cost Summary
+
+Every death or knockdown costs OMEN. This is an automatic deduction — there's no option to skip repairs.
+
+| Zone | Cost Multiplier | What's Repaired |
+|------|-----------------|-----------------|
+| Friendly | 1x base | Hull restored to functional (not 100% — durability still affected) |
+| Mild (PvE) | 1x base | Hull restored to functional |
+| Mild (PvP) | 2x base | Hull restored, no equipment (equipment was kept) |
+| Full | 3x base | Hull frame only (all equipment lost) |
+| Hardcore | N/A | Nothing to repair — ship is gone. Free T1 shuttle if no backup |
+
+**Repair costs are an OMEN sink** — they drain currency from the economy on every death, which supports the player-driven market by creating constant demand.
+
+---
+
+#### Death Prevention Tips (shown contextually on death screen)
+
+After the respawn button, a small contextual tip appears based on how the player died:
+
+| Cause of Death | Tip |
+|----------------|-----|
+| PvP ganked while mining | "Fit a warp stabilizer to escape tackle. Or hire an escort." |
+| Creature attack | "Some creatures can be scared off with sonic emitters. Check the market." |
+| Environmental hazard | "Environmental protection modules reduce hazard damage. Equip before entering." |
+| Crash / collision | "Auto-stabilization helps in tight terrain. Toggle it in settings." |
+| Overheated equipment | "Fire in bursts. Overheating damages equipment and can cause system failure." |
+| Ran out of fuel | "Always check fuel before leaving a station. Carry emergency fuel cells." |
+| World boss | "World bosses require coordination. Bring friends next time." |
+
+---
+
 ## Fleet Battle System (Advanced Combat)
 
 **Advanced fleet-based combat system supporting multiple engagement styles and tactical depth.**
