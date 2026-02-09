@@ -7,6 +7,26 @@ export enum MsgType {
   PlayerLeft = 0x06,
   Ping = 0x07,
   Pong = 0x08,
+  StartMining = 0x09,
+  MiningUpdate = 0x0a,
+  NodeDepleted = 0x0b,
+  StopMining = 0x0c,
+  ZoneInfo = 0x0d,
+  ZoneTransfer = 0x0e,
+}
+
+export enum ResourceType {
+  Iron = "iron",
+  Copper = "copper",
+  Silicon = "silicon",
+  Carbon = "carbon",
+  Titanium = "titanium",
+}
+
+export enum ZoneType {
+  Space = "space",
+  Station = "station",
+  Planet = "planet",
 }
 
 export interface PlayerInput {
@@ -48,6 +68,7 @@ export interface WorldStatePayload {
   serverTime: number;
   lastProcessedSeq: number;
   players: PlayerState[];
+  resourceNodes: ResourceNodeState[];
 }
 
 export interface PlayerJoinedPayload {
@@ -62,4 +83,47 @@ export interface PlayerLeftPayload {
 
 export interface PingPongPayload {
   clientTime: number;
+}
+
+export interface StartMiningPayload {
+  nodeId: number;
+}
+
+export interface StopMiningPayload {
+  // empty — just the message type is enough
+}
+
+export interface MiningUpdatePayload {
+  nodeId: number;
+  amountExtracted: number;
+  remaining: number;
+  resourceType: ResourceType;
+  inventoryTotal: number;
+}
+
+export interface NodeDepletedPayload {
+  nodeId: number;
+}
+
+export interface ResourceNodeState {
+  id: number;
+  type: ResourceType;
+  x: number;
+  y: number;
+  currentAmount: number;
+  totalAmount: number;
+  quality: number;
+}
+
+export interface ZoneInfoPayload {
+  zoneId: string;
+  zoneName: string;
+  zoneType: ZoneType;
+  bounds: { xMin: number; xMax: number; yMin: number; yMax: number };
+  players: PlayerState[];
+  resourceNodes: ResourceNodeState[];
+}
+
+export interface ZoneTransferPayload {
+  targetZoneId: string;
 }

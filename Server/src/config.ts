@@ -8,4 +8,21 @@ export const Config = {
   disconnectTimeout: 60_000, // 60s reconnect window
   maxInputBufferSize: 10,
   protocolVersion: 1,
+
+  // Mining
+  baseMiningRate: 10, // units per tick at quality 1
+  miningRange: 100, // max distance to mine a node
+  inventoryCapacity: 200, // max total resource units a player can carry
+
+  // Resource nodes
+  nodeRespawnTime: 30_000, // ms before a depleted node respawns
+  nodeBaseAmount: 100, // base total amount for a node
+  nodeQualityMultiplier: 0.5, // extra amount per quality level (fraction of base)
+  nodesPerZone: {
+    default: 8,
+    asteroidBelt: 20,
+  },
+
+  // Zones
+  defaultZoneId: "uurf-orbit", // zone players spawn into
 } as const;

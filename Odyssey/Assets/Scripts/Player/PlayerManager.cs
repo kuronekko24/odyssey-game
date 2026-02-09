@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Odyssey.Network;
+using Odyssey.World;
 
 namespace Odyssey.Player
 {
@@ -45,12 +46,8 @@ namespace Odyssey.Player
             }
             else
             {
-                // Fallback: create a primitive cube
-                go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                go.transform.localScale = new Vector3(1f, 0.5f, 1.5f);
-                var renderer = go.GetComponent<Renderer>();
-                if (renderer != null)
-                    renderer.material.color = Color.cyan;
+                // Build a composed ship visual from primitives (cyan = remote player)
+                go = ShipVisual.CreateShipObject(Color.cyan);
             }
 
             go.name = $"RemoteShip_{id}";

@@ -2,6 +2,7 @@ using UnityEngine;
 using Odyssey.Network;
 using Odyssey.Player;
 using Odyssey.Camera;
+using Odyssey.World;
 
 namespace Odyssey.Core
 {
@@ -86,12 +87,8 @@ namespace Odyssey.Core
             }
             else
             {
-                // Fallback: create a primitive
-                shipGo = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                shipGo.transform.localScale = new Vector3(1f, 0.5f, 1.5f);
-                var renderer = shipGo.GetComponent<Renderer>();
-                if (renderer != null)
-                    renderer.material.color = Color.yellow;
+                // Build a composed ship visual from primitives (yellow = local player)
+                shipGo = ShipVisual.CreateShipObject(Color.yellow);
             }
 
             shipGo.name = "LocalShip";
