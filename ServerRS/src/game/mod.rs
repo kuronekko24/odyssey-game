@@ -299,6 +299,37 @@ impl GameServer {
                     self.handle_auth_register(msg.conn_id, payload);
                 }
             }
+            id::AUTH_LOGOUT => {
+                self.handle_logout(msg.conn_id);
+            }
+            id::AUTH_STATUS => {
+                self.handle_auth_status(msg.conn_id);
+            }
+
+            // Crafting: cancel + queue
+            id::CRAFT_CANCEL => {
+                if let Ok(payload) = rmp_serde::from_slice::<crate::msg::crafting::CraftingCancelRequest>(body) {
+                    self.handle_craft_cancel(msg.conn_id, payload);
+                }
+            }
+            id::CRAFT_QUEUE => {
+                self.handle_craft_queue(msg.conn_id);
+            }
+
+            // Market: player orders
+            id::MARKET_PLAYER_ORDERS => {
+                self.handle_market_player_orders(msg.conn_id);
+            }
+
+            // Station list
+            id::STATION_LIST => {
+                self.handle_station_list(msg.conn_id);
+            }
+
+            // Quest journal
+            id::QUEST_JOURNAL => {
+                self.handle_quest_journal(msg.conn_id);
+            }
 
             other => {
                 warn!("Unknown message type: 0x{other:02X} from conn {}", msg.conn_id);
@@ -1478,6 +1509,187 @@ impl GameServer {
         };
         self.send_to_conn(conn_id, id::AUTH_SUCCESS, &response);
         info!("Login successful: {} (account_id={})", payload.username, account_id);
+    }
+
+    fn handle_logout(&mut self, conn_id: u64) {
+        let response = crate::msg::auth::LogoutResponse { success: true };
+        self.send_to_conn(conn_id, id::AUTH_LOGOUT, &response);
+        self.handle_disconnect(conn_id);
+    }
+
+    fn handle_auth_status(&self, conn_id: u64) {
+        let player_id = self.conn_to_player.get(&conn_id).copied();
+        let (authenticated, player_name) = if let Some(pid) = player_id {
+            let name = self.player_to_zone.get(&pid).and_then(|zone_id| {
+                self.zones.get(zone_id)?.get_player(pid).map(|p| p.name.clone())
+            });
+            (true, name)
+        } else {
+            (false, None)
+        };
+        let response = crate::msg::auth::AuthStatusResponse {
+            authenticated,
+            player_id,
+            player_name,
+            session_expires_at: None,
+        };
+        self.send_to_conn(conn_id, id::AUTH_STATUS, &response);
+    }
+
+    fn handle_craft_cancel(&mut self, conn_id: u64, payload: crate::msg::crafting::CraftingCancelRequest) {
+        let player_id = match self.conn_to_player.get(&conn_id) {
+            Some(&id) => id,
+            None => return,
+        };
+        let queue = match self.crafting_queues.get_mut(&player_id) {
+            Some(q) => q,
+            None => {
+                let response = crate::msg::crafting::CraftingCancelResponse {
+                    success: false,
+                    error: Some("No crafting queue".into()),
+                };
+                self.send_to_conn(conn_id, id::CRAFT_CANCEL, &response);
+                return;
+            }
+        };
+        // Find and cancel the job
+        let found = queue.get_active_jobs().iter().any(|j| j.job_id == payload.job_id);
+        if !found {
+            let response = crate::msg::crafting::CraftingCancelResponse {
+                success: false,
+                error: Some("Job not found or already complete".into()),
+            };
+            self.send_to_conn(conn_id, id::CRAFT_CANCEL, &response);
+            return;
+        }
+        // Mark as failed (which prune_finished will pick up)
+        for job in &mut queue.get_all_jobs().to_vec() {
+            // We can't mutate through get_all_jobs, so remove and re-add
+            let _ = job;
+        }
+        // Direct removal: rebuild jobs without the cancelled one
+        let jobs: Vec<crafting::CraftJob> = queue.get_all_jobs().to_vec();
+        *queue = CraftingQueue::new(player_id);
+        for job in jobs {
+            if job.job_id != payload.job_id {
+                queue.add_job(job);
+            }
+        }
+        let response = crate::msg::crafting::CraftingCancelResponse {
+            success: true,
+            error: None,
+        };
+        self.send_to_conn(conn_id, id::CRAFT_CANCEL, &response);
+    }
+
+    fn handle_craft_queue(&self, conn_id: u64) {
+        let player_id = match self.conn_to_player.get(&conn_id) {
+            Some(&id) => id,
+            None => return,
+        };
+        let jobs = match self.crafting_queues.get(&player_id) {
+            Some(q) => q.get_active_jobs().iter().map(|j| {
+                crate::msg::crafting::CraftingJobStatus {
+                    job_id: j.job_id.clone(),
+                    recipe_id: j.recipe_id.clone(),
+                    quantity: 1,
+                    progress: if j.end_time > j.start_time {
+                        let server_time = self.start_time.elapsed().as_secs_f64();
+                        ((server_time - j.start_time) / (j.end_time - j.start_time)).clamp(0.0, 1.0)
+                    } else {
+                        1.0
+                    },
+                    started_at: (j.start_time * 1000.0) as u64,
+                    estimated_completion: (j.end_time * 1000.0) as u64,
+                }
+            }).collect(),
+            None => vec![],
+        };
+        let response = crate::msg::crafting::CraftingQueueResponse {
+            jobs,
+            max_concurrent: 3,
+        };
+        self.send_to_conn(conn_id, id::CRAFT_QUEUE, &response);
+    }
+
+    fn handle_market_player_orders(&self, conn_id: u64) {
+        let player_id = match self.conn_to_player.get(&conn_id) {
+            Some(&id) => id,
+            None => return,
+        };
+        let orders = self.market.get_player_orders(player_id);
+        let order_infos: Vec<crate::msg::market::PlayerOrderInfo> = orders.iter().map(|o| {
+            crate::msg::market::PlayerOrderInfo {
+                order_id: o.order_id.clone(),
+                side: match o.side { OrderSide::Buy => "buy".into(), OrderSide::Sell => "sell".into() },
+                item_type: o.item_type.clone(),
+                original_quantity: o.quantity,
+                filled_quantity: o.filled_quantity,
+                remaining_quantity: o.quantity.saturating_sub(o.filled_quantity),
+                price: o.price_per_unit,
+                created_at: (o.created_at * 1000.0) as u64,
+            }
+        }).collect();
+        let response = crate::msg::market::PlayerOrdersResponse { orders: order_infos };
+        self.send_to_conn(conn_id, id::MARKET_PLAYER_ORDERS, &response);
+    }
+
+    fn handle_station_list(&self, conn_id: u64) {
+        let player_id = match self.conn_to_player.get(&conn_id) {
+            Some(&id) => id,
+            None => return,
+        };
+        let zone_id = match self.player_to_zone.get(&player_id) {
+            Some(z) => z.clone(),
+            None => return,
+        };
+        let zone = match self.zones.get(&zone_id) {
+            Some(z) => z,
+            None => return,
+        };
+        let player = match zone.get_player(player_id) {
+            Some(p) => p,
+            None => return,
+        };
+        let px = player.state.x;
+        let py = player.state.y;
+
+        let stations = self.docking_system.get_stations_in_zone(&zone_id);
+        let station_infos: Vec<crate::msg::docking::StationInfo> = stations.iter().map(|s| {
+            let dx = s.x - px;
+            let dy = s.y - py;
+            crate::msg::docking::StationInfo {
+                id: s.id.clone(),
+                name: s.name.clone(),
+                x: s.x,
+                y: s.y,
+                distance: (dx * dx + dy * dy).sqrt(),
+                services: s.services.iter().map(|svc| format!("{:?}", svc).to_lowercase()).collect(),
+            }
+        }).collect();
+        let response = crate::msg::docking::StationListResponse { stations: station_infos };
+        self.send_to_conn(conn_id, id::STATION_LIST, &response);
+    }
+
+    fn handle_quest_journal(&self, conn_id: u64) {
+        let player_id = match self.conn_to_player.get(&conn_id) {
+            Some(&id) => id,
+            None => return,
+        };
+        let (completed_ids, total) = match self.quest_trackers.get(&player_id) {
+            Some(tracker) => {
+                let completed = tracker.get_completed_quests();
+                let ids: Vec<String> = completed.iter().cloned().collect();
+                let count = ids.len() as u32;
+                (ids, count)
+            }
+            None => (vec![], 0),
+        };
+        let response = crate::msg::quest::QuestJournalResponse {
+            completed_quest_ids: completed_ids,
+            total_completed: total,
+        };
+        self.send_to_conn(conn_id, id::QUEST_JOURNAL, &response);
     }
 
     /// Handle a connection being dropped.

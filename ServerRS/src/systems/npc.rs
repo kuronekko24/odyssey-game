@@ -165,20 +165,16 @@ impl NPC {
         }
     }
 
-    /// Take damage. Returns `true` if the NPC died.
+    /// Take damage. Returns `true` if the damage was lethal (HP reached zero).
+    /// Does NOT set `alive = false` — the caller (SpawnManager::handle_npc_death)
+    /// handles death state so the alive-check guard there works correctly.
     #[allow(dead_code)]
     pub fn take_damage(&mut self, amount: f64) -> bool {
         if !self.alive {
             return false;
         }
         self.combat.hp = (self.combat.hp - amount).max(0.0);
-        if self.combat.hp <= 0.0 {
-            self.alive = false;
-            self.vx = 0.0;
-            self.vy = 0.0;
-            return true;
-        }
-        false
+        self.combat.hp <= 0.0
     }
 
     /// Roll loot on death.

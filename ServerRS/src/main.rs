@@ -5,6 +5,9 @@ mod net;
 mod persistence;
 mod systems;
 
+#[cfg(test)]
+mod integration_tests;
+
 use std::sync::atomic::{AtomicU64, Ordering};
 
 use tokio::net::TcpListener;

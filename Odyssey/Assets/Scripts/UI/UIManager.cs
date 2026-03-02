@@ -8,7 +8,8 @@ namespace Odyssey.UI
     /// Central UI controller that manages all panels.
     /// Creates the full UI hierarchy programmatically on Start().
     /// Handles panel state: only one overlay panel open at a time.
-    /// Listens to keyboard shortcuts for testing: I=inventory, M=market, C=crafting, Escape=close all.
+    /// Listens to keyboard shortcuts for testing: I=inventory, M=market, C=crafting,
+    /// L=loadout, Q=quest log, S=settings, Escape=close all.
     /// </summary>
     public class UIManager : MonoBehaviour
     {
@@ -20,10 +21,23 @@ namespace Odyssey.UI
         public MarketPanel Market { get; private set; }
         public CraftingPanel Crafting { get; private set; }
         public NotificationSystem Notifications { get; private set; }
+        public LoginScreen Login { get; private set; }
+        public SettingsPanel Settings { get; private set; }
+        public ShipLoadoutPanel ShipLoadout { get; private set; }
+        public QuestLogPanel QuestLog { get; private set; }
+        public GameOverlay Overlay { get; private set; }
 
         // --- Internal ---
         private Canvas _canvas;
         private RectTransform _canvasRoot;
+
+        // HUD buttons for new panels
+        private Button _settingsButton;
+        private Button _loadoutButton;
+        private Button _questLogButton;
+
+        // Username tracking
+        private string _currentUsername = "Player";
 
         private void Awake()
         {
@@ -85,6 +99,9 @@ namespace Odyssey.UI
             HUD = hudGo.GetComponent<HUDPanel>();
             HUD.Initialize(_canvasRoot);
 
+            // Add extra HUD buttons for new panels
+            BuildExtraHUDButtons();
+
             // --- Inventory Panel ---
             var invGo = new GameObject("InventoryPanel", typeof(InventoryPanel));
             invGo.transform.SetParent(transform, false);
@@ -103,8 +120,92 @@ namespace Odyssey.UI
             Crafting = craftGo.GetComponent<CraftingPanel>();
             Crafting.Initialize(_canvasRoot);
 
+            // --- Ship Loadout Panel ---
+            var loadoutGo = new GameObject("ShipLoadoutPanel", typeof(ShipLoadoutPanel));
+            loadoutGo.transform.SetParent(transform, false);
+            ShipLoadout = loadoutGo.GetComponent<ShipLoadoutPanel>();
+            ShipLoadout.Initialize(_canvasRoot);
+
+            // --- Quest Log Panel ---
+            var questGo = new GameObject("QuestLogPanel", typeof(QuestLogPanel));
+            questGo.transform.SetParent(transform, false);
+            QuestLog = questGo.GetComponent<QuestLogPanel>();
+            QuestLog.Initialize(_canvasRoot);
+
+            // --- Settings Panel ---
+            var settingsGo = new GameObject("SettingsPanel", typeof(SettingsPanel));
+            settingsGo.transform.SetParent(transform, false);
+            Settings = settingsGo.GetComponent<SettingsPanel>();
+            Settings.Initialize(_canvasRoot);
+
+            // --- Game Overlay (loading, connection lost, FPS) ---
+            var overlayGo = new GameObject("GameOverlay", typeof(GameOverlay));
+            overlayGo.transform.SetParent(transform, false);
+            Overlay = overlayGo.GetComponent<GameOverlay>();
+            Overlay.Initialize(_canvasRoot);
+
+            // --- Login Screen (on top of everything) ---
+            var loginGo = new GameObject("LoginScreen", typeof(LoginScreen));
+            loginGo.transform.SetParent(transform, false);
+            Login = loginGo.GetComponent<LoginScreen>();
+            Login.Initialize(_canvasRoot);
+
             // Populate inventory with sample data for testing
             PopulateSampleData();
+
+            // Show login screen first
+            Login.Show();
+        }
+
+        /// <summary>
+        /// Build additional HUD buttons: settings gear (top-right), loadout and quest log (bottom action row).
+        /// </summary>
+        private void BuildExtraHUDButtons()
+        {
+            if (HUD == null || HUD.Root == null) return;
+
+            // Settings gear button (top-right, near minimap)
+            _settingsButton = UIHelpers.CreateButton(HUD.Root, "GR", UIHelpers.PanelBgSolid, UIHelpers.Inactive, () =>
+            {
+                if (Settings.IsOpen) CloseSettings();
+                else OpenSettings();
+            });
+            var gearRt = _settingsButton.GetComponent<RectTransform>();
+            gearRt.anchorMin = new Vector2(1f, 1f);
+            gearRt.anchorMax = new Vector2(1f, 1f);
+            gearRt.pivot = new Vector2(1f, 1f);
+            gearRt.sizeDelta = new Vector2(44f, 44f);
+            gearRt.anchoredPosition = new Vector2(-164f, -12f); // left of minimap
+
+            // Get the font size smaller for the gear icon
+            var gearText = _settingsButton.GetComponentInChildren<Text>();
+            if (gearText != null) gearText.fontSize = 14;
+
+            // Ship Loadout button (in bottom action row area)
+            _loadoutButton = UIHelpers.CreateButton(HUD.Root, "SHIP", UIHelpers.PanelBgSolid, UIHelpers.TextWhite, () =>
+            {
+                if (ShipLoadout.IsOpen) CloseShipLoadout();
+                else OpenShipLoadout();
+            });
+            var loadoutRt = _loadoutButton.GetComponent<RectTransform>();
+            loadoutRt.anchorMin = new Vector2(0.5f, 0f);
+            loadoutRt.anchorMax = new Vector2(0.5f, 0f);
+            loadoutRt.pivot = new Vector2(0.5f, 0f);
+            loadoutRt.sizeDelta = new Vector2(64f, 52f);
+            loadoutRt.anchoredPosition = new Vector2(-200f, 68f);
+
+            // Quest Log button
+            _questLogButton = UIHelpers.CreateButton(HUD.Root, "QUEST", UIHelpers.PanelBgSolid, UIHelpers.TextWhite, () =>
+            {
+                if (QuestLog.IsOpen) CloseQuestLog();
+                else OpenQuestLog();
+            });
+            var questRt = _questLogButton.GetComponent<RectTransform>();
+            questRt.anchorMin = new Vector2(0.5f, 0f);
+            questRt.anchorMax = new Vector2(0.5f, 0f);
+            questRt.pivot = new Vector2(0.5f, 0f);
+            questRt.sizeDelta = new Vector2(80f, 52f);
+            questRt.anchoredPosition = new Vector2(200f, 68f);
         }
 
         private void WireCallbacks()
@@ -117,6 +218,9 @@ namespace Odyssey.UI
             Inventory.OnCloseRequested = CloseInventory;
             Market.OnCloseRequested = CloseMarket;
             Crafting.OnCloseRequested = CloseCrafting;
+            ShipLoadout.OnCloseRequested = CloseShipLoadout;
+            QuestLog.OnCloseRequested = CloseQuestLog;
+            Settings.OnCloseRequested = CloseSettings;
 
             // Market order submission
             Market.OnOrderSubmitted = (itemName, isBuy, qty, price) =>
@@ -131,6 +235,65 @@ namespace Odyssey.UI
             {
                 Debug.Log($"[UIManager] Craft requested: recipe index {recipeIndex}");
                 // In production, forward to NetworkManager
+            };
+
+            // Ship loadout callbacks
+            ShipLoadout.OnEquipItem = (slotType, itemName) =>
+            {
+                Debug.Log($"[UIManager] Equip: {itemName} -> {slotType}");
+            };
+
+            ShipLoadout.OnUnequipItem = (slotType) =>
+            {
+                Debug.Log($"[UIManager] Unequip: {slotType}");
+            };
+
+            // Quest log callbacks
+            QuestLog.OnQuestAccepted = (questId) =>
+            {
+                Debug.Log($"[UIManager] Quest accepted: {questId}");
+            };
+
+            QuestLog.OnQuestAbandoned = (questId) =>
+            {
+                Debug.Log($"[UIManager] Quest abandoned: {questId}");
+            };
+
+            // Login callbacks
+            Login.OnLoginSubmitted = (username, password) =>
+            {
+                Debug.Log($"[UIManager] Login: {username}");
+                // Simulate successful login for testing
+                _currentUsername = username;
+                Settings.SetUsername(username);
+                Login.OnAuthSuccess();
+            };
+
+            Login.OnRegisterSubmitted = (username, password) =>
+            {
+                Debug.Log($"[UIManager] Register: {username}");
+                // Simulate successful registration for testing
+                _currentUsername = username;
+                Settings.SetUsername(username);
+                Login.OnAuthSuccess();
+            };
+
+            // Settings callbacks
+            Settings.OnSettingsChanged = () =>
+            {
+                // Apply FPS counter setting
+                if (Overlay != null)
+                {
+                    Overlay.SetShowFPS(Settings.ShowFPS);
+                }
+                Debug.Log("[UIManager] Settings changed");
+            };
+
+            Settings.OnLogoutPressed = () =>
+            {
+                Debug.Log("[UIManager] Logout pressed");
+                CloseSettings();
+                // In production, disconnect and show login screen again
             };
         }
 
@@ -169,6 +332,39 @@ namespace Odyssey.UI
             Crafting.Close();
         }
 
+        public void OpenShipLoadout()
+        {
+            CloseAllOverlays();
+            ShipLoadout.Open();
+        }
+
+        public void CloseShipLoadout()
+        {
+            ShipLoadout.Close();
+        }
+
+        public void OpenQuestLog()
+        {
+            CloseAllOverlays();
+            QuestLog.Open();
+        }
+
+        public void CloseQuestLog()
+        {
+            QuestLog.Close();
+        }
+
+        public void OpenSettings()
+        {
+            CloseAllOverlays();
+            Settings.Open();
+        }
+
+        public void CloseSettings()
+        {
+            Settings.Close();
+        }
+
         /// <summary>
         /// Close all overlay panels. HUD always stays visible.
         /// </summary>
@@ -177,6 +373,9 @@ namespace Odyssey.UI
             if (Inventory.IsOpen) Inventory.Close();
             if (Market.IsOpen) Market.Close();
             if (Crafting.IsOpen) Crafting.Close();
+            if (ShipLoadout.IsOpen) ShipLoadout.Close();
+            if (QuestLog.IsOpen) QuestLog.Close();
+            if (Settings.IsOpen) Settings.Close();
         }
 
         /// <summary>
@@ -184,13 +383,17 @@ namespace Odyssey.UI
         /// </summary>
         public bool IsAnyOverlayOpen()
         {
-            return Inventory.IsOpen || Market.IsOpen || Crafting.IsOpen;
+            return Inventory.IsOpen || Market.IsOpen || Crafting.IsOpen
+                || ShipLoadout.IsOpen || QuestLog.IsOpen || Settings.IsOpen;
         }
 
         // --- Keyboard Shortcuts (for editor testing) ---
 
         private void Update()
         {
+            // Don't process shortcuts if login screen is visible
+            if (Login != null && Login.IsVisible) return;
+
 #if UNITY_EDITOR || UNITY_STANDALONE
             if (Input.GetKeyDown(KeyCode.I))
             {
@@ -208,6 +411,24 @@ namespace Odyssey.UI
             {
                 if (Crafting.IsOpen) CloseCrafting();
                 else OpenCrafting();
+            }
+
+            if (Input.GetKeyDown(KeyCode.L))
+            {
+                if (ShipLoadout.IsOpen) CloseShipLoadout();
+                else OpenShipLoadout();
+            }
+
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                if (QuestLog.IsOpen) CloseQuestLog();
+                else OpenQuestLog();
+            }
+
+            if (Input.GetKeyDown(KeyCode.S))
+            {
+                if (Settings.IsOpen) CloseSettings();
+                else OpenSettings();
             }
 
             if (Input.GetKeyDown(KeyCode.Escape))
@@ -284,6 +505,9 @@ namespace Odyssey.UI
                 new() { Price = 15.00f, Quantity = 500 },
             };
             Market.SetOrderBook(buyOrders, sellOrders);
+
+            // Settings username
+            Settings.SetUsername("Player");
         }
 
         // --- Public Convenience Methods ---
@@ -325,6 +549,38 @@ namespace Odyssey.UI
             System.Collections.Generic.List<MarketPanel.MarketOrder> sellOrders)
         {
             Market?.SetOrderBook(buyOrders, sellOrders);
+        }
+
+        /// <summary>
+        /// Show the loading overlay.
+        /// </summary>
+        public void ShowLoading(string message = "WARPING...")
+        {
+            Overlay?.ShowLoading(message);
+        }
+
+        /// <summary>
+        /// Hide the loading overlay.
+        /// </summary>
+        public void HideLoading()
+        {
+            Overlay?.HideLoading();
+        }
+
+        /// <summary>
+        /// Show the connection lost overlay.
+        /// </summary>
+        public void ShowConnectionLost()
+        {
+            Overlay?.ShowConnectionLost();
+        }
+
+        /// <summary>
+        /// Hide the connection lost overlay.
+        /// </summary>
+        public void HideConnectionLost()
+        {
+            Overlay?.HideConnectionLost();
         }
     }
 }

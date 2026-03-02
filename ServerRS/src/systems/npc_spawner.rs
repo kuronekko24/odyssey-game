@@ -541,6 +541,27 @@ mod tests {
     }
 
     #[test]
+    fn damage_npc_lethal_returns_death_event() {
+        let mut mgr = SpawnManager::new();
+        let zone = make_zone("uurf-hub"); // StationGuard, max_hp = 150
+        let events = mgr.initialize_zone(&zone);
+        let npc_id = events[0].payload.npc_id;
+
+        // Deal lethal damage through damage_npc (previously bugged)
+        let death = mgr.damage_npc(npc_id, 200.0, Some(7));
+        assert!(death.is_some(), "lethal damage_npc should return a death event");
+
+        let death = death.unwrap();
+        assert_eq!(death.npc_id, npc_id);
+        assert_eq!(death.killer_id, Some(7));
+        assert_eq!(death.zone_id, "uurf-hub");
+
+        // NPC should be fully removed
+        assert!(mgr.get_npc(npc_id).is_none());
+        assert_eq!(mgr.total_npc_count(), 1);
+    }
+
+    #[test]
     fn handle_npc_death_kills_and_returns_event() {
         let mut mgr = SpawnManager::new();
         let zone = make_zone("uurf-hub"); // StationGuard, max_hp = 150

@@ -33,14 +33,17 @@ pub mod id {
     pub const CRAFT_STATUS: u8 = 0x11;
     pub const CRAFT_COMPLETE: u8 = 0x12;
     pub const CRAFT_FAILED: u8 = 0x13;
+    pub const CRAFT_CANCEL: u8 = 0x1A;
+    pub const CRAFT_QUEUE: u8 = 0x1B;
 
-    // Market (0x14-0x19)
+    // Market (0x14-0x1F)
     pub const MARKET_PLACE_ORDER: u8 = 0x14;
     pub const MARKET_CANCEL_ORDER: u8 = 0x15;
     pub const MARKET_ORDER_UPDATE: u8 = 0x16;
     pub const MARKET_TRADE_EXECUTED: u8 = 0x17;
     pub const MARKET_ORDER_BOOK: u8 = 0x18;
     pub const MARKET_REQUEST_BOOK: u8 = 0x19;
+    pub const MARKET_PLAYER_ORDERS: u8 = 0x1C;
 
     // Combat (0x20-0x26)
     pub const FIRE_WEAPON: u8 = 0x20;
@@ -69,14 +72,17 @@ pub mod id {
     pub const QUEST_COMPLETE: u8 = 0x43;
     pub const QUEST_ABANDON: u8 = 0x44;
     pub const QUEST_AVAILABLE: u8 = 0x45;
+    pub const QUEST_JOURNAL: u8 = 0x48;
     pub const DIALOGUE_START: u8 = 0x46;
     pub const DIALOGUE_CHOICE: u8 = 0x47;
 
-    // Auth (0x50-0x53)
+    // Auth (0x50-0x55)
     pub const AUTH_LOGIN: u8 = 0x50;
     pub const AUTH_REGISTER: u8 = 0x51;
     pub const AUTH_SUCCESS: u8 = 0x52;
     pub const AUTH_FAILED: u8 = 0x53;
+    pub const AUTH_LOGOUT: u8 = 0x54;
+    pub const AUTH_STATUS: u8 = 0x55;
 
     // Docking (0x60-0x64)
     pub const DOCK_REQUEST: u8 = 0x60;
@@ -84,4 +90,5 @@ pub mod id {
     pub const UNDOCK_REQUEST: u8 = 0x62;
     pub const UNDOCK_CONFIRM: u8 = 0x63;
     pub const DOCK_FAILED: u8 = 0x64;
+    pub const STATION_LIST: u8 = 0x65;
 }

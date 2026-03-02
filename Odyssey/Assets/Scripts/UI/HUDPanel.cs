@@ -40,9 +40,11 @@ namespace Odyssey.UI
         private readonly List<Image> _minimapDots = new();
         private const int MaxMinimapDots = 20;
 
-        // Callbacks for UIManager
+        // Callbacks for UIManager / NetworkUIBridge
         public System.Action OnInventoryPressed;
         public System.Action OnCraftPressed;
+        public System.Action OnMinePressed;
+        public System.Action OnDockPressed;
 
         public void Initialize(RectTransform canvasRoot)
         {
@@ -193,7 +195,7 @@ namespace Odyssey.UI
             // Mine button (contextual)
             _mineButton = UIHelpers.CreateButton(_actionRow, "MINE", UIHelpers.Interactive, Color.white, () =>
             {
-                NotificationSystem.Instance?.ShowNotification("Mining started...", NotificationType.Info);
+                OnMinePressed?.Invoke();
             });
             _mineButton.GetComponent<RectTransform>().sizeDelta = new Vector2(120f, 52f);
             _mineButton.gameObject.SetActive(false);
@@ -201,7 +203,7 @@ namespace Odyssey.UI
             // Dock button (contextual)
             _dockButton = UIHelpers.CreateButton(_actionRow, "DOCK", UIHelpers.Safe, Color.white, () =>
             {
-                NotificationSystem.Instance?.ShowNotification("Docking...", NotificationType.Info);
+                OnDockPressed?.Invoke();
             });
             _dockButton.GetComponent<RectTransform>().sizeDelta = new Vector2(120f, 52f);
             _dockButton.gameObject.SetActive(false);
